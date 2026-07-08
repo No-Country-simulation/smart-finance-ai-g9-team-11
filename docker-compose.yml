@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  ml-mock-service:
+    container_name: ml-mock-service
+    build:
+      context: .
+      dockerfile: docker/ml-mock.Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1

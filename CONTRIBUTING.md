@@ -19,8 +19,8 @@ develop
 ├── feature/backend-validation
 ├── feature/frontend-dashboard
 ├── feature/frontend-transactions
-├── feature/ml-classification
-├── feature/ml-profile
+├── feature/ml-nlp-transactions
+├── feature/ml-profile-risk
 ├── feature/oci-storage
 ├── feature/docs-readme
 └── feature/devops-ci

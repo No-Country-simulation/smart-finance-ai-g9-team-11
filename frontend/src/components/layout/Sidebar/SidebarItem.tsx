@@ -56,7 +56,7 @@ export function SidebarItem({ item, index, isCollapsed }: SidebarItemProps) {
   if (isCollapsed) {
     return (
       <Tooltip>
-        <TooltipTrigger asChild>{link}</TooltipTrigger>
+        <TooltipTrigger>{link}</TooltipTrigger>
         <TooltipContent side="right">{item.label}</TooltipContent>
       </Tooltip>
     );

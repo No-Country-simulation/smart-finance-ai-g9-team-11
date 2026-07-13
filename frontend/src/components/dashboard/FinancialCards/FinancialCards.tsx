@@ -1,13 +1,14 @@
-import { dashboardSummaryMock } from "@/mocks/dashboard.mock";
+import { dashboardMock } from "@/mocks/dashboard.mock";
 
 import { FinancialCard } from "../FinancialCard";
 
 export function FinancialCards() {
   return (
     <>
-      {dashboardSummaryMock.map((card) => (
+      {dashboardMock.summary.map((card) => (
         <FinancialCard
-          key={card.title}
+          key={card.id}
+          id={card.id}
           title={card.title}
           value={card.value}
           variation={card.variation}

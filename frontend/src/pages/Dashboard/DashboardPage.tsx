@@ -1,13 +1,21 @@
-const DashboardPage = () => {
-  return (
-    <div className="space-y-2">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+import { DashboardGrid } from "@/components/dashboard/DashobordGrid";
 
-      <p className="text-muted-foreground">
-        Bem-vindo ao Finance AI.
-      </p>
-    </div>
+export function DashboardPage() {
+  return (
+    <main className="space-y-2">
+      <header>
+        <h1 className="text-4xl font-bold tracking-tight">
+          Dashboard
+        </h1>
+
+        <p className="mt-2 text-slate-600">
+          Bem-vindo ao Finance AI.
+        </p>
+      </header>
+
+      <DashboardGrid />
+    </main>
   );
-};
+}
 
 export default DashboardPage;

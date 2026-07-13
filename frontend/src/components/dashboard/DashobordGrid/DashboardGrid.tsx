@@ -1,0 +1,38 @@
+import { cn } from "@/lib/utils";
+
+export function DashboardGrid() {
+  return (
+    <section className="mt-8 grid gap-6">
+      {/* Financial Cards */}
+      <div
+        className={cn(
+          "grid gap-6",
+          "grid-cols-1",
+          "md:grid-cols-2",
+          "xl:grid-cols-4"
+        )}
+      >
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="h-32 rounded-2xl border border-slate-200 bg-white shadow-sm"
+          />
+        ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid gap-6 xl:grid-cols-3">
+        <div className="h-96 rounded-2xl border border-slate-200 bg-white shadow-sm xl:col-span-2" />
+
+        <div className="h-96 rounded-2xl border border-slate-200 bg-white shadow-sm" />
+      </div>
+
+      {/* Transactions + Insights */}
+      <div className="grid gap-6 xl:grid-cols-3">
+        <div className="h-[480px] rounded-2xl border border-slate-200 bg-white shadow-sm xl:col-span-2" />
+
+        <div className="h-[480px] rounded-2xl border border-slate-200 bg-white shadow-sm" />
+      </div>
+    </section>
+  );
+}

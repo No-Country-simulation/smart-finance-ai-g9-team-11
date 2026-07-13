@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 
+import { FinancialCards } from "../FinancialCards";
+
 export function DashboardGrid() {
   return (
     <section className="mt-8 grid gap-6">
@@ -12,12 +14,7 @@ export function DashboardGrid() {
           "xl:grid-cols-4"
         )}
       >
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-32 rounded-2xl border border-slate-200 bg-white shadow-sm"
-          />
-        ))}
+        <FinancialCards />
       </div>
 
       {/* Charts */}

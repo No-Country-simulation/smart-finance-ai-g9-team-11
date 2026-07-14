@@ -1,0 +1,1521 @@
+﻿=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\predict.py ===
+
+"""
+predict.py
+Executa o pipeline completo com um exemplo real (CLI), Ãºtil para
+demonstrar o fluxo para a equipe.
+"""
+
+import json
+
+from src.scripts.model_registry import carregar_modelo_com_metadados
+from src.scripts.pipeline.pipeline_completo import executar_pipeline_completo
+
+
+def main():
+    modelo1, _ = carregar_modelo_com_metadados(
+        "src/models/classificador_transacoes.joblib", "src/metrics/classificador_transacoes.json"
+    )
+    modelo2, _ = carregar_modelo_com_metadados(
+        "src/models/classificador_perfil.joblib", "src/metrics/classificador_perfil.json"
+    )
+
+    transacoes_brutas = [
+        {"descricao": "Supermercado Mateus", "valor": 420.0},
+        {"descricao": "Uber", "valor": 60.0},
+        {"descricao": "Farmacia", "valor": 150.0},
+        {"descricao": "Netflix", "valor": 40.0},
+        {"descricao": "Conta de energia", "valor": 280.0},
+        {"descricao": "Aluguel Apartamento", "valor": 1500.0},
+        {"descricao": "Posto Shell", "valor": 200.0},
+        {"descricao": "Restaurante Sabor Caseiro", "valor": 90.0},
+    ]
+
+    dados_financeiros = {
+        "renda_mensal": 4500,
+        "nivel_endividamento": 25,
+        "poupanca_mensal": 300,
+        "reserva_financeira": 1500,
+        "meses_saldo_negativo": 0,
+        "frequencia_poupanca": "Media",
+    }
+
+    resultado = executar_pipeline_completo(
+        transacoes_brutas, dados_financeiros, modelo1, modelo2, usuario_id="user-001"
+    )
+
+    print(json.dumps(resultado, indent=2, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\train.py ===
+
+"""
+train.py
+Treina, compara e versiona os dois algoritmos do fluxograma.
+Execute: python train.py
+"""
+
+from src.scripts.algorithm1.dataset_transacoes import gerar_dataset_transacoes_simulado
+from src.scripts.algorithm1.model_transacoes import treinar_e_comparar_modelos
+from src.scripts.algorithm2.dataset_perfil import gerar_dataset_perfil_simulado
+from src.scripts.algorithm2.model_perfil import treinar_e_comparar_perfil
+from src.scripts.model_registry import salvar_modelo_com_metadados
+
+
+def main():
+    print(">>> [1/4] Gerando dataset de transaÃ§Ãµes...")
+    df_transacoes = gerar_dataset_transacoes_simulado(n_amostras=1500, seed=42)
+
+    print(">>> [2/4] Treinando Algoritmo 1 (classificador de transaÃ§Ãµes)...")
+    modelo1 = treinar_e_comparar_modelos(df_transacoes)
+    salvar_modelo_com_metadados(
+        modelo1, "src/models/classificador_transacoes.joblib",
+        "src/metrics/classificador_transacoes.json",
+        extra_metadados={"quantidade_registros_treino": len(df_transacoes)}
+    )
+
+    print("\n>>> [3/4] Gerando dataset de perfil financeiro...")
+    df_perfil = gerar_dataset_perfil_simulado(n_amostras=1200, seed=42)
+
+    print(">>> [4/4] Treinando Algoritmo 2 (classificador de perfil)...")
+    modelo2 = treinar_e_comparar_perfil(df_perfil)
+    salvar_modelo_com_metadados(
+        modelo2, "src/models/classificador_perfil.joblib",
+        "src/metrics/classificador_perfil.json",
+        extra_metadados={"quantidade_registros_treino": len(df_perfil)}
+    )
+
+    print("\n=== TREINAMENTO CONCLUÃDO ===")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\api\main.py ===
+
+"""
+main.py
+ServiÃ§o FastAPI consumido pelo Spring Boot (via MlServiceClient),
+conforme a arquitetura definida pela equipe.
+"""
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+from typing import List, Optional
+
+from src.scripts.model_registry import carregar_modelo_com_metadados
+from src.scripts.pipeline.pipeline_completo import executar_pipeline_completo
+from src.scripts.validation import ErroValidacaoTransacoes
+
+app = FastAPI(title="Finance AI - ML Service", version="1.0.0")
+
+modelo_transacoes, _ = carregar_modelo_com_metadados(
+    "src/models/classificador_transacoes.joblib", "src/metrics/classificador_transacoes.json"
+)
+modelo_perfil, _ = carregar_modelo_com_metadados(
+    "src/models/classificador_perfil.joblib", "src/metrics/classificador_perfil.json"
+)
+
+
+class TransacaoRequest(BaseModel):
+    descricao: str
+    valor: float = Field(gt=0)
+
+
+class AnaliseFinanceiraRequest(BaseModel):
+    usuario_id: Optional[str] = None
+    renda_mensal: float = Field(gt=0)
+    nivel_endividamento: float = Field(ge=0, le=100)
+    poupanca_mensal: Optional[float] = 0
+    reserva_financeira: Optional[float] = 0
+    meses_saldo_negativo: Optional[int] = 0
+    frequencia_poupanca: Optional[str] = "Baixa"
+    transacoes: List[TransacaoRequest]
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
+@app.post("/analise-financeira")
+def analise_financeira(payload: AnaliseFinanceiraRequest):
+    try:
+        transacoes = [t.dict() for t in payload.transacoes]
+        dados_financeiros = payload.dict(exclude={"transacoes"})
+
+        resultado = executar_pipeline_completo(
+            transacoes, dados_financeiros, modelo_transacoes, modelo_perfil,
+            usuario_id=payload.usuario_id
+        )
+        return resultado
+
+    except ErroValidacaoTransacoes as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\api\__init__.py ===
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\confidence.py ===
+
+"""
+confidence.py
+Regra de negÃ³cio de confianÃ§a da classificaÃ§Ã£o (definida no fluxograma):
+
+Probabilidade >= 70%        -> classificaÃ§Ã£o aceita
+Probabilidade entre 50-69%  -> aceita, porÃ©m marcada como "baixa confianÃ§a"
+Probabilidade < 50%         -> categoria reclassificada como "outras" e marcada para revisÃ£o
+"""
+
+LIMIAR_ALTA_CONFIANCA = 0.70
+LIMIAR_BAIXA_CONFIANCA = 0.50
+
+
+def aplicar_regra_confianca(categoria_prevista: str, probabilidade: float) -> dict:
+    if probabilidade >= LIMIAR_ALTA_CONFIANCA:
+        return {
+            "categoria": categoria_prevista,
+            "nivel_confianca": "alta",
+            "necessita_revisao": False,
+        }
+
+    if probabilidade >= LIMIAR_BAIXA_CONFIANCA:
+        return {
+            "categoria": categoria_prevista,
+            "nivel_confianca": "baixa",
+            "necessita_revisao": False,
+        }
+
+    return {
+        "categoria": "outras",
+        "nivel_confianca": "muito_baixa",
+        "necessita_revisao": True,
+    }
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\dashboard.py ===
+
+"""
+dashboard.py
+Monta a estrutura final do JSON do dashboard, unificando todos os blocos
+do fluxograma: visÃ£o geral, comportamento, saÃºde e risco, recomendaÃ§Ãµes.
+"""
+
+from datetime import datetime, date
+
+
+def montar_dashboard(usuario_id: str, periodo_inicio: str, periodo_fim: str,
+                       indicadores: dict, resultado_perfil: dict, score_info: dict,
+                       recomendacoes: dict, versoes_modelos: dict,
+                       transacoes_para_revisao: list = None) -> dict:
+
+    return {
+        "usuario_id": usuario_id,
+        "periodo": {
+            "inicio": periodo_inicio,
+            "fim": periodo_fim,
+        },
+        "visao_geral": {
+            "renda_mensal_liquida": indicadores["renda_mensal_liquida"],
+            "despesa_total": indicadores["despesa_total"],
+            "margem_sobra": indicadores["margem_sobra"],
+            "percentual_sobra": indicadores["percentual_sobra"],
+        },
+        "comportamento": {
+            "distribuicao_categorias": indicadores["gasto_por_categoria"],
+            "ranking_gastos": indicadores["ranking_gastos"],
+            "ticket_medio": indicadores["ticket_medio"],
+            "categoria_dominante": indicadores["categoria_dominante"],
+            "gastos_recorrentes": indicadores["gastos_recorrentes"],
+        },
+        "saude_risco": {
+            "perfil_financeiro": resultado_perfil["perfil_financeiro"],
+            "score_saude_financeira": score_info["score_saude_financeira"],
+            "probabilidade": resultado_perfil["probabilidade"],
+            "probabilidades": resultado_perfil["probabilidades"],
+            "nivel_risco": score_info["nivel_risco"],
+            "nivel_endividamento": indicadores["nivel_endividamento"],
+            "comprometimento_renda": indicadores["comprometimento_renda"],
+            "taxa_poupanca": indicadores["taxa_poupanca"],
+            "meses_reserva": indicadores["meses_reserva"],
+        },
+        "recomendacoes_financeiras": recomendacoes,
+        "transacoes_para_revisao": transacoes_para_revisao or [],
+        "modelos": versoes_modelos,
+        "gerado_em": datetime.now().isoformat(timespec="seconds"),
+    }
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\explainability.py ===
+
+"""
+explainability.py
+Gera as razÃµes pelas quais o usuÃ¡rio recebeu determinado perfil financeiro,
+combinando regras de negÃ³cio com a importÃ¢ncia das features do modelo.
+"""
+
+
+def gerar_explicabilidade(indicadores: dict, resultado_perfil: dict,
+                            importancias_features: dict = None) -> dict:
+    fatores = []
+
+    comprometimento = indicadores.get("comprometimento_renda", 0)
+    taxa_poupanca = indicadores.get("taxa_poupanca", 0)
+    meses_reserva = indicadores.get("meses_reserva", 0)
+    endividamento = indicadores.get("nivel_endividamento", 0)
+    margem_sobra = indicadores.get("margem_sobra", 0)
+
+    if margem_sobra < 0:
+        fatores.append("As despesas totais superam a renda mensal lÃ­quida.")
+    if comprometimento > 70:
+        fatores.append(f"O comprometimento da renda estÃ¡ em {comprometimento:.1f}%, considerado elevado.")
+    if endividamento >= 40:
+        fatores.append(f"O nÃ­vel de endividamento ({endividamento:.1f}%) estÃ¡ acima do recomendado.")
+    if taxa_poupanca < 10:
+        fatores.append(f"A taxa de poupanÃ§a mensal ({taxa_poupanca:.1f}%) estÃ¡ abaixo do ideal (>=15%).")
+    if meses_reserva < 3:
+        fatores.append(f"A reserva financeira cobre apenas {meses_reserva:.1f} mÃªs(es) de despesas.")
+
+    if not fatores:
+        fatores.append("Os indicadores financeiros estÃ£o dentro dos parÃ¢metros considerados saudÃ¡veis.")
+
+    resultado = {
+        "fatores_determinantes": fatores,
+        "perfil_atribuido": resultado_perfil["perfil_financeiro"],
+        "probabilidade_classificacao": resultado_perfil["probabilidade"],
+    }
+
+    if importancias_features:
+        top_features = sorted(importancias_features.items(), key=lambda x: x[1], reverse=True)[:5]
+        resultado["variaveis_mais_relevantes"] = [
+            {"variavel": nome, "importancia": valor} for nome, valor in top_features
+        ]
+
+    return resultado
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\feature_engineering.py ===
+
+"""
+feature_engineering.py
+ENGENHARIA DE INDICADORES (entre o Algoritmo 1 e o Algoritmo 2).
+
+Transforma transaÃ§Ãµes categorizadas + dados financeiros do usuÃ¡rio
+em indicadores agregados que alimentam o Algoritmo 2.
+"""
+
+import pandas as pd
+
+
+def calcular_indicadores_financeiros(df_transacoes_categorizadas: pd.DataFrame,
+                                       dados_financeiros: dict) -> dict:
+    df = df_transacoes_categorizadas.copy()
+
+    renda_mensal_liquida = float(dados_financeiros["renda_mensal"])
+    endividamento = float(dados_financeiros.get("nivel_endividamento", 0))
+    poupanca_mensal = float(dados_financeiros.get("poupanca_mensal", 0))
+    reserva_financeira = float(dados_financeiros.get("reserva_financeira", 0))
+    meses_saldo_negativo = int(dados_financeiros.get("meses_saldo_negativo", 0))
+
+    # despesa total e por categoria
+    despesa_total = round(float(df["valor"].sum()), 2)
+    gasto_por_categoria = df.groupby("categoria")["valor"].sum().round(2).to_dict()
+
+    # ticket mÃ©dio
+    ticket_medio = round(float(df["valor"].mean()), 2) if len(df) > 0 else 0.0
+
+    # categoria dominante
+    categoria_dominante = max(gasto_por_categoria, key=gasto_por_categoria.get) if gasto_por_categoria else None
+
+    # gastos recorrentes (se a coluna existir)
+    if "recorrente" in df.columns:
+        gastos_recorrentes = round(float(df[df["recorrente"] == True]["valor"].sum()), 2)
+    else:
+        gastos_recorrentes = 0.0
+
+    # indicadores financeiros principais
+    margem_sobra = round(renda_mensal_liquida - despesa_total, 2)
+    percentual_sobra = round((margem_sobra / renda_mensal_liquida) * 100, 2) if renda_mensal_liquida > 0 else 0.0
+    comprometimento_renda = round((despesa_total / renda_mensal_liquida) * 100, 2) if renda_mensal_liquida > 0 else 100.0
+    taxa_poupanca = round((poupanca_mensal / renda_mensal_liquida) * 100, 2) if renda_mensal_liquida > 0 else 0.0
+    meses_reserva = round(reserva_financeira / despesa_total, 2) if despesa_total > 0 else 0.0
+
+    # ranking Top 5 categorias
+    ranking_gastos = []
+    ranking_ordenado = sorted(gasto_por_categoria.items(), key=lambda x: x[1], reverse=True)[:5]
+    for posicao, (categoria, valor) in enumerate(ranking_ordenado, start=1):
+        percentual = round((valor / despesa_total) * 100, 2) if despesa_total > 0 else 0.0
+        ranking_gastos.append({
+            "posicao": posicao, "categoria": categoria,
+            "valor": round(valor, 2), "percentual": percentual,
+        })
+
+    return {
+        "renda_mensal_liquida": round(renda_mensal_liquida, 2),
+        "despesa_total": despesa_total,
+        "margem_sobra": margem_sobra,
+        "percentual_sobra": percentual_sobra,
+        "comprometimento_renda": comprometimento_renda,
+        "taxa_poupanca": taxa_poupanca,
+        "meses_reserva": meses_reserva,
+        "nivel_endividamento": endividamento,
+        "meses_saldo_negativo": meses_saldo_negativo,
+        "ticket_medio": ticket_medio,
+        "categoria_dominante": categoria_dominante,
+        "gastos_recorrentes": gastos_recorrentes,
+        "gasto_por_categoria": gasto_por_categoria,
+        "ranking_gastos": ranking_gastos,
+    }
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\model_registry.py ===
+
+"""
+model_registry.py
+Salva modelos treinados com metadados completos (versÃ£o, mÃ©tricas, ambiente).
+"""
+
+import json
+import platform
+from datetime import datetime
+from pathlib import Path
+
+import joblib
+import sklearn
+
+VERSAO_PROJETO = "1.0.0"
+
+
+def salvar_modelo_com_metadados(modelo_info, caminho_modelo, caminho_metricas, extra_metadados=None):
+    caminho_modelo, caminho_metricas = Path(caminho_modelo), Path(caminho_metricas)
+    caminho_modelo.parent.mkdir(parents=True, exist_ok=True)
+    caminho_metricas.parent.mkdir(parents=True, exist_ok=True)
+
+    objeto_para_salvar = {
+        k: v for k, v in modelo_info.items()
+        if k in ("modelo", "pipeline", "colunas_features", "classes", "nome_modelo", "importancias_features")
+    }
+    joblib.dump(objeto_para_salvar, caminho_modelo)
+
+    metadados = {
+        "versao_projeto": VERSAO_PROJETO,
+        "data_treinamento": datetime.now().isoformat(timespec="seconds"),
+        "nome_modelo_escolhido": modelo_info.get("nome_modelo"),
+        "classes": modelo_info.get("classes"),
+        "metricas_todos_modelos": modelo_info.get("metricas_todos_modelos"),
+        "ambiente": {
+            "python_version": platform.python_version(),
+            "sklearn_version": sklearn.__version__,
+        },
+    }
+    if extra_metadados:
+        metadados.update(extra_metadados)
+
+    with open(caminho_metricas, "w", encoding="utf-8") as f:
+        json.dump(metadados, f, indent=2, ensure_ascii=False)
+
+    print(f"[OK] Modelo salvo em: {caminho_modelo}")
+    print(f"[OK] Metadados salvos em: {caminho_metricas}")
+    return metadados
+
+
+def carregar_modelo_com_metadados(caminho_modelo, caminho_metricas):
+    modelo_info = joblib.load(caminho_modelo)
+    with open(caminho_metricas, "r", encoding="utf-8") as f:
+        metadados = json.load(f)
+    return modelo_info, metadados
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\recommendations.py ===
+
+"""
+recommendations.py
+Motor de recomendaÃ§Ãµes financeiras: frase principal + bullet points,
+conforme especificado no fluxograma.
+"""
+
+
+def gerar_recomendacoes_financeiras(perfil_financeiro: str, indicadores: dict,
+                                      score_info: dict) -> dict:
+    nivel_risco = score_info["nivel_risco"]
+
+    frases_por_risco = {
+        "baixo": "Sua situaÃ§Ã£o financeira estÃ¡ saudÃ¡vel.",
+        "moderado": "Sua situaÃ§Ã£o financeira exige atenÃ§Ã£o moderada.",
+        "alto": "Sua situaÃ§Ã£o financeira exige atenÃ§Ã£o imediata.",
+    }
+    frase_principal = frases_por_risco.get(nivel_risco, "Revise seus hÃ¡bitos financeiros.")
+
+    bullet_points = []
+
+    comprometimento = indicadores.get("comprometimento_renda", 0)
+    taxa_poupanca = indicadores.get("taxa_poupanca", 0)
+    meses_reserva = indicadores.get("meses_reserva", 0)
+    endividamento = indicadores.get("nivel_endividamento", 0)
+    categoria_dominante = indicadores.get("categoria_dominante")
+
+    if comprometimento > 70:
+        bullet_points.append("Reduza gastos nÃ£o essenciais em pelo menos 10%.")
+
+    if endividamento >= 40:
+        bullet_points.append("Priorize o pagamento de dÃ­vidas com juros elevados.")
+
+    if taxa_poupanca < 15:
+        bullet_points.append("Aumente gradualmente sua reserva mensal.")
+
+    if meses_reserva < 3:
+        bullet_points.append("Construa uma reserva de emergÃªncia equivalente a 3 meses de despesas.")
+
+    if categoria_dominante:
+        bullet_points.append(f"Revise despesas recorrentes na categoria '{categoria_dominante}'.")
+
+    if not bullet_points:
+        bullet_points.append("Continue mantendo o controle financeiro atual e considere investir o excedente.")
+
+    return {
+        "frase_principal": frase_principal,
+        "bullet_points": bullet_points,
+    }
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\scoring.py ===
+
+"""
+scoring.py
+Calcula o score de saÃºde financeira (0-100) e o nÃ­vel de risco,
+combinando o resultado do Algoritmo 2 com os indicadores financeiros.
+"""
+
+MAPA_RISCO = {
+    "saudavel": "baixo",
+    "em_observacao": "moderado",
+    "em_risco": "alto",
+}
+
+
+def calcular_score_saude_financeira(indicadores: dict, resultado_perfil: dict) -> dict:
+    """
+    Score ponderado (0-100) considerando:
+    - comprometimento da renda (peso 35%)
+    - taxa de poupanÃ§a (peso 25%)
+    - meses de reserva (peso 20%)
+    - nÃ­vel de endividamento (peso 20%)
+    """
+    comprometimento = min(indicadores.get("comprometimento_renda", 100), 150)
+    taxa_poupanca = indicadores.get("taxa_poupanca", 0)
+    meses_reserva = min(indicadores.get("meses_reserva", 0), 12)
+    endividamento = indicadores.get("nivel_endividamento", 0)
+
+    nota_comprometimento = max(0, 100 - comprometimento) * 0.35
+    nota_poupanca = min(taxa_poupanca, 30) / 30 * 100 * 0.25
+    nota_reserva = min(meses_reserva, 6) / 6 * 100 * 0.20
+    nota_endividamento = max(0, 100 - endividamento) * 0.20
+
+    score = round(nota_comprometimento + nota_poupanca + nota_reserva + nota_endividamento, 0)
+    score = int(max(0, min(100, score)))
+
+    perfil = resultado_perfil["perfil_financeiro"]
+    nivel_risco = MAPA_RISCO.get(perfil, "moderado")
+
+    return {
+        "score_saude_financeira": score,
+        "nivel_risco": nivel_risco,
+    }
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\text_utils.py ===
+
+"""
+text_utils.py
+NormalizaÃ§Ã£o de texto usada na classificaÃ§Ã£o das transaÃ§Ãµes.
+"""
+
+import re
+import unicodedata
+
+
+def remover_acentos(texto: str) -> str:
+    nfkd = unicodedata.normalize("NFKD", texto)
+    return "".join(c for c in nfkd if not unicodedata.combining(c))
+
+
+def limpar_texto(texto) -> str:
+    if not isinstance(texto, str):
+        return ""
+
+    texto = texto.lower()
+    texto = remover_acentos(texto)
+    texto = re.sub(r"\b\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b", " ", texto)
+    texto = re.sub(r"\b\d{4,}\b", " ", texto)
+    texto = re.sub(r"[^a-z0-9\s]", " ", texto)
+    texto = re.sub(r"\s+", " ", texto).strip()
+    return texto
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\validation.py ===
+
+"""
+validation.py
+Bloco de PRÃ‰-PROCESSAMENTO do fluxograma:
+- validaÃ§Ã£o
+- remoÃ§Ã£o de duplicidades
+- normalizaÃ§Ã£o de valores
+- tratamento de datas ausentes
+TransaÃ§Ãµes invÃ¡lidas sÃ£o separadas e reportadas, nunca enviadas ao modelo.
+"""
+
+import pandas as pd
+
+
+class ErroValidacaoTransacoes(Exception):
+    pass
+
+
+def validar_e_limpar_transacoes(transacoes: list[dict]) -> tuple[pd.DataFrame, list[dict]]:
+    """
+    Recebe uma lista de dicts (descricao, valor[, data]) e retorna:
+    - DataFrame de transaÃ§Ãµes vÃ¡lidas e limpas
+    - lista de transaÃ§Ãµes rejeitadas com o motivo
+    """
+    if not transacoes:
+        raise ErroValidacaoTransacoes("A lista de transaÃ§Ãµes nÃ£o pode estar vazia.")
+
+    df = pd.DataFrame(transacoes)
+
+    if "descricao" not in df.columns or "valor" not in df.columns:
+        raise ErroValidacaoTransacoes("Cada transaÃ§Ã£o deve conter 'descricao' e 'valor'.")
+
+    rejeitadas = []
+    validas_idx = []
+
+    for idx, linha in df.iterrows():
+        descricao = linha.get("descricao")
+        valor = linha.get("valor")
+        motivo = None
+
+        if not isinstance(descricao, str) or not descricao.strip():
+            motivo = "descricao vazia ou invÃ¡lida"
+        elif valor is None or not _e_numero(valor):
+            motivo = "valor ausente ou nÃ£o numÃ©rico"
+        elif float(valor) <= 0:
+            motivo = "valor deve ser maior que zero"
+
+        if motivo:
+            rejeitadas.append({**linha.to_dict(), "motivo_rejeicao": motivo})
+        else:
+            validas_idx.append(idx)
+
+    df_validas = df.loc[validas_idx].copy()
+
+    if df_validas.empty:
+        raise ErroValidacaoTransacoes("Nenhuma transaÃ§Ã£o vÃ¡lida apÃ³s a validaÃ§Ã£o.")
+
+    # normalizaÃ§Ã£o de valores
+    df_validas["valor"] = df_validas["valor"].astype(float).round(2)
+    df_validas["descricao"] = df_validas["descricao"].astype(str).str.strip()
+
+    # remoÃ§Ã£o de duplicidades exatas (mesma descricao + valor)
+    antes = len(df_validas)
+    df_validas = df_validas.drop_duplicates(subset=["descricao", "valor"]).reset_index(drop=True)
+    duplicadas_removidas = antes - len(df_validas)
+
+    if duplicadas_removidas > 0:
+        rejeitadas.append({
+            "descricao": None,
+            "valor": None,
+            "motivo_rejeicao": f"{duplicadas_removidas} transaÃ§Ã£o(Ãµes) duplicada(s) removida(s)"
+        })
+
+    # tratamento de datas (se existir a coluna, preenche ausentes)
+    if "data" in df_validas.columns:
+        df_validas["data"] = pd.to_datetime(df_validas["data"], errors="coerce")
+
+    return df_validas, rejeitadas
+
+
+def _e_numero(valor) -> bool:
+    try:
+        float(valor)
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
+def validar_dados_financeiros(dados: dict) -> dict:
+    """
+    Valida os dados financeiros gerais do usuÃ¡rio (renda, endividamento etc.).
+    """
+    campos_obrigatorios = ["renda_mensal", "nivel_endividamento"]
+    faltantes = [c for c in campos_obrigatorios if c not in dados]
+    if faltantes:
+        raise ErroValidacaoTransacoes(f"Campos obrigatÃ³rios faltando: {faltantes}")
+
+    if dados["renda_mensal"] is None or float(dados["renda_mensal"]) <= 0:
+        raise ErroValidacaoTransacoes("renda_mensal deve ser maior que zero")
+
+    if not (0 <= float(dados["nivel_endividamento"]) <= 100):
+        raise ErroValidacaoTransacoes("nivel_endividamento deve estar entre 0 e 100")
+
+    dados = dados.copy()
+    dados.setdefault("poupanca_mensal", 0.0)
+    dados.setdefault("reserva_financeira", 0.0)
+    dados.setdefault("meses_saldo_negativo", 0)
+    dados.setdefault("frequencia_poupanca", "Baixa")
+
+    return dados
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\__init__.py ===
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\algorithm1\dataset_transacoes.py ===
+
+"""
+dataset_transacoes.py
+GeraÃ§Ã£o do dataset sintÃ©tico de transaÃ§Ãµes rotuladas por categoria,
+com ruÃ­do textual e de valores para simular dados reais.
+"""
+
+import numpy as np
+import pandas as pd
+
+CATEGORIAS_TEMPLATES = {
+    "alimentacao": [
+        "Supermercado Extra", "Pao de Acucar", "Restaurante Sabor Caseiro",
+        "iFood Pedido", "Padaria Central", "Feira Livre", "Acougue Bom Corte",
+        "Lanchonete Rapida", "Mercado Bom Preco", "Hortifruti Verde Vida",
+        "Supermercado Mateus"
+    ],
+    "transporte": [
+        "Uber Trip", "99 corrida", "Posto Ipiranga Combustivel",
+        "Estacionamento Shopping", "Metro Bilhete Unico", "Onibus Municipal",
+        "Pedagio Concessionaria", "Oficina Mecanica Motor", "Posto Shell",
+        "Locadora de Veiculos"
+    ],
+    "saude": [
+        "Farmacia Pague Menos", "Consulta Dr Silva", "Plano de Saude Unimed",
+        "Exame Laboratorio Central", "Drogaria Sao Paulo", "Academia Smart Fit",
+        "Clinica Odontologica", "Farmacia Drogasil", "Fisioterapia Sessao",
+        "Farmacia"
+    ],
+    "moradia": [
+        "Aluguel Apartamento", "Condominio Residencial", "Conta de Luz Enel",
+        "Conta de Agua Sabesp", "Internet Vivo Fibra", "Gas Encanado",
+        "Seguro Residencial", "Material de Construcao", "IPTU Prefeitura",
+        "Conta de energia"
+    ],
+    "educacao": [
+        "Mensalidade Faculdade", "Curso Online Udemy", "Livraria Cultura",
+        "Material Escolar", "Curso de Ingles", "Mensalidade Escola",
+        "Plataforma Alura", "Apostila Concurso", "Pos Graduacao EAD",
+        "Certificacao Profissional"
+    ],
+    "lazer": [
+        "Netflix Assinatura", "Cinema Shopping", "Spotify Premium",
+        "Viagem Passagem Aerea", "Bar Happy Hour", "Show de Musica",
+        "Parque de Diversoes", "Streaming Disney Plus", "Jogo Steam", "Netflix"
+    ],
+    "servicos": [
+        "Assinatura Celular Vivo", "Manutencao Notebook", "Salao de Beleza",
+        "Lavanderia Express", "Contador Mensalidade", "Assinatura Software",
+        "Servico de Limpeza", "Advogado Consultoria", "Seguro de Vida",
+        "Cartorio Documentos"
+    ],
+    "outras": [
+        "Transferencia Pix Diversos", "Saque Caixa Eletronico", "Doacao ONG",
+        "Compra Diversa Loja X", "Pagamento Boleto Diversos", "Presente Aniversario",
+        "Multa de Transito", "Taxa Bancaria", "Deposito Conta Poupanca",
+        "Compra Nao Identificada"
+    ],
+}
+
+FAIXAS_VALORES = {
+    "alimentacao": (15, 500), "transporte": (8, 300), "saude": (30, 800),
+    "moradia": (100, 2500), "educacao": (50, 1200), "lazer": (15, 600),
+    "servicos": (20, 400), "outras": (10, 1000),
+}
+
+
+def _gerar_ruido_texto(descricao: str, rng: np.random.Generator) -> str:
+    prefixos = ["PGTO ", "COMPRA ", "DEB AUT ", "TED ", ""]
+    sufixos_data = [" 08/07", " 12/07", " 25/06", ""]
+    sufixos_codigo = [f" {rng.integers(10000, 99999)}", ""]
+    return f"{rng.choice(prefixos)}{descricao}{rng.choice(sufixos_data)}{rng.choice(sufixos_codigo)}"
+
+
+def gerar_dataset_transacoes_simulado(n_amostras: int = 1500, seed: int = 42) -> pd.DataFrame:
+    rng = np.random.default_rng(seed)
+    categorias = list(CATEGORIAS_TEMPLATES.keys())
+
+    registros = []
+    for _ in range(n_amostras):
+        categoria = rng.choice(categorias)
+        template = rng.choice(CATEGORIAS_TEMPLATES[categoria])
+        descricao = _gerar_ruido_texto(template, rng)
+
+        faixa_min, faixa_max = FAIXAS_VALORES[categoria]
+        valor = round(float(rng.uniform(faixa_min, faixa_max)), 2)
+
+        prob_recorrente = {
+            "moradia": 0.85, "saude": 0.4, "servicos": 0.6,
+            "educacao": 0.7, "lazer": 0.3, "alimentacao": 0.1,
+            "transporte": 0.15, "outras": 0.05,
+        }[categoria]
+        recorrente = bool(rng.random() < prob_recorrente)
+
+        registros.append({
+            "descricao": descricao, "valor": valor,
+            "categoria": categoria, "recorrente": recorrente,
+        })
+
+    return pd.DataFrame(registros)
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\algorithm1\model_transacoes.py ===
+
+"""
+model_transacoes.py
+ALGORITMO 1 - ClassificaÃ§Ã£o automÃ¡tica de transaÃ§Ãµes.
+Treina, compara e escolhe o melhor modelo entre 4 candidatos.
+"""
+
+import numpy as np
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, recall_score
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+
+from src.scripts.text_utils import limpar_texto
+from src.scripts.confidence import aplicar_regra_confianca
+
+SEED = 42
+
+
+def _preparar_dados(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df["descricao_limpa"] = df["descricao"].apply(limpar_texto)
+    return df
+
+
+def _construir_pipeline(modelo_final):
+    preprocessador = ColumnTransformer(
+        transformers=[
+            ("texto", TfidfVectorizer(max_features=300, ngram_range=(1, 2)), "descricao_limpa"),
+            ("numerico", StandardScaler(), ["valor"]),
+        ],
+        remainder="drop",
+    )
+    return Pipeline(steps=[("preprocessador", preprocessador), ("classificador", modelo_final)])
+
+
+def treinar_e_comparar_modelos(df: pd.DataFrame) -> dict:
+    df = _preparar_dados(df)
+    X = df[["descricao_limpa", "valor"]]
+    y = df["categoria"]
+
+    X_treino, X_teste, y_treino, y_teste = train_test_split(
+        X, y, test_size=0.2, random_state=SEED, stratify=y
+    )
+
+    candidatos = {
+        "logistic_regression": LogisticRegression(max_iter=1000, random_state=SEED),
+        "random_forest": RandomForestClassifier(n_estimators=200, random_state=SEED),
+        "svm": SVC(probability=True, random_state=SEED),
+        "naive_bayes": MultinomialNB(),
+    }
+
+    metricas_todos_modelos, pipelines_treinados = {}, {}
+
+    for nome, modelo in candidatos.items():
+        if nome == "naive_bayes":
+            preprocessador = ColumnTransformer(
+                transformers=[("texto", TfidfVectorizer(max_features=300, ngram_range=(1, 2)), "descricao_limpa")],
+                remainder="drop",
+            )
+            pipeline = Pipeline(steps=[("preprocessador", preprocessador), ("classificador", modelo)])
+        else:
+            pipeline = _construir_pipeline(modelo)
+
+        pipeline.fit(X_treino, y_treino)
+        y_pred = pipeline.predict(X_teste)
+
+        f1_macro = f1_score(y_teste, y_pred, average="macro", zero_division=0)
+        recall_macro = recall_score(y_teste, y_pred, average="macro", zero_division=0)
+
+        try:
+            cv_media = float(np.mean(cross_val_score(pipeline, X, y, cv=5, scoring="f1_macro")))
+        except Exception:
+            cv_media = None
+
+        metricas_todos_modelos[nome] = {
+            "f1_macro": float(f1_macro),
+            "recall_macro": float(recall_macro),
+            "cv_f1_macro_media": cv_media,
+        }
+        pipelines_treinados[nome] = pipeline
+
+    melhor_nome = max(metricas_todos_modelos, key=lambda k: metricas_todos_modelos[k]["f1_macro"])
+    melhor_pipeline = pipelines_treinados[melhor_nome]
+
+    return {
+        "modelo": melhor_pipeline,
+        "nome_modelo": melhor_nome,
+        "classes": list(melhor_pipeline.classes_),
+        "metricas_todos_modelos": metricas_todos_modelos,
+    }
+
+
+def classificar_transacoes(df_transacoes: pd.DataFrame, modelo_info: dict) -> pd.DataFrame:
+    """
+    Classifica transaÃ§Ãµes e aplica a regra de confianÃ§a do fluxograma
+    (>=70% aceita | 50-69% baixa confianÃ§a | <50% -> 'outras' + revisÃ£o).
+    """
+    df = _preparar_dados(df_transacoes)
+    pipeline = modelo_info["modelo"]
+
+    X = df[["descricao_limpa", "valor"]]
+    probabilidades = pipeline.predict_proba(X)
+    classes = pipeline.classes_
+
+    resultados = []
+    for linha_probs in probabilidades:
+        idx_top1 = int(np.argmax(linha_probs))
+        categoria_prevista = classes[idx_top1]
+        confianca = float(linha_probs[idx_top1])
+
+        regra = aplicar_regra_confianca(categoria_prevista, confianca)
+
+        resultados.append({
+            "categoria": regra["categoria"],
+            "categoria_original_prevista": categoria_prevista,
+            "probabilidade": round(confianca, 4),
+            "nivel_confianca": regra["nivel_confianca"],
+            "necessita_revisao": regra["necessita_revisao"],
+        })
+
+    df_resultado = df_transacoes.reset_index(drop=True).copy()
+    df_resultado = pd.concat([df_resultado, pd.DataFrame(resultados)], axis=1)
+    return df_resultado
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\algorithm1\__init__.py ===
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\algorithm2\dataset_perfil.py ===
+
+"""
+dataset_perfil.py
+GeraÃ§Ã£o do dataset sintÃ©tico de perfis financeiros, com poupanÃ§a e reserva
+coerentes com a margem real (renda - gastos).
+"""
+
+import numpy as np
+import pandas as pd
+
+
+def _classificar_perfil_regra(renda, gastos, endividamento, poupanca_mensal,
+                                reserva_financeira, meses_saldo_negativo):
+    margem = renda - gastos
+    comprometimento = (gastos / renda * 100) if renda > 0 else 100
+    taxa_poupanca = (poupanca_mensal / renda * 100) if renda > 0 else 0
+    meses_reserva = reserva_financeira / gastos if gastos > 0 else 0
+
+    if margem < 0 or endividamento >= 50 or meses_saldo_negativo >= 2:
+        return "em_risco"
+
+    if comprometimento <= 70 and endividamento <= 20 and taxa_poupanca >= 15 and meses_reserva >= 3:
+        return "saudavel"
+
+    return "em_observacao"
+
+
+def _separar_poupanca_e_reserva(renda_mensal, total_gastos, rng):
+    margem = max(renda_mensal - total_gastos, 0)
+    poupanca_mensal = round(margem * rng.uniform(0, 0.6), 2) if margem > 0 else 0.0
+    reserva_financeira = round(renda_mensal * rng.uniform(0, 4), 2)
+    return poupanca_mensal, reserva_financeira
+
+
+def gerar_dataset_perfil_simulado(n_amostras: int = 1200, seed: int = 42) -> pd.DataFrame:
+    rng = np.random.default_rng(seed)
+    registros = []
+
+    for _ in range(n_amostras):
+        renda_mensal = round(float(rng.uniform(1200, 15000)), 2)
+        percentual_gasto = rng.uniform(0.3, 1.3)
+        total_gastos = round(renda_mensal * percentual_gasto, 2)
+        endividamento = round(float(rng.uniform(0, 90)), 2)
+
+        poupanca_mensal, reserva_financeira = _separar_poupanca_e_reserva(renda_mensal, total_gastos, rng)
+        meses_saldo_negativo = int(rng.integers(0, 6)) if percentual_gasto > 1 else int(rng.integers(0, 2))
+
+        percentual_essenciais = round(float(rng.uniform(40, 90)), 2)
+        ticket_medio = round(float(rng.uniform(30, 500)), 2)
+        percentual_recorrentes = round(float(rng.uniform(10, 70)), 2)
+
+        perfil = _classificar_perfil_regra(
+            renda_mensal, total_gastos, endividamento,
+            poupanca_mensal, reserva_financeira, meses_saldo_negativo
+        )
+
+        registros.append({
+            "renda_mensal_liquida": renda_mensal,
+            "despesa_total": total_gastos,
+            "nivel_endividamento": endividamento,
+            "poupanca_mensal": poupanca_mensal,
+            "reserva_financeira": reserva_financeira,
+            "meses_saldo_negativo": meses_saldo_negativo,
+            "percentual_essenciais": percentual_essenciais,
+            "ticket_medio": ticket_medio,
+            "percentual_recorrentes": percentual_recorrentes,
+            "margem_sobra": round(renda_mensal - total_gastos, 2),
+            "comprometimento_renda": round((total_gastos / renda_mensal) * 100, 2),
+            "taxa_poupanca": round((poupanca_mensal / renda_mensal) * 100, 2),
+            "meses_reserva": round(reserva_financeira / total_gastos, 2) if total_gastos > 0 else 0.0,
+            "perfil": perfil,
+        })
+
+    return pd.DataFrame(registros)
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\algorithm2\model_perfil.py ===
+
+"""
+model_perfil.py
+ALGORITMO 2 - ClassificaÃ§Ã£o do perfil financeiro.
+Recebe indicadores agregados (NÃƒO transaÃ§Ãµes brutas), treina e compara modelos,
+priorizando recall da classe "em_risco".
+"""
+
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, recall_score
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+
+SEED = 42
+
+COLUNAS_FEATURES = [
+    "renda_mensal_liquida", "despesa_total", "nivel_endividamento",
+    "poupanca_mensal", "reserva_financeira", "meses_saldo_negativo",
+    "percentual_essenciais", "ticket_medio", "percentual_recorrentes",
+    "margem_sobra", "comprometimento_renda", "taxa_poupanca", "meses_reserva",
+]
+
+
+def treinar_e_comparar_perfil(df: pd.DataFrame) -> dict:
+    colunas_features = [c for c in COLUNAS_FEATURES if c in df.columns]
+    X = df[colunas_features]
+    y = df["perfil"]
+
+    X_treino, X_teste, y_treino, y_teste = train_test_split(
+        X, y, test_size=0.2, random_state=SEED, stratify=y
+    )
+
+    candidatos = {
+        "logistic_regression": LogisticRegression(max_iter=1000, random_state=SEED),
+        "random_forest": RandomForestClassifier(n_estimators=200, random_state=SEED),
+        "svm": SVC(probability=True, random_state=SEED),
+    }
+
+    metricas_todos_modelos, pipelines_treinados = {}, {}
+
+    for nome, modelo in candidatos.items():
+        pipeline = Pipeline(steps=[("scaler", StandardScaler()), ("classificador", modelo)])
+        pipeline.fit(X_treino, y_treino)
+        y_pred = pipeline.predict(X_teste)
+
+        f1_macro = f1_score(y_teste, y_pred, average="macro", zero_division=0)
+        recall_em_risco = (
+            recall_score(y_teste, y_pred, labels=["em_risco"], average="macro", zero_division=0)
+            if "em_risco" in y_teste.unique() else None
+        )
+
+        try:
+            cv_media = float(np.mean(cross_val_score(pipeline, X, y, cv=5, scoring="f1_macro")))
+        except Exception:
+            cv_media = None
+
+        metricas_todos_modelos[nome] = {
+            "f1_macro": float(f1_macro),
+            "recall_em_risco": float(recall_em_risco) if recall_em_risco is not None else None,
+            "cv_f1_macro_media": cv_media,
+        }
+        pipelines_treinados[nome] = pipeline
+
+    def score_ordenacao(nome):
+        m = metricas_todos_modelos[nome]
+        return (m["recall_em_risco"] or 0, m["f1_macro"])
+
+    melhor_nome = max(metricas_todos_modelos, key=score_ordenacao)
+    melhor_pipeline = pipelines_treinados[melhor_nome]
+
+    # feature importance (quando disponÃ­vel) para a Explicabilidade
+    importancias = None
+    classificador = melhor_pipeline.named_steps["classificador"]
+    if hasattr(classificador, "feature_importances_"):
+        importancias = dict(zip(colunas_features, classificador.feature_importances_.round(4).tolist()))
+
+    return {
+        "pipeline": melhor_pipeline,
+        "nome_modelo": melhor_nome,
+        "classes": list(melhor_pipeline.classes_),
+        "colunas_features": colunas_features,
+        "metricas_todos_modelos": metricas_todos_modelos,
+        "importancias_features": importancias,
+    }
+
+
+def prever_perfil(modelo_info: dict, indicadores: dict) -> dict:
+    """
+    Recebe o dict de indicadores (saÃ­da da engenharia de atributos)
+    e retorna perfil + probabilidade + probabilidades por classe.
+    """
+    colunas_features = modelo_info["colunas_features"]
+    pipeline = modelo_info["pipeline"]
+
+    linha = {c: indicadores.get(c, 0) for c in colunas_features}
+    X = pd.DataFrame([linha])
+
+    probabilidades = pipeline.predict_proba(X)[0]
+    classes = pipeline.classes_
+
+    idx_top = int(np.argmax(probabilidades))
+    perfil_previsto = classes[idx_top]
+    probabilidade = float(probabilidades[idx_top])
+
+    dict_probabilidades = {classes[i]: round(float(probabilidades[i]), 4) for i in range(len(classes))}
+
+    return {
+        "perfil_financeiro": perfil_previsto,
+        "probabilidade": round(probabilidade, 4),
+        "probabilidades": dict_probabilidades,
+    }
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\algorithm2\__init__.py ===
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\pipeline\pipeline_completo.py ===
+
+"""
+pipeline_completo.py
+Orquestra o fluxograma completo:
+
+TransaÃ§Ãµes brutas
+  -> ValidaÃ§Ã£o e limpeza
+  -> Algoritmo 1 (classificaÃ§Ã£o de transaÃ§Ãµes)
+  -> Tratamento de confianÃ§a
+  -> Engenharia de indicadores financeiros
+  -> Algoritmo 2 (classificaÃ§Ã£o de perfil)
+  -> Score de saÃºde financeira
+  -> Explicabilidade
+  -> Motor de recomendaÃ§Ãµes
+  -> Dashboard (JSON final)
+"""
+
+import uuid
+from datetime import date
+
+from src.scripts.validation import validar_e_limpar_transacoes, validar_dados_financeiros
+from src.scripts.algorithm1.model_transacoes import classificar_transacoes
+from src.scripts.feature_engineering import calcular_indicadores_financeiros
+from src.scripts.algorithm2.model_perfil import prever_perfil
+from src.scripts.scoring import calcular_score_saude_financeira
+from src.scripts.explainability import gerar_explicabilidade
+from src.scripts.recommendations import gerar_recomendacoes_financeiras
+from src.scripts.dashboard import montar_dashboard
+
+
+def executar_pipeline_completo(transacoes_brutas: list[dict], dados_financeiros: dict,
+                                  modelo_transacoes: dict, modelo_perfil: dict,
+                                  usuario_id: str = None) -> dict:
+
+    usuario_id = usuario_id or f"user-{uuid.uuid4().hex[:8]}"
+
+    # 1. ValidaÃ§Ã£o e limpeza
+    dados_financeiros_validados = validar_dados_financeiros(dados_financeiros)
+    df_transacoes_validas, transacoes_rejeitadas = validar_e_limpar_transacoes(transacoes_brutas)
+
+    # 2. Algoritmo 1 + 3. Tratamento de confianÃ§a (jÃ¡ embutido em classificar_transacoes)
+    df_classificado = classificar_transacoes(df_transacoes_validas, modelo_transacoes)
+
+    transacoes_para_revisao = (
+        df_classificado[df_classificado["necessita_revisao"] == True]
+        [["descricao", "valor", "categoria_original_prevista", "probabilidade"]]
+        .to_dict(orient="records")
+    )
+
+    # 4. Engenharia de indicadores financeiros
+    indicadores = calcular_indicadores_financeiros(df_classificado, dados_financeiros_validados)
+
+    # 5. Algoritmo 2 - perfil financeiro
+    resultado_perfil = prever_perfil(modelo_perfil, indicadores)
+
+    # 6. Score de saÃºde financeira + nÃ­vel de risco
+    score_info = calcular_score_saude_financeira(indicadores, resultado_perfil)
+
+    # 7. Explicabilidade
+    _ = gerar_explicabilidade(
+        indicadores, resultado_perfil, modelo_perfil.get("importancias_features")
+    )
+
+    # 8. Motor de recomendaÃ§Ãµes
+    recomendacoes = gerar_recomendacoes_financeiras(
+        resultado_perfil["perfil_financeiro"], indicadores, score_info
+    )
+
+    # 9. Dashboard (JSON final)
+    dashboard = montar_dashboard(
+        usuario_id=usuario_id,
+        periodo_inicio=str(date.today().replace(day=1)),
+        periodo_fim=str(date.today()),
+        indicadores=indicadores,
+        resultado_perfil=resultado_perfil,
+        score_info=score_info,
+        recomendacoes=recomendacoes,
+        versoes_modelos={
+            "classificador_transacoes": "v1.0.0",
+            "classificador_perfil": "v1.0.0",
+        },
+        transacoes_para_revisao=transacoes_para_revisao,
+    )
+
+    dashboard["_debug"] = {
+        "transacoes_rejeitadas_na_validacao": transacoes_rejeitadas,
+    }
+
+    return dashboard
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\scripts\pipeline\__init__.py ===
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\tests\test_algorithm1.py ===
+
+import pytest
+from scripts.algorithm1.model_transacoes import classificar_transacao
+
+CATEGORIAS_VALIDAS = {
+    "alimentacao", "transporte", "saude", "moradia",
+    "educacao", "lazer", "servicos", "outras"
+}
+
+
+def test_classifica_categoria_valida():
+    resultado = classificar_transacao("Supermercado Mateus", 420.0)
+    assert resultado["categoria"] in CATEGORIAS_VALIDAS
+
+
+def test_probabilidade_entre_0_e_1():
+    resultado = classificar_transacao("Posto Ipiranga", 150.0)
+    assert 0.0 <= resultado["probabilidade"] <= 1.0
+
+
+def test_retorna_todas_as_chaves_esperadas():
+    resultado = classificar_transacao("FarmÃ¡cia Popular", 89.90)
+    assert set(resultado.keys()) >= {"descricao", "valor", "categoria", "probabilidade"}
+
+
+def test_descricao_desconhecida_cai_em_outras_ou_baixa_confianca():
+    resultado = classificar_transacao("xzq123 aleatorio", 10.0)
+    assert resultado["categoria"] in CATEGORIAS_VALIDAS
+
+
+def test_valor_zero_nao_quebra_modelo():
+    resultado = classificar_transacao("Estorno", 0.0)
+    assert resultado["categoria"] in CATEGORIAS_VALIDAS
+
+
+@pytest.mark.parametrize("descricao,valor", [
+    ("Uber Trip", 32.5),
+    ("Netflix", 39.9),
+    ("Plano de SaÃºde", 350.0),
+])
+def test_multiplas_transacoes(descricao, valor):
+    resultado = classificar_transacao(descricao, valor)
+    assert resultado["categoria"] in CATEGORIAS_VALIDAS
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\tests\test_algorithm2.py ===
+
+import pytest
+from scripts.algorithm2.model_perfil import classificar_perfil_financeiro
+
+PERFIS_VALIDOS = {"saudavel", "em_observacao", "em_risco"}
+
+
+def test_perfil_valido_retornado():
+    indicadores = {
+        "comprometimento_renda": 55.0,
+        "taxa_poupanca": 12.0,
+        "meses_reserva": 3.0,
+        "nivel_endividamento": 20.0
+    }
+    resultado = classificar_perfil_financeiro(indicadores)
+    assert resultado["perfil_financeiro"] in PERFIS_VALIDOS
+
+
+def test_score_saude_financeira_entre_0_e_100():
+    indicadores = {
+        "comprometimento_renda": 70.0,
+        "taxa_poupanca": 5.0,
+        "meses_reserva": 1.0,
+        "nivel_endividamento": 40.0
+    }
+    resultado = classificar_perfil_financeiro(indicadores)
+    assert 0 <= resultado["score_saude_financeira"] <= 100
+
+
+def test_caso_extremo_endividamento_alto_gera_risco():
+    indicadores = {
+        "comprometimento_renda": 95.0,
+        "taxa_poupanca": 0.0,
+        "meses_reserva": 0.0,
+        "nivel_endividamento": 90.0
+    }
+    resultado = classificar_perfil_financeiro(indicadores)
+    assert resultado["perfil_financeiro"] == "em_risco"
+
+
+def test_caso_saudavel_baixo_comprometimento():
+    indicadores = {
+        "comprometimento_renda": 30.0,
+        "taxa_poupanca": 25.0,
+        "meses_reserva": 6.0,
+        "nivel_endividamento": 5.0
+    }
+    resultado = classificar_perfil_financeiro(indicadores)
+    assert resultado["perfil_financeiro"] == "saudavel"
+
+
+def test_probabilidade_entre_0_e_1():
+    indicadores = {
+        "comprometimento_renda": 60.0,
+        "taxa_poupanca": 10.0,
+        "meses_reserva": 2.0,
+        "nivel_endividamento": 30.0
+    }
+    resultado = classificar_perfil_financeiro(indicadores)
+    assert 0.0 <= resultado["probabilidade"] <= 1.0
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\tests\test_feature_engineering.py ===
+
+import pytest
+from scripts.feature_engineering import gerar_indicadores_financeiros
+
+
+def test_calcula_despesa_total_corretamente():
+    transacoes = [
+        {"categoria": "alimentacao", "valor": 200.0},
+        {"categoria": "transporte", "valor": 100.0},
+    ]
+    indicadores = gerar_indicadores_financeiros(
+        transacoes=transacoes,
+        renda_mensal=1000.0,
+        poupanca_mensal=100.0,
+        reserva_atual=600.0
+    )
+    assert indicadores["despesa_total"] == 300.0
+
+
+def test_categoria_dominante_correta():
+    transacoes = [
+        {"categoria": "alimentacao", "valor": 500.0},
+        {"categoria": "lazer", "valor": 50.0},
+    ]
+    indicadores = gerar_indicadores_financeiros(
+        transacoes=transacoes,
+        renda_mensal=2000.0,
+        poupanca_mensal=200.0,
+        reserva_atual=1000.0
+    )
+    assert indicadores["categoria_dominante"] == "alimentacao"
+
+
+def test_taxa_poupanca_calculada_corretamente():
+    indicadores = gerar_indicadores_financeiros(
+        transacoes=[{"categoria": "moradia", "valor": 800.0}],
+        renda_mensal=4000.0,
+        poupanca_mensal=400.0,
+        reserva_atual=2000.0
+    )
+    assert indicadores["taxa_poupanca"] == pytest.approx(10.0)
+
+
+def test_meses_reserva_calculado_corretamente():
+    indicadores = gerar_indicadores_financeiros(
+        transacoes=[{"categoria": "moradia", "valor": 1000.0}],
+        renda_mensal=3000.0,
+        poupanca_mensal=300.0,
+        reserva_atual=3000.0
+    )
+    assert indicadores["meses_reserva"] == pytest.approx(3.0)
+
+
+def test_lista_vazia_de_transacoes_nao_quebra():
+    indicadores = gerar_indicadores_financeiros(
+        transacoes=[],
+        renda_mensal=2500.0,
+        poupanca_mensal=100.0,
+        reserva_atual=500.0
+    )
+    assert indicadores["despesa_total"] == 0.0
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\tests\test_pipeline.py ===
+
+import pytest
+
+from src.scripts.algorithm1.dataset_transacoes import gerar_dataset_transacoes_simulado
+from src.scripts.algorithm1.model_transacoes import treinar_e_comparar_modelos
+from src.scripts.algorithm2.dataset_perfil import gerar_dataset_perfil_simulado
+from src.scripts.algorithm2.model_perfil import treinar_e_comparar_perfil
+from src.scripts.pipeline.pipeline_completo import executar_pipeline_completo
+
+
+@pytest.fixture(scope="module")
+def modelos_treinados():
+    df_t = gerar_dataset_transacoes_simulado(n_amostras=300, seed=1)
+    df_p = gerar_dataset_perfil_simulado(n_amostras=300, seed=1)
+    return treinar_e_comparar_modelos(df_t), treinar_e_comparar_perfil(df_p)
+
+
+def test_pipeline_completo_gera_dashboard_valido(modelos_treinados):
+    modelo1, modelo2 = modelos_treinados
+
+    transacoes = [
+        {"descricao": "Supermercado Mateus", "valor": 420.0},
+        {"descricao": "Netflix", "valor": 40.0},
+        {"descricao": "Uber", "valor": 60.0},
+    ]
+    dados_financeiros = {"renda_mensal": 4500, "nivel_endividamento": 25}
+
+    resultado = executar_pipeline_completo(transacoes, dados_financeiros, modelo1, modelo2)
+
+    assert "visao_geral" in resultado
+    assert "comportamento" in resultado
+    assert "saude_risco" in resultado
+    assert "recomendacoes_financeiras" in resultado
+    assert resultado["saude_risco"]["perfil_financeiro"] in modelo2["classes"]
+    assert 0 <= resultado["saude_risco"]["score_saude_financeira"] <= 100
+
+
+def test_pipeline_rejeita_transacoes_invalidas(modelos_treinados):
+    modelo1, modelo2 = modelos_treinados
+
+    transacoes = [
+        {"descricao": "", "valor": -10},
+        {"descricao": "Supermercado Mateus", "valor": 420.0},
+    ]
+    dados_financeiros = {"renda_mensal": 4500, "nivel_endividamento": 25}
+
+    resultado = executar_pipeline_completo(transacoes, dados_financeiros, modelo1, modelo2)
+    assert len(resultado["_debug"]["transacoes_rejeitadas_na_validacao"]) >= 1
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\tests\test_validation.py ===
+
+import pandas as pd
+import pytest
+from scripts.validation import validar_e_limpar_transacoes
+
+
+def test_remove_transacoes_com_valor_negativo():
+    df = pd.DataFrame({
+        "descricao": ["Mercado", "SalÃ¡rio"],
+        "valor": [-50.0, 4500.0],
+        "data": ["2026-07-01", "2026-07-05"]
+    })
+    resultado = validar_e_limpar_transacoes(df)
+    assert (resultado["valor"] >= 0).all()
+
+
+def test_remove_duplicatas():
+    df = pd.DataFrame({
+        "descricao": ["Mercado", "Mercado"],
+        "valor": [100.0, 100.0],
+        "data": ["2026-07-01", "2026-07-01"]
+    })
+    resultado = validar_e_limpar_transacoes(df)
+    assert len(resultado) == 1
+
+
+def test_remove_descricao_vazia():
+    df = pd.DataFrame({
+        "descricao": ["", "FarmÃ¡cia"],
+        "valor": [30.0, 45.0],
+        "data": ["2026-07-01", "2026-07-02"]
+    })
+    resultado = validar_e_limpar_transacoes(df)
+    assert len(resultado) == 1
+    assert resultado.iloc[0]["descricao"] == "FarmÃ¡cia"
+
+
+def test_data_invalida_e_descartada():
+    df = pd.DataFrame({
+        "descricao": ["Uber", "Padaria"],
+        "valor": [25.0, 15.0],
+        "data": ["data_invalida", "2026-07-03"]
+    })
+    resultado = validar_e_limpar_transacoes(df)
+    assert len(resultado) == 1
+
+
+def test_dataframe_vazio_nao_quebra():
+    df = pd.DataFrame(columns=["descricao", "valor", "data"])
+    resultado = validar_e_limpar_transacoes(df)
+    assert resultado.empty
+
+
+
+=== C:\Users\lucfs\Desktop\algoritmos para financeai\algoritmos para financeai\src\tests\__init__.py ===
+
+
+

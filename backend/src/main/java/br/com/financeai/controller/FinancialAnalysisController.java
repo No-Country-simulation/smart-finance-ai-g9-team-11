@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FinancialAnalysisController {
 
-    @PostMapping("/analise-financeira")
+//    @PostMapping("/analise-financeira")
     public String analise(){
         return """
                 Dados mockados, endpoint analise-financeira:

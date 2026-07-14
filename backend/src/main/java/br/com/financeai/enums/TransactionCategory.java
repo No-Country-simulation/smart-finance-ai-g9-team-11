@@ -1,4 +1,4 @@
-package br.com.financeai.entity;
+package br.com.financeai.enums;
 
 public enum TransactionCategory {
 

@@ -3,8 +3,6 @@ package br.com.financeai.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.security.PrivateKey;
-
 @Entity
 @Table(name = "recommendations")
 @Getter

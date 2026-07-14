@@ -1,10 +1,13 @@
 package br.com.financeai.entity;
 
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,18 +24,31 @@ public class FinancialAnalysis {
 
     private BigDecimal rendaMensal;
 
-    private int nivelEndividamento;
+    private Double nivelEndividamento;
 
-    private String frequenciaPoupanca;
+    @Enumerated(EnumType.STRING)
+    private SavingFrequency frequenciaPoupanca;
 
-    private String perfilFinanceiro;
+    @Enumerated(EnumType.STRING)
+    private FinancialProfile perfilFinanceiro;
 
-    private int probabilidade;
+    private BigDecimal probabilidade;
 
+    @Column(nullable = false)
     private LocalDateTime dataAnalise;
 
-    List<Transaction> transacoes;
+    @OneToMany(
+            mappedBy = "analysis",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Transaction> transacoes = new ArrayList<>();
 
-    List<Recommendation> recomendacoes;
+    @OneToMany(
+            mappedBy = "analysis",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Recommendation> recomendacoes = new ArrayList<>();
 
 }

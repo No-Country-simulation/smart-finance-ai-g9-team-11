@@ -1,12 +1,13 @@
 package br.com.financeai.entity;
 
+import br.com.financeai.enums.TransactionCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "financial_transactions")
 @Getter
 @Setter
 @NoArgsConstructor

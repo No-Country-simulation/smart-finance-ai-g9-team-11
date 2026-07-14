@@ -1,4 +1,9 @@
 package br.com.financeai.dto.response;
 
-public record ExpenseSummaryResponse() {
-}
+import java.math.BigDecimal;
+
+public record ExpenseSummaryResponse(
+        BigDecimal alimentacao,
+        BigDecimal transporte,
+        BigDecimal entretenimento
+) {}

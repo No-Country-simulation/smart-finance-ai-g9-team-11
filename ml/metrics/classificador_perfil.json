@@ -1,0 +1,32 @@
+{
+  "versao_projeto": "1.0.0",
+  "data_treinamento": "2026-07-11T23:05:05",
+  "nome_modelo_escolhido": "random_forest",
+  "classes": [
+    "em_observacao",
+    "em_risco",
+    "saudavel"
+  ],
+  "metricas_todos_modelos": {
+    "logistic_regression": {
+      "f1_macro": 0.8177471607119848,
+      "recall_em_risco": 0.8759124087591241,
+      "cv_f1_macro_media": 0.7863107236994312
+    },
+    "random_forest": {
+      "f1_macro": 0.9612709155856364,
+      "recall_em_risco": 1.0,
+      "cv_f1_macro_media": 0.8221629307108392
+    },
+    "svm": {
+      "f1_macro": 0.6184884071062933,
+      "recall_em_risco": 0.9343065693430657,
+      "cv_f1_macro_media": 0.6573789726131373
+    }
+  },
+  "ambiente": {
+    "python_version": "3.14.5",
+    "sklearn_version": "1.9.0"
+  },
+  "quantidade_registros_treino": 1200
+}

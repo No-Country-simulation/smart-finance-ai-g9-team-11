@@ -1,0 +1,42 @@
+{
+  "versao_projeto": "1.0.0",
+  "data_treinamento": "2026-07-11T23:04:58",
+  "nome_modelo_escolhido": "logistic_regression",
+  "classes": [
+    "alimentacao",
+    "educacao",
+    "lazer",
+    "moradia",
+    "outras",
+    "saude",
+    "servicos",
+    "transporte"
+  ],
+  "metricas_todos_modelos": {
+    "logistic_regression": {
+      "f1_macro": 1.0,
+      "recall_macro": 1.0,
+      "cv_f1_macro_media": 0.9977715842178634
+    },
+    "random_forest": {
+      "f1_macro": 0.9964676616915423,
+      "recall_macro": 0.9963235294117647,
+      "cv_f1_macro_media": 0.9979000705113619
+    },
+    "svm": {
+      "f1_macro": 1.0,
+      "recall_macro": 1.0,
+      "cv_f1_macro_media": 0.9993043478260869
+    },
+    "naive_bayes": {
+      "f1_macro": 1.0,
+      "recall_macro": 1.0,
+      "cv_f1_macro_media": 0.9936276391736918
+    }
+  },
+  "ambiente": {
+    "python_version": "3.14.5",
+    "sklearn_version": "1.9.0"
+  },
+  "quantidade_registros_treino": 1500
+}

@@ -4,6 +4,7 @@ import br.com.financeai.dto.request.FinancialAnalysisRequest;
 import br.com.financeai.dto.request.TransactionRequest;
 import br.com.financeai.dto.response.ExpenseSummaryResponse;
 import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.enums.FinancialProfile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -32,7 +33,7 @@ public class FinancialAnalysisController {
     @PostMapping("/analise-financeira")
     public FinancialAnalysisResponse analise(@Valid @RequestBody FinancialAnalysisRequest request){
         return new FinancialAnalysisResponse(
-                "Em observação",
+                FinancialProfile.EM_OBSERVACAO,
                 0.82,
                 new ExpenseSummaryResponse(
                         new BigDecimal("800.00"),

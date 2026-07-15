@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "financial_analysis")
+@Table(name = "analises_financeiras")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,33 +22,30 @@ public class FinancialAnalysis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private BigDecimal rendaMensal;
 
-    private Double nivelEndividamento;
+    @Column(nullable = false)
+    private Integer nivelEndividamento;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private SavingFrequency frequenciaPoupanca;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private FinancialProfile perfilFinanceiro;
 
+    @Column(nullable = false, precision = 3, scale = 2)
     private BigDecimal probabilidade;
+
+    @OneToMany(mappedBy = "analise",
+                cascade = CascadeType.ALL,
+                orphanRemoval = true)
+    private List<Transaction> transacoes = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime dataAnalise;
 
-    @OneToMany(
-            mappedBy = "analysis",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<Transaction> transacoes = new ArrayList<>();
-
-    @OneToMany(
-            mappedBy = "analysis",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<Recommendation> recomendacoes = new ArrayList<>();
 
 }

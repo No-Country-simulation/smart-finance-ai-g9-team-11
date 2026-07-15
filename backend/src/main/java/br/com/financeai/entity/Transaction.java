@@ -7,7 +7,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "financial_transactions")
+@Table(name = "transacoes")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,14 +18,17 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String descricao;
 
+    @Column(nullable = false)
     private BigDecimal valor;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TransactionCategory categoria;
 
-    @ManyToOne
-    @JoinColumn(name = "analysis_id")
-    private FinancialAnalysis analysis;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "analise_id")
+    private FinancialAnalysis analise;
 }

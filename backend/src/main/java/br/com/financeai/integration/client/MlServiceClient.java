@@ -5,6 +5,7 @@ import br.com.financeai.dto.response.ExpenseSummaryResponse;
 import br.com.financeai.enums.FinancialProfile;
 import br.com.financeai.integration.dto.MlResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -12,22 +13,19 @@ import java.util.List;
 @Service
 public class MlServiceClient {
 
+    private final RestClient restClient;
+
+    public MlServiceClient(RestClient restClient) {
+        this.restClient = restClient;
+    }
+
     public MlResponse analyze(FinancialAnalysisRequest request) {
 
-        ExpenseSummaryResponse resumoGastos = new ExpenseSummaryResponse(
-                new BigDecimal("420"), // alimentação
-                new BigDecimal("300"), // transporte
-                new BigDecimal("40") // entretenimento
-                 );
+        return restClient.post()
+                .uri("/analise-financeira")
+                .body(request)
+                .retrieve()
+                .body(MlResponse.class);
 
-        return new MlResponse(
-                FinancialProfile.EM_OBSERVACAO,
-                new Double("0.82"),
-                resumoGastos,
-                List.of(
-                        "Monitorar gastos recorrentes de entretenimento",
-                        "Aumentar reserva financeira mensal"
-                )
-        );
     }
 }

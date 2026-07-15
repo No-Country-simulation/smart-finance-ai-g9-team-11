@@ -3,6 +3,7 @@ package br.com.financeai.integration.client;
 import br.com.financeai.dto.request.FinancialAnalysisRequest;
 import br.com.financeai.dto.response.ExpenseSummaryResponse;
 import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.integration.dto.MlRequest;
 import br.com.financeai.integration.dto.MlResponse;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class MlServiceClient {
         this.restClient = restClient;
     }
 
-    public MlResponse analyze(FinancialAnalysisRequest request) {
+    public MlResponse analyze(MlRequest request) {
 
         return new MlResponse(
                 FinancialProfile.EM_OBSERVACAO,

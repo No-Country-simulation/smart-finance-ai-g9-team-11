@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FinancialAnalysisService {
 
-    private MlServiceClient mlServiceClient;
+    private  MlServiceClient mlServiceClient;
 
     public FinancialAnalysisService(MlServiceClient mlServiceClient) {
         this.mlServiceClient = mlServiceClient;

@@ -34,7 +34,7 @@ public class FinancialAnalysisController {
     public FinancialAnalysisResponse analise(@Valid @RequestBody FinancialAnalysisRequest request){
         return new FinancialAnalysisResponse(
                 FinancialProfile.EM_OBSERVACAO,
-                0.82,
+                new BigDecimal("0.82"),
                 new ExpenseSummaryResponse(
                         new BigDecimal("800.00"),
                         new BigDecimal("200.00"),

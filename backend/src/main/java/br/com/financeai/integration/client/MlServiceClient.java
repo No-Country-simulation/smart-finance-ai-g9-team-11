@@ -25,7 +25,7 @@ public class MlServiceClient {
 
         return new MlResponse(
                 FinancialProfile.EM_OBSERVACAO,
-                new Double("0.82"),
+                new BigDecimal("0.82"),
                 new ExpenseSummaryResponse(
                         new BigDecimal("420"),
                         new BigDecimal("300"),

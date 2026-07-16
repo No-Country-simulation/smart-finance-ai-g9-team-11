@@ -34,6 +34,7 @@ public class FinancialAnalysisController {
     public FinancialAnalysisResponse analise(@Valid @RequestBody FinancialAnalysisRequest request){
         return new FinancialAnalysisResponse(
                 FinancialProfile.EM_OBSERVACAO,
+>>>>>>>>> Temporary merge branch 2
                 0.82,
                 new ExpenseSummaryResponse(
                         new BigDecimal("800.00"),

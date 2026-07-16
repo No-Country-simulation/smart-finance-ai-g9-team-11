@@ -7,7 +7,7 @@ export function FinancialCards() {
     <>
       {dashboardMock.summary.map((card) => (
         <FinancialCard
-          key={card.id}
+          key={card.id ?? card.title}
           id={card.id}
           title={card.title}
           value={card.value}

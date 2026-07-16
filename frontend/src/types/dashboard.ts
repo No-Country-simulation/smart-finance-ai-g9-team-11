@@ -8,6 +8,18 @@ export interface Transaction {
   category: string;
   amount: number;
   date: string;
+
+  /**
+   * Tipo da movimentação.
+   * Utilizado para cores, gráficos e indicadores.
+   */
+  type: "income" | "expense";
+
+  /**
+   * Estado da transação.
+   * Futuramente virá do backend.
+   */
+  status: "completed" | "pending";
 }
 
 export interface DashboardMock {

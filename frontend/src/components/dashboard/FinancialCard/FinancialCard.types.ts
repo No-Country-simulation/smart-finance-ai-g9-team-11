@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 export interface FinancialCardProps {
+  id?: string;
   title: string;
   value: string;
   variation: string;

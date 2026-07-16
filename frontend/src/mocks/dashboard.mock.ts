@@ -7,9 +7,11 @@ import {
 } from "lucide-react";
 
 import type { FinancialCardProps } from "@/components/dashboard/FinancialCard/FinancialCard.types";
+import type { BalanceChartData } from "@/components/dashboard/BalanceChart/BalanceChart.types";
 
 export const dashboardMock: {
   summary: FinancialCardProps[];
+  cashFlow: BalanceChartData[];
 } = {
   summary: [
     {
@@ -44,5 +46,13 @@ export const dashboardMock: {
       trend: "up",
       icon: createElement(DollarSign, { className: "h-6 w-6 text-blue-600" }),
     },
+  ],
+  cashFlow: [
+    { month: "Jan", income: 42000, expenses: 21000 },
+    { month: "Fev", income: 38000, expenses: 19000 },
+    { month: "Mar", income: 45000, expenses: 22000 },
+    { month: "Abr", income: 47000, expenses: 24000 },
+    { month: "Mai", income: 50000, expenses: 26000 },
+    { month: "Jun", income: 52000, expenses: 28000 },
   ],
 };

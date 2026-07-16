@@ -12,6 +12,7 @@ export function DashboardGrid() {
           "grid-cols-1",
           "md:grid-cols-2",
           "xl:grid-cols-4"
+          
         )}
       >
         <FinancialCards />

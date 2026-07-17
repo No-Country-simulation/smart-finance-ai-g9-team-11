@@ -39,9 +39,9 @@ export function DashboardGrid() {
         </div>
 
         <div className="space-y-6">
-          {/* Próxima Sprint */}
+          {/* Próxima Sprint   <ScoreCard />*/}
           <div className="min-h-[320px] rounded-2xl border border-slate-200 bg-white shadow-sm" />
-
+          
           {/* Alerts */}
           <div className="min-h-[140px] rounded-2xl border border-slate-200 bg-white shadow-sm" />
         </div>

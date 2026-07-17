@@ -17,8 +17,20 @@ export const dashboardService = {
     return dashboardMock.transactions ?? [];
   },
 
+  getFinancialHealth() {
+    return dashboardMock.financialHealth;
+  },
+
   getInsights() {
-    return dashboardMock.insights ?? [];
+    return dashboardMock.financialHealth.insights;
+  },
+
+  getScore() {
+    return dashboardMock.financialHealth;
+  },
+
+  getAlerts() {
+    return dashboardMock.financialHealth.alerts;
   },
 
   async getDashboardData() {

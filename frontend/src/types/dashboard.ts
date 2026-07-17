@@ -22,6 +22,28 @@ export interface Transaction {
   status: "completed" | "pending";
 }
 
+export interface FinancialScore {
+  score: number;
+  maxScore: number;
+  classification: "Excelente" | "Bom" | "Regular" | "Baixo";
+  variation: string;
+}
+
+export interface FinancialAlert {
+  id: number;
+  title: string;
+  type: "success" | "warning" | "danger" | "info";
+}
+
+export interface FinancialHealth {
+  score: number;
+  maxScore: number;
+  classification: "Excelente" | "Bom" | "Regular" | "Baixo";
+  variation: string;
+  insights: string[];
+  alerts: FinancialAlert[];
+}
+
 export interface DashboardMock {
   summary: FinancialCardProps[];
 
@@ -31,5 +53,5 @@ export interface DashboardMock {
 
   transactions: Transaction[];
 
-  insights: string[];
+  financialHealth: FinancialHealth;
 }

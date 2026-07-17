@@ -174,10 +174,36 @@ export const dashboardMock: DashboardMock = {
   },
 ],
 
+  financialHealth: {
+  score: 91,
+  maxScore: 100,
+  classification: "Excelente",
+  variation: "+8 pontos este mês",
+
   insights: [
     "Você reduziu seus gastos com alimentação em 12% neste mês.",
     "Sua renda aumentou 8% em relação ao mês anterior.",
     "Seu Score Financeiro permanece acima da média dos usuários.",
     "Você pode economizar até R$ 420 reduzindo gastos recorrentes.",
   ],
-};
+
+  alerts: [
+    {
+      id: 1,
+      title: "Você gastou 18% acima da média com lazer.",
+      type: "warning",
+    },
+    {
+      id: 2,
+      title: "Sua reserva de emergência cresceu este mês.",
+      type: "success",
+    },
+    {
+      id: 3,
+      title: "Nenhuma conta em atraso encontrada.",
+      type: "info",
+    },
+  ],
+},
+
+}

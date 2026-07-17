@@ -21,11 +21,11 @@ Each team member was responsible for a specific set of tasks while collaborating
 | Gabriel  | Backend Developer         | Business rules, ML integration, database, services      |
 | Amanda   | Backend Developer         | REST controllers, Swagger/OpenAPI documentation         |
 | Leilanny | Backend Developer         | DTOs, request validation                                |
-| Member   | Backend Developer         | Persistence, repositories, API documentation            |
+         |
 | Member   | Backend Developer         | --------------------------------                        |
 | Gean     | Frontend Developer        | React application, UI/UX, API integration               |
-| Member   | Machine Learning Engineer | Model training, data preprocessing, prediction pipeline |
-| Member   | Machine Learning Engineer | FastAPI service, model deployment, inference            |
+| Luciano  | Machine Learning Engineer | Model training, data preprocessing, prediction pipeline |
+| Vitor    | Machine Learning Engineer | FastAPI service, model deployment, inference            |
 
 ---
 

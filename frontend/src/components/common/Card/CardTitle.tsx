@@ -1,16 +1,13 @@
 import type { CardSectionProps } from "./Card.types";
 
-export function CardTitle({
-  children,
-  className = "",
-}: CardSectionProps) {
+export function CardTitle({ children, className = "" }: CardSectionProps) {
   return (
     <h3
       className={`
-        text-lg
+        text-title
         font-semibold
         tracking-tight
-        text-slate-900
+        text-text
         ${className}
       `}
     >

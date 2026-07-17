@@ -1,9 +1,6 @@
 import type { CardSectionProps } from "./Card.types";
 
-export function CardContent({
-  children,
-  className = "",
-}: CardSectionProps) {
+export function CardContent({ children, className = "" }: CardSectionProps) {
   return (
     <div
       className={`

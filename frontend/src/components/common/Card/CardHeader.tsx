@@ -1,9 +1,6 @@
 import type { CardSectionProps } from "./Card.types";
 
-export function CardHeader({
-  children,
-  className = "",
-}: CardSectionProps) {
+export function CardHeader({ children, className = "" }: CardSectionProps) {
   return (
     <header
       className={`

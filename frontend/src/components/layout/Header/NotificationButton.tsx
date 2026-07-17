@@ -3,6 +3,7 @@ import { Bell } from "lucide-react";
 export function NotificationButton() {
   return (
     <button
+      aria-label="Notificações"
       className="
       relative
       flex
@@ -12,12 +13,15 @@ export function NotificationButton() {
       justify-center
       rounded-xl
       border
-      border-slate-200
-      bg-white
-      shadow-sm
+      border-border
+      bg-surface
+      text-text
+      shadow-card
       transition-all
+      duration-200
+      ease-out
       hover:-translate-y-0.5
-      hover:shadow-md
+      hover:shadow-elevated
       "
     >
       <Bell size={20} />
@@ -30,7 +34,7 @@ export function NotificationButton() {
         h-2
         w-2
         rounded-full
-        bg-red-500
+        bg-danger
         "
       />
     </button>

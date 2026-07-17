@@ -1,27 +1,26 @@
 import type { ChartTooltipProps } from "./Chart.types";
 
-export function ChartTooltip({
-  active,
-  payload,
-  label,
-}: ChartTooltipProps) {
+export function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-lg">
-      <p className="mb-3 text-sm font-semibold">
-        {label}
-      </p>
+    <div className="rounded-md bg-[var(--chart-tooltip-bg)] px-4 py-3 shadow-elevated">
+      {label && (
+        <p className="mb-2 text-caption font-medium text-[var(--chart-tooltip-text)] opacity-70">
+          {label}
+        </p>
+      )}
 
       {payload.map((item) => (
         <div
           key={item.dataKey}
-          className="flex justify-between gap-6 text-sm"
+          className="flex items-center justify-between gap-6 text-caption text-[var(--chart-tooltip-text)]"
         >
-          <span>{item.name}</span>
-
+          <span className="opacity-80">{item.name}</span>
           <span className="font-semibold">
-            R$ {Number(item.value).toLocaleString("pt-BR")}
+            {typeof item.value === "number"
+              ? item.value.toLocaleString("pt-BR")
+              : item.value}
           </span>
         </div>
       ))}

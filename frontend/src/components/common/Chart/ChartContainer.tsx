@@ -4,7 +4,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/common/Card";
-
 import type { ChartContainerProps } from "./Chart.types";
 
 export function ChartContainer({
@@ -20,16 +19,12 @@ export function ChartContainer({
           <CardTitle>{title}</CardTitle>
 
           {subtitle && (
-            <p className="mt-1 text-sm text-slate-500">
-              {subtitle}
-            </p>
+            <p className="mt-1 text-caption text-text-muted">{subtitle}</p>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="h-[340px]">
-        {children}
-      </CardContent>
+      <CardContent className="h-[340px]">{children}</CardContent>
     </Card>
   );
 }

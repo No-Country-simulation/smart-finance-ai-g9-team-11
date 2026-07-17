@@ -1,0 +1,132 @@
+/* ==========================================================================
+   Finance AI — Design Tokens
+   Single source of truth for color, radius, shadow and typography.
+   Semantic CSS variables live in :root / .dark so components never touch
+   raw hex values — only tokens (bg-surface, text-muted, border-border...).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --background: #F7F8FA;
+  --surface: #FFFFFF;
+  --surface-muted: #F1F3F6;
+  --surface-accent: #EAF1FF;    /* tinted KPI card, e.g. "Views" */
+  --surface-accent-2: #EEF0FA;  /* secondary tint, e.g. "Active Users" */
+
+  /* Borders */
+  --border: #E5E7EB;
+  --border-muted: #EEF0F3;
+
+  /* Brand */
+  --primary: #4F7CFF;
+  --primary-foreground: #FFFFFF;
+
+  /* Feedback */
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+
+  /* Text */
+  --text: #0F172A;
+  --text-muted: #64748B;
+  --text-subtle: #94A3B8;
+
+  /* Charts (kept as plain vars — consumed via getChartTheme(), not @theme,
+     because Recharts needs literal color strings, not Tailwind classes) */
+  --chart-line-1: #4F7CFF;
+  --chart-line-2: #0F172A;
+  --chart-grid: #EEF0F3;
+  --chart-tooltip-bg: #0F172A;
+  --chart-tooltip-text: #FFFFFF;
+
+  /* Raw RGB triplet used to build shadow colors with alpha below */
+  --shadow-color: 15 23 42;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: #111315;
+  --surface: #1B1D20;
+  --surface-muted: #17191C;
+  --surface-accent: #22314F;
+  --surface-accent-2: #1F2226;
+
+  --border: #2B2F36;
+  --border-muted: #24272C;
+
+  --primary: #7EA1FF;
+  --primary-foreground: #0F1115;
+
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+
+  --text: #F3F4F6;
+  --text-muted: #9CA3AF;
+  --text-subtle: #6B7280;
+
+  --chart-line-1: #7EA1FF;
+  --chart-line-2: #F3F4F6;
+  --chart-grid: #24272C;
+  --chart-tooltip-bg: #F3F4F6;
+  --chart-tooltip-text: #111315;
+
+  --shadow-color: 0 0 0;
+}
+
+/* @theme inline re-reads the CSS custom properties above at runtime, so
+   switching the .dark class instantly updates every bg-*/text-*/border-*
+   utility without a rebuild. This is the correct v4 pattern for themeable
+   tokens (as opposed to static @theme, which bakes values at build time). */
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-accent: var(--surface-accent);
+  --color-surface-accent-2: var(--surface-accent-2);
+
+  --color-border: var(--border);
+  --color-border-muted: var(--border-muted);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+
+  /* Radius namespace -> rounded-sm / rounded-md / rounded-card / rounded-lg / rounded-pill */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-card: 18px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Shadow namespace -> shadow-card / shadow-elevated */
+  --shadow-card: 0 1px 2px rgb(var(--shadow-color) / 0.04), 0 8px 24px -12px rgb(var(--shadow-color) / 0.10);
+  --shadow-elevated: 0 4px 12px rgb(var(--shadow-color) / 0.06), 0 16px 40px -16px rgb(var(--shadow-color) / 0.16);
+
+  /* Type scale namespace -> text-display / text-heading / text-title / text-body / text-caption
+     (font-size + line-height pair; combine with font-semibold etc. for weight) */
+  --text-display: 2.5rem;
+  --text-display--line-height: 1.1;
+
+  --text-heading: 1.5rem;
+  --text-heading--line-height: 1.25;
+
+  --text-title: 1.125rem;
+  --text-title--line-height: 1.4;
+
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.55;
+
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.4;
+}

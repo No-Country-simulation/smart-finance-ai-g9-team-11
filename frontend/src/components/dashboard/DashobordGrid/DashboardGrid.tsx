@@ -1,11 +1,16 @@
 import { cn } from "@/lib/utils";
 
-import { FinancialCards } from "../FinancialCards";
+import { AIInsights } from "../AIInsights";
 import { BalanceChart } from "../BalanceChart";
+import { FinancialCards } from "../FinancialCards";
+import { TransactionsTable } from "../TransactionsTable";
+
+// Será implementado na próxima sprint
+// import { ScoreCard } from "../ScoreCard";
 
 export function DashboardGrid() {
   return (
-    <section className="mt-8 grid gap-6">
+    <section className="mt-8 space-y-6">
       {/* Financial Cards */}
       <div
         className={cn(
@@ -18,20 +23,28 @@ export function DashboardGrid() {
         <FinancialCards />
       </div>
 
-      {/* Charts */}
+      {/* Balance + AI */}
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
           <BalanceChart />
         </div>
 
-        <div className="h-96 rounded-2xl border border-slate-200 bg-white shadow-sm" />
+        <AIInsights />
       </div>
 
-      {/* Transactions */}
+      {/* Transactions + Sidebar Widgets */}
       <div className="grid gap-6 xl:grid-cols-3">
-        <div className="h-[480px] rounded-2xl border border-slate-200 bg-white shadow-sm xl:col-span-2" />
+        <div className="xl:col-span-2">
+          <TransactionsTable />
+        </div>
 
-        <div className="h-[480px] rounded-2xl border border-slate-200 bg-white shadow-sm" />
+        <div className="space-y-6">
+          {/* Próxima Sprint */}
+          <div className="min-h-[320px] rounded-2xl border border-slate-200 bg-white shadow-sm" />
+
+          {/* Alerts */}
+          <div className="min-h-[140px] rounded-2xl border border-slate-200 bg-white shadow-sm" />
+        </div>
       </div>
     </section>
   );

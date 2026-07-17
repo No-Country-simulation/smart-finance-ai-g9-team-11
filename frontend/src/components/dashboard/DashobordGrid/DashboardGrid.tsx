@@ -5,11 +5,40 @@ import { AIInsights } from "../AIInsights";
 import { Alerts } from "../Alerts";
 import { BalanceChart } from "../BalanceChart";
 import { FinancialCards } from "../FinancialCards";
+import {
+  QuickActions,
+  type QuickAction,
+} from "../QuickActions";
 import { ScoreCard } from "../ScoreCard";
 import { TransactionsTable } from "../TransactionsTable";
 
 export function DashboardGrid() {
   const { alerts } = dashboardMock.financialHealth;
+
+  const handleQuickAction = (action: QuickAction): void => {
+    switch (action.id) {
+      case "add-transaction":
+        console.info("Abrir fluxo de nova transação.");
+        break;
+
+      case "run-analysis":
+        console.info("Executar nova análise financeira.");
+        break;
+
+      case "view-recommendations":
+        console.info("Abrir recomendações financeiras.");
+        break;
+
+      case "import-transactions":
+        console.info("Importação de transações indisponível.");
+        break;
+
+      default: {
+        const exhaustiveCheck: never = action.id;
+        return exhaustiveCheck;
+      }
+    }
+  };
 
   return (
     <section
@@ -19,7 +48,10 @@ export function DashboardGrid() {
       )}
       aria-labelledby="dashboard-overview-title"
     >
-      <h2 id="dashboard-overview-title" className="sr-only">
+      <h2
+        id="dashboard-overview-title"
+        className="sr-only"
+      >
         Visão geral financeira
       </h2>
 
@@ -53,7 +85,7 @@ export function DashboardGrid() {
         </div>
       </div>
 
-      {/* Transações e indicadores de saúde financeira */}
+      {/* Transações e widgets de saúde financeira */}
       <div
         className={cn(
           "grid min-w-0 grid-cols-1 items-start gap-4",
@@ -72,11 +104,13 @@ export function DashboardGrid() {
             "sm:gap-5",
             "xl:gap-6",
           )}
-          aria-label="Saúde financeira e alertas"
+          aria-label="Saúde financeira e ações"
         >
           <ScoreCard />
 
           <Alerts alerts={alerts} />
+
+          <QuickActions onAction={handleQuickAction} />
         </aside>
       </div>
     </section>

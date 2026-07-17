@@ -1,10 +1,10 @@
 import { NavLink } from "react-router-dom";
-import type { NavigationItem } from "../../../types/navigation.types";
+import type { NavigationItem } from "@/types/navigation.types";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "../../ui/tooltip";
+} from "@/components/ui/tooltip";
 
 interface SidebarItemProps {
   item: NavigationItem;
@@ -28,8 +28,8 @@ export function SidebarItem({ item, index, isCollapsed }: SidebarItemProps) {
       className={({ isActive }) =>
         `group flex items-center gap-3 rounded-lg px-3 py-2.5 opacity-0 motion-safe:animate-slide-in transition-colors duration-200 ${
           isActive
-            ? "bg-brand-600/20 text-white"
-            : "text-slate-400 hover:bg-white/5 hover:text-white"
+            ? "bg-primary/10 text-primary"
+            : "text-text-muted hover:bg-surface-muted hover:text-text"
         }`
       }
     >
@@ -38,7 +38,7 @@ export function SidebarItem({ item, index, isCollapsed }: SidebarItemProps) {
           <Icon
             size={18}
             className={`shrink-0 transition-colors duration-200 ${
-              isActive ? "text-brand-500" : "text-slate-400 group-hover:text-white"
+              isActive ? "text-primary" : "text-text-muted group-hover:text-text"
             }`}
           />
           {!isCollapsed && (

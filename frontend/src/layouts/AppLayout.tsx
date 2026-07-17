@@ -8,16 +8,14 @@ export function AppLayout() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <Header
-          onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
-        />
+        <Header onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)} />
 
         <main className="flex-1 overflow-y-auto p-6">
           <Outlet />

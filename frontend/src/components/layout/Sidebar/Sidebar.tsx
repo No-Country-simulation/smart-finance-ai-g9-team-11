@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronLeft, TrendingUp } from "lucide-react";
 import { SidebarItem } from "./SidebarItem";
-import { NAVIGATION_ITEMS } from "../../../constants/navigation.constants";
+import { NAVIGATION_ITEMS } from "@/constants/navigation.constants";
 
 interface SidebarProps {
   isMobileOpen: boolean;
@@ -20,6 +20,10 @@ interface SidebarProps {
  * a árvore de navegação (uma pra desktop, outra dentro da Sheet pra mobile).
  * Controlando a posição via CSS puro (translate-x), o MESMO componente
  * serve pros dois cenários — menos código, menos bugs de sincronização.
+ *
+ * Cor: segue o token `surface` (não fica sempre escura) — no template de
+ * referência a sidebar acompanha o tema da página, com uma borda sutil
+ * separando do conteúdo.
  */
 export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -36,15 +40,15 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-navy-900 transition-all duration-300 ease-in-out
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-surface transition-all duration-300 ease-in-out
           ${isCollapsed ? "w-[76px]" : "w-64"}
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
           md:static md:translate-x-0`}
       >
         <div className="flex items-center gap-2 px-4 py-5">
-          <TrendingUp className="shrink-0 text-brand-500" size={22} />
+          <TrendingUp className="shrink-0 text-primary" size={22} />
           {!isCollapsed && (
-            <span className="text-base font-medium text-white">Finance AI</span>
+            <span className="text-base font-semibold text-text">Finance AI</span>
           )}
         </div>
 
@@ -62,7 +66,7 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
         {/* Botão de colapsar — só faz sentido em desktop */}
         <button
           onClick={() => setIsCollapsed((prev) => !prev)}
-          className="mx-2 mb-4 hidden items-center justify-center rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/5 hover:text-white md:flex"
+          className="mx-2 mb-4 hidden items-center justify-center rounded-lg p-2 text-text-muted transition-colors duration-200 hover:bg-surface-muted hover:text-text md:flex"
           aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
         >
           <ChevronLeft

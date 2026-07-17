@@ -4,6 +4,7 @@ import { AIInsights } from "../AIInsights";
 import { BalanceChart } from "../BalanceChart";
 import { FinancialCards } from "../FinancialCards";
 import { TransactionsTable } from "../TransactionsTable";
+import { ScoreCard } from "../ScoreCard";
 
 // Será implementado na próxima sprint
 // import { ScoreCard } from "../ScoreCard";
@@ -39,7 +40,10 @@ export function DashboardGrid() {
         </div>
 
         <div className="space-y-6">
-          {/* Próxima Sprint   <ScoreCard />*/}
+          {/* Próxima Sprint */}
+
+          <ScoreCard />
+
           <div className="min-h-[320px] rounded-2xl border border-slate-200 bg-white shadow-sm" />
           
           {/* Alerts */}

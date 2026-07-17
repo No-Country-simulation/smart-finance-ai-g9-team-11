@@ -1,6 +1,7 @@
-import type { FinancialCardProps } from "@/components/dashboard/FinancialCard/FinancialCard.types";
 import type { BalanceChartData } from "@/components/dashboard/BalanceChart/BalanceChart.types";
 import type { ExpenseCategory } from "@/components/dashboard/ExpenseChart/ExpenseChart.types";
+import type { FinancialAlert } from "@/components/dashboard/Alerts";
+import type { FinancialCardProps } from "@/components/dashboard/FinancialCard/FinancialCard.types";
 
 export interface Transaction {
   id: number;
@@ -29,12 +30,6 @@ export interface FinancialScore {
   variation: string;
 }
 
-export interface FinancialAlert {
-  id: number;
-  title: string;
-  type: "success" | "warning" | "danger" | "info";
-}
-
 export interface FinancialHealth {
   score: number;
   maxScore: number;
@@ -46,12 +41,8 @@ export interface FinancialHealth {
 
 export interface DashboardMock {
   summary: FinancialCardProps[];
-
   cashFlow: BalanceChartData[];
-
   categories: ExpenseCategory[];
-
   transactions: Transaction[];
-
   financialHealth: FinancialHealth;
 }

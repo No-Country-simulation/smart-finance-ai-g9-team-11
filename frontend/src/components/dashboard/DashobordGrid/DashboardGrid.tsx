@@ -1,54 +1,83 @@
 import { cn } from "@/lib/utils";
+import { dashboardMock } from "@/mocks/dashboard.mock";
 
 import { AIInsights } from "../AIInsights";
+import { Alerts } from "../Alerts";
 import { BalanceChart } from "../BalanceChart";
 import { FinancialCards } from "../FinancialCards";
-import { TransactionsTable } from "../TransactionsTable";
 import { ScoreCard } from "../ScoreCard";
-
-// Será implementado na próxima sprint
-// import { ScoreCard } from "../ScoreCard";
+import { TransactionsTable } from "../TransactionsTable";
 
 export function DashboardGrid() {
+  const { alerts } = dashboardMock.financialHealth;
+
   return (
-    <section className="mt-8 space-y-6">
-      {/* Financial Cards */}
+    <section
+      className={cn(
+        "mt-6 min-w-0 space-y-5",
+        "sm:mt-8 sm:space-y-6",
+      )}
+      aria-labelledby="dashboard-overview-title"
+    >
+      <h2 id="dashboard-overview-title" className="sr-only">
+        Visão geral financeira
+      </h2>
+
+      {/* Resumo financeiro */}
       <div
         className={cn(
-          "grid gap-6",
-          "grid-cols-1",
+          "grid min-w-0 grid-cols-1 gap-4",
+          "sm:gap-5",
           "md:grid-cols-2",
-          "xl:grid-cols-4"
+          "xl:grid-cols-4 xl:gap-6",
         )}
       >
         <FinancialCards />
       </div>
 
-      {/* Balance + AI */}
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2">
+      {/* Fluxo financeiro e análises da IA */}
+      <div
+        className={cn(
+          "grid min-w-0 grid-cols-1 items-start gap-4",
+          "sm:gap-5",
+          "xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]",
+          "xl:gap-6",
+        )}
+      >
+        <div className="min-w-0">
           <BalanceChart />
         </div>
 
-        <AIInsights />
+        <div className="min-w-0">
+          <AIInsights />
+        </div>
       </div>
 
-      {/* Transactions + Sidebar Widgets */}
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2">
+      {/* Transações e indicadores de saúde financeira */}
+      <div
+        className={cn(
+          "grid min-w-0 grid-cols-1 items-start gap-4",
+          "sm:gap-5",
+          "xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]",
+          "xl:gap-6",
+        )}
+      >
+        <div className="min-w-0">
           <TransactionsTable />
         </div>
 
-        <div className="space-y-6">
-          {/* Próxima Sprint */}
-
+        <aside
+          className={cn(
+            "grid min-w-0 content-start gap-4",
+            "sm:gap-5",
+            "xl:gap-6",
+          )}
+          aria-label="Saúde financeira e alertas"
+        >
           <ScoreCard />
 
-          <div className="min-h-[320px] rounded-2xl border border-slate-200 bg-white shadow-sm" />
-          
-          {/* Alerts */}
-          <div className="min-h-[140px] rounded-2xl border border-slate-200 bg-white shadow-sm" />
-        </div>
+          <Alerts alerts={alerts} />
+        </aside>
       </div>
     </section>
   );

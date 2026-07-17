@@ -17,7 +17,7 @@ export function ScoreGauge({
     circumference - progress * circumference;
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="relative flex items-center justify-center">
       <svg
         width={140}
         height={140}

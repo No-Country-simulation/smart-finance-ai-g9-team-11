@@ -5,6 +5,7 @@ import {
   Wallet,
 } from "lucide-react";
 
+import type { FinancialAlert } from "@/components/dashboard/Alerts";
 import type { DashboardMock } from "@/types/dashboard";
 
 export const dashboardMock: DashboardMock = {
@@ -23,7 +24,9 @@ export const dashboardMock: DashboardMock = {
       value: "R$ 24.300,00",
       variation: "+12,8%",
       trend: "up",
-      icon: <ArrowUpCircle className="h-6 w-6 text-emerald-600" />,
+      icon: (
+        <ArrowUpCircle className="h-6 w-6 text-emerald-600" />
+      ),
     },
     {
       id: "expenses",
@@ -31,7 +34,9 @@ export const dashboardMock: DashboardMock = {
       value: "R$ 5.759,75",
       variation: "-3,2%",
       trend: "down",
-      icon: <ArrowDownCircle className="h-6 w-6 text-red-600" />,
+      icon: (
+        <ArrowDownCircle className="h-6 w-6 text-red-600" />
+      ),
     },
     {
       id: "score",
@@ -100,110 +105,117 @@ export const dashboardMock: DashboardMock = {
   ],
 
   transactions: [
-  {
-    id: 1,
-    description: "Salário",
-    category: "Receita",
-    amount: 12000,
-    date: "2026-07-05",
-    type: "income",
-    status: "completed",
-  },
-  {
-    id: 2,
-    description: "Supermercado Mateus",
-    category: "Alimentação",
-    amount: -350.45,
-    date: "2026-07-08",
-    type: "expense",
-    status: "completed",
-  },
-  {
-    id: 3,
-    description: "Netflix",
-    category: "Assinatura",
-    amount: -39.9,
-    date: "2026-07-09",
-    type: "expense",
-    status: "completed",
-  },
-  {
-    id: 4,
-    description: "Posto Shell",
-    category: "Transporte",
-    amount: -220,
-    date: "2026-07-10",
-    type: "expense",
-    status: "completed",
-  },
-  {
-    id: 5,
-    description: "Aluguel",
-    category: "Moradia",
-    amount: -1800,
-    date: "2026-07-01",
-    type: "expense",
-    status: "completed",
-  },
-  {
-    id: 6,
-    description: "Freelance React",
-    category: "Receita",
-    amount: 2800,
-    date: "2026-07-12",
-    type: "income",
-    status: "completed",
-  },
-  {
-    id: 7,
-    description: "Conta de Energia",
-    category: "Moradia",
-    amount: -245.8,
-    date: "2026-07-13",
-    type: "expense",
-    status: "pending",
-  },
-  {
-    id: 8,
-    description: "Farmácia",
-    category: "Saúde",
-    amount: -89.5,
-    date: "2026-07-14",
-    type: "expense",
-    status: "completed",
-  },
-],
-
-  financialHealth: {
-  score: 91,
-  maxScore: 100,
-  classification: "Excelente",
-  variation: "+8 pontos este mês",
-
-  insights: [
-    "Você reduziu seus gastos com alimentação em 12% neste mês.",
-    "Sua renda aumentou 8% em relação ao mês anterior.",
-    "Seu Score Financeiro permanece acima da média dos usuários.",
-    "Você pode economizar até R$ 420 reduzindo gastos recorrentes.",
-  ],
-
-  alerts: [
     {
       id: 1,
-      title: "Você gastou 18% acima da média com lazer.",
-      type: "warning",
+      description: "Salário",
+      category: "Receita",
+      amount: 12000,
+      date: "2026-07-05",
+      type: "income",
+      status: "completed",
     },
     {
       id: 2,
-      title: "Sua reserva de emergência cresceu este mês.",
-      type: "success",
+      description: "Supermercado Mateus",
+      category: "Alimentação",
+      amount: -350.45,
+      date: "2026-07-08",
+      type: "expense",
+      status: "completed",
     },
     {
       id: 3,
-      title: "Nenhuma conta em atraso encontrada.",
-      type: "info",
+      description: "Netflix",
+      category: "Assinatura",
+      amount: -39.9,
+      date: "2026-07-09",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 4,
+      description: "Posto Shell",
+      category: "Transporte",
+      amount: -220,
+      date: "2026-07-10",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 5,
+      description: "Aluguel",
+      category: "Moradia",
+      amount: -1800,
+      date: "2026-07-01",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 6,
+      description: "Freelance React",
+      category: "Receita",
+      amount: 2800,
+      date: "2026-07-12",
+      type: "income",
+      status: "completed",
+    },
+    {
+      id: 7,
+      description: "Conta de Energia",
+      category: "Moradia",
+      amount: -245.8,
+      date: "2026-07-13",
+      type: "expense",
+      status: "pending",
+    },
+    {
+      id: 8,
+      description: "Farmácia",
+      category: "Saúde",
+      amount: -89.5,
+      date: "2026-07-14",
+      type: "expense",
+      status: "completed",
     },
   ],
-},
 
-}
+  financialHealth: {
+    score: 91,
+    maxScore: 100,
+    classification: "Excelente",
+    variation: "+8 pontos este mês",
+
+    insights: [
+      "Você reduziu seus gastos com alimentação em 12% neste mês.",
+      "Sua renda aumentou 8% em relação ao mês anterior.",
+      "Seu Score Financeiro permanece acima da média dos usuários.",
+      "Você pode economizar até R$ 420 reduzindo gastos recorrentes.",
+    ],
+
+    alerts: [
+      {
+        id: 1,
+        title: "Despesas recorrentes aumentaram",
+        description:
+          "Seus gastos recorrentes cresceram 12% em relação ao mês anterior.",
+        type: "warning",
+        actionLabel: "Ver despesas",
+      },
+      {
+        id: 2,
+        title: "Gastos com alimentação acima da média",
+        description:
+          "A categoria alimentação representa 28% das suas despesas deste mês.",
+        type: "danger",
+        actionLabel: "Analisar categoria",
+      },
+      {
+        id: 3,
+        title: "Receita mensal aumentou",
+        description:
+          "Sua receita apresentou crescimento de 8% em comparação ao mês anterior.",
+        type: "success",
+      },
+    ] satisfies FinancialAlert[],
+  },
+};

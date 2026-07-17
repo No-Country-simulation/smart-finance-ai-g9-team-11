@@ -1,5 +1,6 @@
 package br.com.financeai.dto.request;
 
+import br.com.financeai.enums.SavingFrequency;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,8 +21,8 @@ public record FinancialAnalysisRequest(
         @PositiveOrZero(message = "O nível de endividamento não pode ser negativo.")
         @JsonProperty("nivel_endividamento") Integer nivelEndividamento,
 
-        @NotBlank(message = "A frequência de poupança é obrigatória.")
-        @JsonProperty("frequencia_poupanca") String frequenciaPoupanca,
+        @NotNull(message = "A frequência de poupança é obrigatória.")
+        @JsonProperty("frequencia_poupanca") SavingFrequency frequenciaPoupanca,
 
         @NotNull(message = "A lista de transações não pode ser nula.")
         @Valid // Essencial para que o Spring valide os itens dentro da lista

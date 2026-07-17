@@ -4,20 +4,31 @@ import br.com.financeai.dto.request.FinancialAnalysisRequest;
 import br.com.financeai.dto.request.TransactionRequest;
 import br.com.financeai.dto.response.ExpenseSummaryResponse;
 import br.com.financeai.dto.response.FinancialAnalysisResponse;
-import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.service.FinancialAnalysisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.math.BigDecimal;
+
+
 
 
 @RestController
 public class FinancialAnalysisController {
+
+
+    private final FinancialAnalysisService financialAnalysisService;
+
+    public FinancialAnalysisController(FinancialAnalysisService financialAnalysisService) {
+        this.financialAnalysisService = financialAnalysisService;
+    }
+
     @Operation(
             summary = "Analyze financial profile",
             description = "Receives the user's financial data and returns a mocked financial analysis."
@@ -31,16 +42,10 @@ public class FinancialAnalysisController {
             description = "Invalid request data"
     )
     @PostMapping("/analise-financeira")
-    public FinancialAnalysisResponse analise(@Valid @RequestBody FinancialAnalysisRequest request){
-        return new FinancialAnalysisResponse(
-                FinancialProfile.EM_OBSERVACAO,
-                new BigDecimal("0.82"),
-                new ExpenseSummaryResponse(
-                        new BigDecimal("800.00"),
-                        new BigDecimal("200.00"),
-                        new BigDecimal("100.00")),
-                List.of("Monitor gastos", "Aumentar reserva")
-        );
+    public ResponseEntity<FinancialAnalysisResponse> analise(@Valid @RequestBody FinancialAnalysisRequest request){
+
+
+        return ResponseEntity.ok(financialAnalysisService.analyze(request));
     }
 
     @Operation(

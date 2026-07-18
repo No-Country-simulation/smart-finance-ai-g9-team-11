@@ -1,3 +1,4 @@
+@import "@fontsource-variable/geist";
 @import "tailwindcss";
 @import "./styles/theme.css";
 
@@ -113,10 +114,6 @@ button:disabled {
   outline: 2px solid var(--primary-bright);
   outline-offset: 3px;
 }
-
-/* --------------------------------------------------------------------------
-   Application shell
-   -------------------------------------------------------------------------- */
 
 .app-shell {
   background:

@@ -25,17 +25,21 @@ import { NAVIGATION_ITEMS } from "@/constants/navigation.constants";
 import { cn } from "@/lib/utils";
 import { userMock } from "@/mocks/user.mock";
 
+import {
+  clampSidebarWidth,
+  SIDEBAR_COLLAPSED_LIMIT,
+  SIDEBAR_KEYBOARD_STEP,
+  SIDEBAR_MAX_WIDTH,
+  SIDEBAR_MIN_WIDTH,
+} from "./Sidebar.constants";
 import { SidebarItem } from "./SidebarItem";
 
 interface SidebarProps {
   isMobileOpen: boolean;
   onCloseMobile: () => void;
+  width: number;
+  onWidthChange: (width: number) => void;
 }
-
-const SIDEBAR_MIN_WIDTH = 80;
-const SIDEBAR_MAX_WIDTH = 196;
-const SIDEBAR_COLLAPSED_LIMIT = 124;
-const SIDEBAR_KEYBOARD_STEP = 12;
 
 interface SidebarStyle extends CSSProperties {
   "--sidebar-width": string;
@@ -50,14 +54,9 @@ function getUserInitials(name: string): string {
     .join("");
 }
 
-function clampSidebarWidth(width: number): number {
-  return Math.min(
-    SIDEBAR_MAX_WIDTH,
-    Math.max(SIDEBAR_MIN_WIDTH, width),
-  );
-}
-
-function isInteractiveElement(target: EventTarget | null): boolean {
+function isInteractiveElement(
+  target: EventTarget | null,
+): boolean {
   if (!(target instanceof HTMLElement)) {
     return false;
   }
@@ -82,19 +81,24 @@ function isInteractiveElement(target: EventTarget | null): boolean {
 export function Sidebar({
   isMobileOpen,
   onCloseMobile,
+  width,
+  onWidthChange,
 }: Readonly<SidebarProps>) {
-  const [sidebarWidth, setSidebarWidth] = useState(
-    SIDEBAR_MIN_WIDTH,
-  );
   const [isResizing, setIsResizing] = useState(false);
 
   const sidebarRef = useRef<HTMLElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef =
+    useRef<HTMLButtonElement>(null);
   const resizeStartXRef = useRef(0);
-  const resizeStartWidthRef = useRef(SIDEBAR_MIN_WIDTH);
+  const resizeStartWidthRef = useRef(
+    SIDEBAR_MIN_WIDTH,
+  );
   const didResizeRef = useRef(false);
 
   const initials = getUserInitials(userMock.name);
+
+  const sidebarWidth = clampSidebarWidth(width);
+
   const isCollapsed =
     sidebarWidth < SIDEBAR_COLLAPSED_LIMIT;
 
@@ -103,11 +107,11 @@ export function Sidebar({
   };
 
   const expandSidebar = (): void => {
-    setSidebarWidth(SIDEBAR_MAX_WIDTH);
+    onWidthChange(SIDEBAR_MAX_WIDTH);
   };
 
   const collapseSidebar = (): void => {
-    setSidebarWidth(SIDEBAR_MIN_WIDTH);
+    onWidthChange(SIDEBAR_MIN_WIDTH);
   };
 
   const toggleCollapsed = (): void => {
@@ -124,7 +128,8 @@ export function Sidebar({
       return;
     }
 
-    const previousOverflow = document.body.style.overflow;
+    const previousOverflow =
+      document.body.style.overflow;
 
     document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
@@ -137,10 +142,15 @@ export function Sidebar({
       }
     };
 
-    document.addEventListener("keydown", handleEscape);
+    document.addEventListener(
+      "keydown",
+      handleEscape,
+    );
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow =
+        previousOverflow;
+
       document.removeEventListener(
         "keydown",
         handleEscape,
@@ -153,7 +163,9 @@ export function Sidebar({
       return;
     }
 
-    const previousCursor = document.body.style.cursor;
+    const previousCursor =
+      document.body.style.cursor;
+
     const previousUserSelect =
       document.body.style.userSelect;
 
@@ -174,7 +186,7 @@ export function Sidebar({
         resizeStartWidthRef.current + deltaX,
       );
 
-      setSidebarWidth(nextWidth);
+      onWidthChange(nextWidth);
     };
 
     const finishResizing = (): void => {
@@ -189,10 +201,12 @@ export function Sidebar({
       "pointermove",
       handlePointerMove,
     );
+
     window.addEventListener(
       "pointerup",
       finishResizing,
     );
+
     window.addEventListener(
       "pointercancel",
       finishResizing,
@@ -207,16 +221,18 @@ export function Sidebar({
         "pointermove",
         handlePointerMove,
       );
+
       window.removeEventListener(
         "pointerup",
         finishResizing,
       );
+
       window.removeEventListener(
         "pointercancel",
         finishResizing,
       );
     };
-  }, [isResizing]);
+  }, [isResizing, onWidthChange]);
 
   const handleResizePointerDown = (
     event: ReactPointerEvent<HTMLButtonElement>,
@@ -241,18 +257,20 @@ export function Sidebar({
     switch (event.key) {
       case "ArrowLeft":
         event.preventDefault();
-        setSidebarWidth((currentWidth) =>
+
+        onWidthChange(
           clampSidebarWidth(
-            currentWidth - SIDEBAR_KEYBOARD_STEP,
+            sidebarWidth - SIDEBAR_KEYBOARD_STEP,
           ),
         );
         break;
 
       case "ArrowRight":
         event.preventDefault();
-        setSidebarWidth((currentWidth) =>
+
+        onWidthChange(
           clampSidebarWidth(
-            currentWidth + SIDEBAR_KEYBOARD_STEP,
+            sidebarWidth + SIDEBAR_KEYBOARD_STEP,
           ),
         );
         break;
@@ -320,7 +338,8 @@ export function Sidebar({
     ).filter(
       (element) =>
         !element.hasAttribute("disabled") &&
-        element.getAttribute("aria-hidden") !== "true",
+        element.getAttribute("aria-hidden") !==
+          "true",
     );
 
     if (focusableElements.length === 0) {
@@ -329,7 +348,9 @@ export function Sidebar({
 
     const firstElement = focusableElements[0];
     const lastElement =
-      focusableElements[focusableElements.length - 1];
+      focusableElements[
+        focusableElements.length - 1
+      ];
 
     if (
       event.shiftKey &&
@@ -386,11 +407,9 @@ export function Sidebar({
           "md:w-[var(--sidebar-width)]",
           "md:rounded-[20px] md:border",
           "md:border-border-highlight/60",
-          isResizing &&
-            "md:transition-none",
+          isResizing && "md:transition-none",
         )}
         aria-label="Menu principal"
-        aria-hidden={!isMobileOpen ? undefined : false}
       >
         <div
           className={cn(
@@ -409,16 +428,17 @@ export function Sidebar({
           className={cn(
             "absolute inset-y-5 -right-1 z-20 hidden w-2",
             "cursor-col-resize rounded-full md:block",
-            "focus-visible:outline-none",
             "focus-visible:ring-2 focus-visible:ring-primary",
             "focus-visible:ring-offset-2",
             "focus-visible:ring-offset-background",
-            "after:absolute after:inset-y-0 after:left-1/2",
-            "after:w-px after:-translate-x-1/2",
+            "after:absolute after:inset-y-0",
+            "after:left-1/2 after:w-px",
+            "after:-translate-x-1/2",
             "after:bg-transparent",
             "hover:after:bg-primary/45",
             "focus-visible:after:bg-primary/70",
-            isResizing && "after:bg-primary-bright",
+            isResizing &&
+              "after:bg-primary-bright",
           )}
           role="separator"
           aria-orientation="vertical"
@@ -475,8 +495,14 @@ export function Sidebar({
                 "min-w-0 transition-[opacity,transform,width]",
                 "duration-200 motion-reduce:transition-none",
                 isCollapsed
-                  ? "md:pointer-events-none md:w-0 md:-translate-x-2 md:opacity-0"
-                  : "w-auto translate-x-0 opacity-100",
+                  ? [
+                      "md:pointer-events-none md:w-0",
+                      "md:-translate-x-2 md:opacity-0",
+                    ]
+                  : [
+                      "w-auto translate-x-0",
+                      "opacity-100",
+                    ],
               )}
             >
               <p className="truncate text-sm font-semibold tracking-tight text-text">
@@ -491,10 +517,13 @@ export function Sidebar({
             onClick={onCloseMobile}
             className={cn(
               "flex size-10 shrink-0 items-center justify-center",
-              "rounded-xl border border-border bg-surface-elevated",
-              "text-text-muted transition-colors",
-              "hover:border-border-highlight hover:text-text",
-              "focus-visible:ring-2 focus-visible:ring-primary",
+              "rounded-xl border border-border",
+              "bg-surface-elevated text-text-muted",
+              "transition-colors",
+              "hover:border-border-highlight",
+              "hover:text-text",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary",
               "md:hidden",
             )}
             aria-label="Fechar menu principal"
@@ -530,10 +559,16 @@ export function Sidebar({
             className={cn(
               "flex min-h-11 w-full items-center rounded-xl",
               "border border-border-muted",
-              "bg-surface-elevated/45 text-text-muted",
-              "disabled:cursor-not-allowed disabled:opacity-70",
+              "bg-surface-elevated/45",
+              "text-text-muted",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-70",
               isCollapsed
-                ? "justify-start gap-3 px-3 md:justify-center md:gap-0 md:px-2"
+                ? [
+                    "justify-start gap-3 px-3",
+                    "md:justify-center md:gap-0",
+                    "md:px-2",
+                  ]
                 : "justify-start gap-3 px-3",
             )}
           >
@@ -562,11 +597,15 @@ export function Sidebar({
           <div
             data-prevent-sidebar-toggle
             className={cn(
-              "flex min-h-[62px] items-center rounded-[15px]",
-              "border border-border bg-card",
-              "shadow-card",
+              "flex min-h-[62px] items-center",
+              "rounded-[15px] border border-border",
+              "bg-card shadow-card",
               isCollapsed
-                ? "gap-3 px-3 md:justify-center md:gap-0 md:px-2"
+                ? [
+                    "gap-3 px-3",
+                    "md:justify-center md:gap-0",
+                    "md:px-2",
+                  ]
                 : "gap-3 px-3",
             )}
           >
@@ -584,12 +623,16 @@ export function Sidebar({
 
               <span
                 className={cn(
-                  "absolute -bottom-0.5 -right-0.5 size-2.5",
-                  "rounded-full border-2 border-surface",
-                  "bg-success",
+                  "absolute -bottom-0.5 -right-0.5",
+                  "size-2.5 rounded-full",
+                  "border-2 border-surface bg-success",
                 )}
-                aria-label="Usuário online"
+                aria-hidden="true"
               />
+
+              <span className="sr-only">
+                Usuário online
+              </span>
             </div>
 
             {!isCollapsed && (
@@ -613,9 +656,14 @@ export function Sidebar({
             className={cn(
               "flex min-h-10 w-full items-center rounded-xl",
               "text-text-muted transition-colors",
-              "disabled:cursor-not-allowed disabled:opacity-65",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-65",
               isCollapsed
-                ? "justify-start gap-3 px-3 md:justify-center md:gap-0 md:px-2"
+                ? [
+                    "justify-start gap-3 px-3",
+                    "md:justify-center md:gap-0",
+                    "md:px-2",
+                  ]
                 : "justify-start gap-3 px-3",
             )}
           >
@@ -642,9 +690,11 @@ export function Sidebar({
               "hidden min-h-10 w-full items-center rounded-xl",
               "border border-transparent text-sm font-medium",
               "text-text-muted transition-colors duration-200",
-              "hover:border-border hover:bg-surface-elevated",
+              "hover:border-border",
+              "hover:bg-surface-elevated",
               "hover:text-text",
-              "focus-visible:ring-2 focus-visible:ring-primary",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary",
               "motion-reduce:transition-none md:flex",
               isCollapsed
                 ? "justify-center px-2"
@@ -667,7 +717,9 @@ export function Sidebar({
               aria-hidden="true"
             />
 
-            {!isCollapsed && <span>Recolher menu</span>}
+            {!isCollapsed && (
+              <span>Recolher menu</span>
+            )}
           </button>
         </div>
       </aside>

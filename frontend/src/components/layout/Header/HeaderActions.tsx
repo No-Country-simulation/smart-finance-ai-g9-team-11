@@ -7,7 +7,13 @@ import { DateRangePicker } from "./DateRangePicker";
 import { NotificationButton } from "./NotificationButton";
 import { ThemeToggle } from "./ThemeToggle";
 
-export function HeaderActions() {
+interface HeaderActionsProps {
+  onOpenSidebar?: () => void;
+}
+
+export function HeaderActions({
+  onOpenSidebar,
+}: Readonly<HeaderActionsProps>) {
   return (
     <div className="flex min-w-0 shrink-0 items-center gap-2">
       <SearchBar className="hidden w-[240px] 2xl:block" />
@@ -22,7 +28,11 @@ export function HeaderActions() {
 
       <NotificationButton />
 
-      <UserMenu user={userMock} />
+      <UserMenu
+        user={userMock}
+        isOnline
+        onOpenSidebar={onOpenSidebar}
+      />
     </div>
   );
 }

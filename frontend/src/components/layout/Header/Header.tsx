@@ -7,10 +7,12 @@ import { HeaderGreeting } from "./HeaderGreeting";
 
 interface HeaderProps {
   onOpenMobileSidebar?: () => void;
+  onOpenSidebar?: () => void;
 }
 
 export function Header({
   onOpenMobileSidebar,
+  onOpenSidebar,
 }: Readonly<HeaderProps>) {
   return (
     <header
@@ -58,7 +60,9 @@ export function Header({
           <HeaderGreeting />
         </div>
 
-        <HeaderActions />
+        <HeaderActions
+          onOpenSidebar={onOpenSidebar}
+        />
       </div>
     </header>
   );

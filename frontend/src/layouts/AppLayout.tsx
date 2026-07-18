@@ -3,11 +3,19 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar/Sidebar";
+import {
+  SIDEBAR_MAX_WIDTH,
+  SIDEBAR_MIN_WIDTH,
+} from "@/components/layout/Sidebar/Sidebar.constants";
 import { cn } from "@/lib/utils";
 
 export function AppLayout() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] =
     useState(false);
+
+  const [sidebarWidth, setSidebarWidth] = useState(
+    SIDEBAR_MIN_WIDTH,
+  );
 
   const location = useLocation();
 
@@ -17,6 +25,19 @@ export function AppLayout() {
 
   const closeMobileSidebar = (): void => {
     setIsMobileSidebarOpen(false);
+  };
+
+  const handleOpenSidebar = (): void => {
+    const isMobile = window.matchMedia(
+      "(max-width: 767px)",
+    ).matches;
+
+    if (isMobile) {
+      openMobileSidebar();
+      return;
+    }
+
+    setSidebarWidth(SIDEBAR_MAX_WIDTH);
   };
 
   return (
@@ -41,6 +62,8 @@ export function AppLayout() {
         <Sidebar
           isMobileOpen={isMobileSidebarOpen}
           onCloseMobile={closeMobileSidebar}
+          width={sidebarWidth}
+          onWidthChange={setSidebarWidth}
         />
 
         <div
@@ -55,6 +78,7 @@ export function AppLayout() {
         >
           <Header
             onOpenMobileSidebar={openMobileSidebar}
+            onOpenSidebar={handleOpenSidebar}
           />
 
           <main

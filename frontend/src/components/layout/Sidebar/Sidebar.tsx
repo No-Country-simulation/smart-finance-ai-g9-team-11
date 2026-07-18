@@ -1,82 +1,106 @@
-import { useState } from "react";
-import { ChevronLeft, TrendingUp } from "lucide-react";
-import { SidebarItem } from "./SidebarItem";
-import { NAVIGATION_ITEMS } from "@/constants/navigation.constants";
+import { NavLink } from "react-router-dom";
 
-interface SidebarProps {
-  isMobileOpen: boolean;
-  onCloseMobile: () => void;
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import type { NavigationItem } from "@/types/navigation.types";
+
+interface SidebarItemProps {
+  item: NavigationItem;
+  index: number;
+  isCollapsed: boolean;
+  onNavigate?: () => void;
 }
 
 /**
- * Sidebar principal da aplicação.
+ * Renderiza um item da navegação principal.
  *
- * Dois estados independentes:
- * - isCollapsed: comportamento DESKTOP (usuário encolhe a sidebar pra ganhar espaço)
- * - isMobileOpen: comportamento MOBILE (sidebar vira um drawer que desliza)
- *
- * Por que não usar o componente Sheet do shadcn aqui?
- * Porque a Sheet usa Portal + Dialog por baixo dos panos, o que duplicaria
- * a árvore de navegação (uma pra desktop, outra dentro da Sheet pra mobile).
- * Controlando a posição via CSS puro (translate-x), o MESMO componente
- * serve pros dois cenários — menos código, menos bugs de sincronização.
- *
- * Cor: segue o token `surface` (não fica sempre escura) — no template de
- * referência a sidebar acompanha o tema da página, com uma borda sutil
- * separando do conteúdo.
+ * O componente recebe a configuração da rota e não possui conhecimento
+ * sobre a lista completa de navegação.
  */
-export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+export function SidebarItem({
+  item,
+  index,
+  isCollapsed,
+  onNavigate,
+}: Readonly<SidebarItemProps>) {
+  const Icon = item.icon;
+
+  const navigationLink = (
+    <NavLink
+      to={item.path}
+      end={item.path === "/"}
+      onClick={onNavigate}
+      style={{
+        transitionDelay: `${Math.min(index * 30, 150)}ms`,
+      }}
+      className={({ isActive }) =>
+        cn(
+          "group flex min-h-11 w-full min-w-0 items-center",
+          "rounded-xl px-3 py-2.5",
+          "transition-[background-color,color,transform]",
+          "duration-200 ease-out",
+          "focus-visible:outline-none focus-visible:ring-2",
+          "focus-visible:ring-primary focus-visible:ring-offset-2",
+          "focus-visible:ring-offset-surface",
+          isCollapsed
+            ? "justify-center gap-0"
+            : "justify-start gap-3",
+          isActive
+            ? "bg-primary/10 text-primary"
+            : [
+                "text-text-muted",
+                "hover:bg-surface-muted hover:text-text",
+                "active:scale-[0.98]",
+              ],
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Icon
+            size={19}
+            strokeWidth={isActive ? 2.25 : 2}
+            className={cn(
+              "shrink-0 transition-colors duration-200",
+              isActive
+                ? "text-primary"
+                : "text-text-muted group-hover:text-text",
+            )}
+            aria-hidden="true"
+          />
+
+          {!isCollapsed && (
+            <span
+              className={cn(
+                "min-w-0 truncate text-sm",
+                isActive ? "font-semibold" : "font-medium",
+              )}
+            >
+              {item.label}
+            </span>
+          )}
+        </>
+      )}
+    </NavLink>
+  );
+
+  if (!isCollapsed) {
+    return navigationLink;
+  }
 
   return (
-    <>
-      {/* Overlay escuro atrás da sidebar no mobile */}
-      {isMobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden"
-          onClick={onCloseMobile}
-          aria-hidden="true"
-        />
-      )}
+    <Tooltip>
+      <TooltipTrigger className="block w-full">
+        {navigationLink}
+      </TooltipTrigger>
 
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-surface transition-all duration-300 ease-in-out
-          ${isCollapsed ? "w-[76px]" : "w-64"}
-          ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-          md:static md:translate-x-0`}
-      >
-        <div className="flex items-center gap-2 px-4 py-5">
-          <TrendingUp className="shrink-0 text-primary" size={22} />
-          {!isCollapsed && (
-            <span className="text-base font-semibold text-text">Finance AI</span>
-          )}
-        </div>
-
-        <nav className="flex flex-1 flex-col gap-1 px-2">
-          {NAVIGATION_ITEMS.map((item, index) => (
-            <SidebarItem
-              key={item.id}
-              item={item}
-              index={index}
-              isCollapsed={isCollapsed}
-            />
-          ))}
-        </nav>
-
-        {/* Botão de colapsar — só faz sentido em desktop */}
-        <button
-          onClick={() => setIsCollapsed((prev) => !prev)}
-          className="mx-2 mb-4 hidden items-center justify-center rounded-lg p-2 text-text-muted transition-colors duration-200 hover:bg-surface-muted hover:text-text md:flex"
-          aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
-        >
-          <ChevronLeft
-            size={16}
-            className={`transition-transform duration-300 ${
-              isCollapsed ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-      </aside>
-    </>
+      <TooltipContent side="right">
+        {item.label}
+      </TooltipContent>
+    </Tooltip>
   );
 }

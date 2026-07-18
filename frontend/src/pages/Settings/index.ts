@@ -1,1 +1,1 @@
-export { default as SettingsPage } from "./SettingsPage";
+export { SettingsPage } from "./SettingsPage";

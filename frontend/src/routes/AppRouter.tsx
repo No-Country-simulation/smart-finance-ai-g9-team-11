@@ -1,23 +1,38 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AppLayout } from "../layouts/AppLayout";
-import { DashboardPage } from "../pages/Dashboard";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 
-const AppRouter = () => {
+import { AppLayout } from "@/layouts/AppLayout";
+import { DashboardPage } from "@/pages/Dashboard";
+import { ProfilePage } from "@/pages/Profile";
+import { SettingsPage } from "@/pages/Settings";
+
+export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rota "casca": sem path, só existe para montar o layout */}
         <Route element={<AppLayout />}>
-          <Route path="/" element={<DashboardPage />} />
-          {/* Próximas páginas entram AQUI DENTRO, como filhas: */}
-          {/* <Route path="/transactions" element={<TransactionsPage />} /> */}
-          {/* <Route path="/analysis" element={<AnalysisPage />} /> */}
-          {/* <Route path="/profile" element={<ProfilePage />} /> */}
-          {/* <Route path="/settings" element={<SettingsPage />} /> */}
+          <Route index element={<DashboardPage />} />
+
+          <Route
+            path="/profile"
+            element={<ProfilePage />}
+          />
+
+          <Route
+            path="/settings"
+            element={<SettingsPage />}
+          />
+
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>
   );
-};
-
-export default AppRouter;
+}

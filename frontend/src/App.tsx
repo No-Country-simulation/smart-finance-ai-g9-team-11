@@ -1,26 +1,53 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "@/providers/ThemeProvider";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
 import { AppLayout } from "@/layouts/AppLayout";
-import { DashboardPage } from "@/pages/Dashboard";
 import { AnalysisPage } from "@/pages/Analysis";
+import { DashboardPage } from "@/pages/Dashboard";
 import { ProfilePage } from "@/pages/Profile";
+import { SettingsPage } from "@/pages/Settings";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 /**
- * ThemeProvider precisa envolver TUDO (inclusive fora do Router), porque
- * ele aplica a classe `.dark` em <html> — se algum dia tiver rota fora
- * do AppLayout (ex: uma tela de login), ela também precisa herdar o tema.
+ * Componente raiz de rotas do Finance AI.
+ *
+ * O ThemeProvider envolve toda a aplicação para que páginas internas
+ * e futuras páginas externas ao AppLayout compartilhem o mesmo tema.
+ *
+ * O AppLayout funciona como a estrutura principal das páginas privadas,
+ * renderizando Header, Sidebar e o conteúdo das rotas através do Outlet.
  */
-function AppRouter() {
+function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/analysis" element={<AnalysisPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            {/* /settings entra quando SettingsPage existir
-                (src/pages/Settings hoje só tem index.ts) */}
+            <Route index element={<DashboardPage />} />
+
+            <Route
+              path="/analysis"
+              element={<AnalysisPage />}
+            />
+
+            <Route
+              path="/profile"
+              element={<ProfilePage />}
+            />
+
+            <Route
+              path="/settings"
+              element={<SettingsPage />}
+            />
+
+            <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+            />
           </Route>
         </Routes>
       </BrowserRouter>
@@ -28,4 +55,4 @@ function AppRouter() {
   );
 }
 
-export default AppRouter;
+export default App;

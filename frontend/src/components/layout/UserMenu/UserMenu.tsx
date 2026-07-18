@@ -58,23 +58,29 @@ export function UserMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          "flex size-11 shrink-0 items-center justify-center",
-          "rounded-xl border border-border bg-surface",
-          "shadow-card transition-all duration-200 ease-out",
-          "hover:-translate-y-0.5 hover:shadow-elevated",
-          "focus-visible:outline-none focus-visible:ring-2",
-          "focus-visible:ring-primary focus-visible:ring-offset-2",
+          "flex size-10 shrink-0 items-center justify-center",
+          "rounded-[14px] border border-border bg-card",
+          "shadow-card",
+          "transition-[background-color,border-color,transform,box-shadow]",
+          "duration-200 ease-out",
+          "hover:-translate-y-px",
+          "hover:border-border-highlight",
+          "hover:bg-card-hover hover:shadow-elevated",
+          "focus-visible:ring-2 focus-visible:ring-primary",
+          "focus-visible:ring-offset-2",
           "focus-visible:ring-offset-background",
+          "motion-reduce:transition-none",
+          "motion-reduce:hover:translate-y-0",
         )}
         aria-label={`Abrir menu de ${user.name}`}
       >
-        <Avatar className="size-8">
+        <Avatar className="size-8 border border-border-highlight">
           <AvatarImage
             src={user.avatar}
             alt={`Foto de ${user.name}`}
           />
 
-          <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+          <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary-bright">
             {initials}
           </AvatarFallback>
         </Avatar>
@@ -82,18 +88,22 @@ export function UserMenu({
 
       <DropdownMenuContent
         align="end"
-        sideOffset={8}
-        className="w-64"
+        sideOffset={10}
+        className={cn(
+          "w-64 rounded-[16px]",
+          "border-border bg-surface-elevated",
+          "text-text shadow-elevated",
+        )}
       >
         <DropdownMenuLabel className="font-normal">
           <div className="flex min-w-0 items-center gap-3">
-            <Avatar className="size-10 shrink-0">
+            <Avatar className="size-10 shrink-0 border border-border-highlight">
               <AvatarImage
                 src={user.avatar}
                 alt={`Foto de ${user.name}`}
               />
 
-              <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+              <AvatarFallback className="bg-primary/15 text-sm font-semibold text-primary-bright">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -114,7 +124,7 @@ export function UserMenu({
 
         <DropdownMenuItem
           onSelect={() => handleNavigate("/profile")}
-          className="cursor-pointer gap-2"
+          className="cursor-pointer gap-2 rounded-[10px]"
         >
           <UserRound size={16} aria-hidden="true" />
           Minha conta
@@ -122,7 +132,7 @@ export function UserMenu({
 
         <DropdownMenuItem
           onSelect={() => handleNavigate("/settings")}
-          className="cursor-pointer gap-2"
+          className="cursor-pointer gap-2 rounded-[10px]"
         >
           <Settings size={16} aria-hidden="true" />
           Configurações
@@ -130,13 +140,13 @@ export function UserMenu({
 
         <DropdownMenuItem
           disabled
-          className="gap-2"
+          className="gap-2 rounded-[10px]"
         >
           <CircleHelp size={16} aria-hidden="true" />
 
           <span>Central de ajuda</span>
 
-          <span className="ml-auto text-[10px] text-text-muted">
+          <span className="ml-auto text-[10px] text-text-subtle">
             Em breve
           </span>
         </DropdownMenuItem>
@@ -145,7 +155,10 @@ export function UserMenu({
 
         <DropdownMenuItem
           onSelect={handleLogout}
-          className="cursor-pointer gap-2 text-danger focus:text-danger"
+          className={cn(
+            "cursor-pointer gap-2 rounded-[10px]",
+            "text-danger focus:text-danger",
+          )}
         >
           <LogOut size={16} aria-hidden="true" />
           Sair

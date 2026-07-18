@@ -15,38 +15,51 @@ export function Header({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex min-w-0 items-center",
-        "justify-between gap-3 border-b border-border",
-        "bg-surface/95 px-4 py-4 backdrop-blur",
-        "supports-[backdrop-filter]:bg-surface/80",
-        "sm:px-6 sm:py-5",
-        "lg:px-8 lg:py-6",
+        "sticky top-0 z-30 min-w-0",
+        "border-b border-border-muted",
+        "bg-background/82 backdrop-blur-xl",
+        "supports-[backdrop-filter]:bg-background/68",
       )}
     >
-      <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-        {onOpenMobileSidebar && (
-          <button
-            type="button"
-            onClick={onOpenMobileSidebar}
-            className={cn(
-              "flex size-10 shrink-0 items-center justify-center",
-              "rounded-xl border border-border bg-surface",
-              "text-text shadow-card transition-colors",
-              "hover:bg-surface-muted",
-              "focus-visible:outline-none focus-visible:ring-2",
-              "focus-visible:ring-primary",
-              "md:hidden",
-            )}
-            aria-label="Abrir menu principal"
-          >
-            <Menu size={20} aria-hidden="true" />
-          </button>
+      <div
+        className={cn(
+          "flex min-h-[72px] min-w-0 items-center",
+          "justify-between gap-3 px-4 py-3",
+          "sm:min-h-[78px] sm:px-5",
+          "lg:px-6",
+          "2xl:px-7",
         )}
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          {onOpenMobileSidebar && (
+            <button
+              type="button"
+              onClick={onOpenMobileSidebar}
+              className={cn(
+                "flex size-10 shrink-0 items-center justify-center",
+                "rounded-[14px] border border-border",
+                "bg-card text-text shadow-card",
+                "transition-[background-color,border-color,color,transform]",
+                "duration-200 ease-out",
+                "hover:-translate-y-px",
+                "hover:border-border-highlight",
+                "hover:bg-card-hover",
+                "focus-visible:ring-2 focus-visible:ring-primary",
+                "motion-reduce:transition-none",
+                "motion-reduce:hover:translate-y-0",
+                "md:hidden",
+              )}
+              aria-label="Abrir menu principal"
+            >
+              <Menu size={19} aria-hidden="true" />
+            </button>
+          )}
 
-        <HeaderGreeting />
+          <HeaderGreeting />
+        </div>
+
+        <HeaderActions />
       </div>
-
-      <HeaderActions />
     </header>
   );
 }

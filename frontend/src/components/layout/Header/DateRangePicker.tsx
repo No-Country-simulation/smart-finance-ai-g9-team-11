@@ -1,31 +1,41 @@
-import { Calendar } from "lucide-react";
+import { CalendarDays, ChevronDown } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 export function DateRangePicker() {
   return (
     <button
-      className="
-      flex
-      items-center
-      gap-3
-      rounded-xl
-      border
-      border-border
-      bg-surface
-      px-5
-      py-3
-      text-sm
-      font-medium
-      text-text
-      shadow-card
-      transition-all
-      duration-200
-      ease-out
-      hover:-translate-y-0.5
-      hover:shadow-elevated
-      "
+      type="button"
+      disabled
+      aria-disabled="true"
+      title="Filtro de período — Em breve"
+      className={cn(
+        "flex h-10 items-center gap-2.5",
+        "rounded-[14px] border border-border",
+        "bg-card px-3.5 text-xs font-medium",
+        "text-text-muted shadow-card",
+        "disabled:cursor-not-allowed disabled:opacity-90",
+      )}
     >
-      01 Mai - 31 Mai 2026
-      <Calendar size={18} />
+      <span
+        className={cn(
+          "flex size-7 items-center justify-center",
+          "rounded-[10px] bg-surface-elevated",
+          "text-secondary-bright",
+        )}
+      >
+        <CalendarDays size={15} aria-hidden="true" />
+      </span>
+
+      <span className="whitespace-nowrap">
+        01 Mai – 31 Mai 2026
+      </span>
+
+      <ChevronDown
+        size={14}
+        className="text-text-subtle"
+        aria-hidden="true"
+      />
     </button>
   );
 }

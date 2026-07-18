@@ -39,8 +39,12 @@ export function UserMenu({
   const navigate = useNavigate();
   const initials = getUserInitials(user.name);
 
-  const handleNavigate = (path: string): void => {
-    navigate(path);
+  const handleNavigateToProfile = (): void => {
+    navigate("/profile");
+  };
+
+  const handleNavigateToSettings = (): void => {
+    navigate("/settings");
   };
 
   const handleLogout = (): void => {
@@ -123,7 +127,7 @@ export function UserMenu({
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onSelect={() => handleNavigate("/profile")}
+          onSelect={handleNavigateToProfile}
           className="cursor-pointer gap-2 rounded-[10px]"
         >
           <UserRound size={16} aria-hidden="true" />
@@ -131,7 +135,7 @@ export function UserMenu({
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          onSelect={() => handleNavigate("/settings")}
+          onSelect={handleNavigateToSettings}
           className="cursor-pointer gap-2 rounded-[10px]"
         >
           <Settings size={16} aria-hidden="true" />

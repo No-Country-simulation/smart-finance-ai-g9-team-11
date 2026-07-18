@@ -2,7 +2,10 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
   BrainCircuit,
@@ -29,6 +32,15 @@ interface SidebarProps {
   onCloseMobile: () => void;
 }
 
+const SIDEBAR_MIN_WIDTH = 80;
+const SIDEBAR_MAX_WIDTH = 196;
+const SIDEBAR_COLLAPSED_LIMIT = 124;
+const SIDEBAR_KEYBOARD_STEP = 12;
+
+interface SidebarStyle extends CSSProperties {
+  "--sidebar-width": string;
+}
+
 function getUserInitials(name: string): string {
   return name
     .trim()
@@ -38,19 +50,73 @@ function getUserInitials(name: string): string {
     .join("");
 }
 
+function clampSidebarWidth(width: number): number {
+  return Math.min(
+    SIDEBAR_MAX_WIDTH,
+    Math.max(SIDEBAR_MIN_WIDTH, width),
+  );
+}
+
+function isInteractiveElement(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return Boolean(
+    target.closest(
+      [
+        "a",
+        "button",
+        "input",
+        "select",
+        "textarea",
+        '[role="button"]',
+        '[role="menuitem"]',
+        "[data-sidebar-resize-handle]",
+        "[data-prevent-sidebar-toggle]",
+      ].join(","),
+    ),
+  );
+}
+
 export function Sidebar({
   isMobileOpen,
   onCloseMobile,
 }: Readonly<SidebarProps>) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [sidebarWidth, setSidebarWidth] = useState(
+    SIDEBAR_MIN_WIDTH,
+  );
+  const [isResizing, setIsResizing] = useState(false);
 
   const sidebarRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const resizeStartXRef = useRef(0);
+  const resizeStartWidthRef = useRef(SIDEBAR_MIN_WIDTH);
+  const didResizeRef = useRef(false);
 
   const initials = getUserInitials(userMock.name);
+  const isCollapsed =
+    sidebarWidth < SIDEBAR_COLLAPSED_LIMIT;
+
+  const sidebarStyle: SidebarStyle = {
+    "--sidebar-width": `${sidebarWidth}px`,
+  };
+
+  const expandSidebar = (): void => {
+    setSidebarWidth(SIDEBAR_MAX_WIDTH);
+  };
+
+  const collapseSidebar = (): void => {
+    setSidebarWidth(SIDEBAR_MIN_WIDTH);
+  };
 
   const toggleCollapsed = (): void => {
-    setIsCollapsed((currentState) => !currentState);
+    if (isCollapsed) {
+      expandSidebar();
+      return;
+    }
+
+    collapseSidebar();
   };
 
   useEffect(() => {
@@ -63,7 +129,9 @@ export function Sidebar({
     document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
 
-    const handleEscape = (event: globalThis.KeyboardEvent): void => {
+    const handleEscape = (
+      event: globalThis.KeyboardEvent,
+    ): void => {
       if (event.key === "Escape") {
         onCloseMobile();
       }
@@ -73,9 +141,157 @@ export function Sidebar({
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener(
+        "keydown",
+        handleEscape,
+      );
     };
   }, [isMobileOpen, onCloseMobile]);
+
+  useEffect(() => {
+    if (!isResizing) {
+      return;
+    }
+
+    const previousCursor = document.body.style.cursor;
+    const previousUserSelect =
+      document.body.style.userSelect;
+
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+
+    const handlePointerMove = (
+      event: globalThis.PointerEvent,
+    ): void => {
+      const deltaX =
+        event.clientX - resizeStartXRef.current;
+
+      if (Math.abs(deltaX) > 2) {
+        didResizeRef.current = true;
+      }
+
+      const nextWidth = clampSidebarWidth(
+        resizeStartWidthRef.current + deltaX,
+      );
+
+      setSidebarWidth(nextWidth);
+    };
+
+    const finishResizing = (): void => {
+      setIsResizing(false);
+
+      window.setTimeout(() => {
+        didResizeRef.current = false;
+      }, 0);
+    };
+
+    window.addEventListener(
+      "pointermove",
+      handlePointerMove,
+    );
+    window.addEventListener(
+      "pointerup",
+      finishResizing,
+    );
+    window.addEventListener(
+      "pointercancel",
+      finishResizing,
+    );
+
+    return () => {
+      document.body.style.cursor = previousCursor;
+      document.body.style.userSelect =
+        previousUserSelect;
+
+      window.removeEventListener(
+        "pointermove",
+        handlePointerMove,
+      );
+      window.removeEventListener(
+        "pointerup",
+        finishResizing,
+      );
+      window.removeEventListener(
+        "pointercancel",
+        finishResizing,
+      );
+    };
+  }, [isResizing]);
+
+  const handleResizePointerDown = (
+    event: ReactPointerEvent<HTMLButtonElement>,
+  ): void => {
+    if (event.pointerType === "touch") {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    resizeStartXRef.current = event.clientX;
+    resizeStartWidthRef.current = sidebarWidth;
+    didResizeRef.current = false;
+
+    setIsResizing(true);
+  };
+
+  const handleResizeKeyDown = (
+    event: ReactKeyboardEvent<HTMLButtonElement>,
+  ): void => {
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+        setSidebarWidth((currentWidth) =>
+          clampSidebarWidth(
+            currentWidth - SIDEBAR_KEYBOARD_STEP,
+          ),
+        );
+        break;
+
+      case "ArrowRight":
+        event.preventDefault();
+        setSidebarWidth((currentWidth) =>
+          clampSidebarWidth(
+            currentWidth + SIDEBAR_KEYBOARD_STEP,
+          ),
+        );
+        break;
+
+      case "Home":
+        event.preventDefault();
+        collapseSidebar();
+        break;
+
+      case "End":
+        event.preventDefault();
+        expandSidebar();
+        break;
+
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        toggleCollapsed();
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const handleSidebarClick = (
+    event: ReactMouseEvent<HTMLElement>,
+  ): void => {
+    if (
+      window.innerWidth < 768 ||
+      isResizing ||
+      didResizeRef.current ||
+      isInteractiveElement(event.target)
+    ) {
+      return;
+    }
+
+    toggleCollapsed();
+  };
 
   const handleSidebarKeyDown = (
     event: ReactKeyboardEvent<HTMLElement>,
@@ -152,6 +368,8 @@ export function Sidebar({
 
       <aside
         ref={sidebarRef}
+        style={sidebarStyle}
+        onClick={handleSidebarClick}
         onKeyDown={handleSidebarKeyDown}
         className={cn(
           "fixed inset-y-0 left-0 z-50",
@@ -165,11 +383,11 @@ export function Sidebar({
             ? "translate-x-0"
             : "-translate-x-full",
           "md:static md:min-h-0 md:translate-x-0",
+          "md:w-[var(--sidebar-width)]",
           "md:rounded-[20px] md:border",
           "md:border-border-highlight/60",
-          isCollapsed
-            ? "md:w-[80px]"
-            : "md:w-[176px] xl:w-[196px]",
+          isResizing &&
+            "md:transition-none",
         )}
         aria-label="Menu principal"
         aria-hidden={!isMobileOpen ? undefined : false}
@@ -181,6 +399,34 @@ export function Sidebar({
             "opacity-60",
           )}
           aria-hidden="true"
+        />
+
+        <button
+          type="button"
+          data-sidebar-resize-handle
+          onPointerDown={handleResizePointerDown}
+          onKeyDown={handleResizeKeyDown}
+          className={cn(
+            "absolute inset-y-5 -right-1 z-20 hidden w-2",
+            "cursor-col-resize rounded-full md:block",
+            "focus-visible:outline-none",
+            "focus-visible:ring-2 focus-visible:ring-primary",
+            "focus-visible:ring-offset-2",
+            "focus-visible:ring-offset-background",
+            "after:absolute after:inset-y-0 after:left-1/2",
+            "after:w-px after:-translate-x-1/2",
+            "after:bg-transparent",
+            "hover:after:bg-primary/45",
+            "focus-visible:after:bg-primary/70",
+            isResizing && "after:bg-primary-bright",
+          )}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Redimensionar menu lateral"
+          aria-valuemin={SIDEBAR_MIN_WIDTH}
+          aria-valuemax={SIDEBAR_MAX_WIDTH}
+          aria-valuenow={Math.round(sidebarWidth)}
+          title="Arraste para redimensionar. Use as setas do teclado para ajustar."
         />
 
         <div
@@ -236,8 +482,6 @@ export function Sidebar({
               <p className="truncate text-sm font-semibold tracking-tight text-text">
                 FINANCE AI
               </p>
-
-              
             </div>
           </div>
 
@@ -316,6 +560,7 @@ export function Sidebar({
           </button>
 
           <div
+            data-prevent-sidebar-toggle
             className={cn(
               "flex min-h-[62px] items-center rounded-[15px]",
               "border border-border bg-card",

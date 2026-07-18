@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@import "./styles/theme.css";
+
+/* Tailwind v4 defaults `dark:` to prefers-color-scheme. We want an explicit
+   toggle (Light / Dark / System) controlled by ThemeProvider via a `.dark`
+   class on <html>, so we override the variant. This was missing before —
+   it's why a theme toggle button would have had no visual effect. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-slide-in: slide-in 0.35s ease forwards;
+  --animate-fade-up: fade-up 0.4s ease forwards;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility glass-panel {
+  background-color: color-mix(in srgb, var(--surface) 70%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: background-color 0.2s ease-out, color 0.2s ease-out;
+}

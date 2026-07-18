@@ -59,6 +59,7 @@
 
 html {
   min-width: 320px;
+  min-height: 100%;
   background-color: var(--background);
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
@@ -77,6 +78,11 @@ body {
   transition:
     background-color 0.2s ease-out,
     color 0.2s ease-out;
+}
+
+#root {
+  min-height: 100vh;
+  isolation: isolate;
 }
 
 button,
@@ -106,6 +112,103 @@ button:disabled {
 :focus-visible {
   outline: 2px solid var(--primary-bright);
   outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Application shell
+   -------------------------------------------------------------------------- */
+
+.app-shell {
+  background:
+    radial-gradient(
+      circle at 18% 4%,
+      color-mix(
+        in srgb,
+        var(--glow-primary) 48%,
+        transparent
+      ) 0,
+      transparent 29rem
+    ),
+    radial-gradient(
+      circle at 82% 12%,
+      color-mix(
+        in srgb,
+        var(--glow-secondary) 42%,
+        transparent
+      ) 0,
+      transparent 32rem
+    ),
+    linear-gradient(
+      145deg,
+      var(--background) 0%,
+      color-mix(
+        in srgb,
+        var(--background) 93%,
+        var(--secondary) 7%
+      ) 52%,
+      var(--background) 100%
+    );
+}
+
+.app-shell__ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.app-shell__ambient::before,
+.app-shell__ambient::after {
+  position: absolute;
+  content: "";
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: 0.28;
+  transform: translateZ(0);
+}
+
+.app-shell__ambient::before {
+  top: -15rem;
+  left: 20%;
+  width: 34rem;
+  height: 34rem;
+  background: var(--glow-primary);
+}
+
+.app-shell__ambient::after {
+  right: -14rem;
+  bottom: -18rem;
+  width: 38rem;
+  height: 38rem;
+  background: var(--glow-secondary);
+}
+
+:root:not(.dark) .app-shell__ambient::before,
+:root:not(.dark) .app-shell__ambient::after {
+  opacity: 0.1;
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        color-mix(
+          in srgb,
+          var(--glow-primary) 30%,
+          transparent
+        ),
+        transparent 22rem
+      ),
+      var(--background);
+  }
+
+  .app-shell__ambient::before,
+  .app-shell__ambient::after {
+    opacity: 0.14;
+    filter: blur(72px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

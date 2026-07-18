@@ -6,20 +6,18 @@ import {
 } from "react-router-dom";
 
 import { AppLayout } from "@/layouts/AppLayout";
-import { AnalysisPage } from "@/pages/Analysis";
 import { DashboardPage } from "@/pages/Dashboard";
 import { ProfilePage } from "@/pages/Profile";
 import { SettingsPage } from "@/pages/Settings";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
 /**
- * Componente raiz de rotas do Finance AI.
+ * Componente raiz da aplicação Finance AI.
  *
- * O ThemeProvider envolve toda a aplicação para que páginas internas
- * e futuras páginas externas ao AppLayout compartilhem o mesmo tema.
+ * O ThemeProvider envolve toda a aplicação para garantir que todas
+ * as páginas compartilhem o mesmo tema.
  *
- * O AppLayout funciona como a estrutura principal das páginas privadas,
- * renderizando Header, Sidebar e o conteúdo das rotas através do Outlet.
+ * O AppLayout fornece Sidebar, Header e a área de conteúdo das páginas.
  */
 function App() {
   return (
@@ -28,11 +26,6 @@ function App() {
         <Routes>
           <Route element={<AppLayout />}>
             <Route index element={<DashboardPage />} />
-
-            <Route
-              path="/analysis"
-              element={<AnalysisPage />}
-            />
 
             <Route
               path="/profile"

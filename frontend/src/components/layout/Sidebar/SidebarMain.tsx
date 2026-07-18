@@ -18,7 +18,7 @@ export function Sidebar({
         "transition-transform duration-300 ease-out md:static md:translate-x-0",
         isMobileOpen ? "translate-x-0" : "-translate-x-full",
       )}
-      aria-label="Navegação principal"
+      aria-label="NavegaÃ§Ã£o principal"
     >
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-muted">

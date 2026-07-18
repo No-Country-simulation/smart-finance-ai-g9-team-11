@@ -19,6 +19,21 @@ interface SettingsSectionProps {
   children: ReactNode;
 }
 
+interface SettingsRowProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  value: string;
+  muted?: boolean;
+}
+
+interface SettingsToggleProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  defaultChecked: boolean;
+}
+
 function SettingsSection({
   title,
   description,
@@ -41,14 +56,6 @@ function SettingsSection({
       </div>
     </section>
   );
-}
-
-interface SettingsRowProps {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  value: string;
-  muted?: boolean;
 }
 
 function SettingsRow({
@@ -86,13 +93,6 @@ function SettingsRow({
       </span>
     </div>
   );
-}
-
-interface SettingsToggleProps {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  defaultChecked: boolean;
 }
 
 function SettingsToggle({
@@ -164,8 +164,8 @@ export function SettingsPage() {
         </h1>
 
         <p className="mt-2 max-w-2xl text-sm text-text-muted sm:text-base">
-          Personalize a experiência e escolha quais informações
-          deseja receber do Finance AI.
+          Personalize a experiência e escolha quais informações deseja
+          receber do Finance AI.
         </p>
       </header>
 

@@ -11,14 +11,6 @@ import { ProfilePage } from "@/pages/Profile";
 import { SettingsPage } from "@/pages/Settings";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
-/**
- * Componente raiz da aplicação Finance AI.
- *
- * O ThemeProvider envolve toda a aplicação para garantir que todas
- * as páginas compartilhem o mesmo tema.
- *
- * O AppLayout fornece Sidebar, Header e a área de conteúdo das páginas.
- */
 function App() {
   return (
     <ThemeProvider>

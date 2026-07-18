@@ -1,17 +1,22 @@
 @import "tailwindcss";
 @import "./styles/theme.css";
 
-/* Tailwind v4 defaults `dark:` to prefers-color-scheme. We want an explicit
-   toggle (Light / Dark / System) controlled by ThemeProvider via a `.dark`
-   class on <html>, so we override the variant. This was missing before —
-   it's why a theme toggle button would have had no visual effect. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    "Geist Variable",
+    "Geist",
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 
-  --animate-slide-in: slide-in 0.35s ease forwards;
-  --animate-fade-up: fade-up 0.4s ease forwards;
+  --animate-slide-in: slide-in 0.35s ease-out forwards;
+  --animate-fade-up: fade-up 0.4s ease-out forwards;
 }
 
 @keyframes slide-in {
@@ -19,6 +24,7 @@
     opacity: 0;
     transform: translateX(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -30,6 +36,7 @@
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -37,24 +44,78 @@
 }
 
 @utility glass-panel {
-  background-color: color-mix(in srgb, var(--surface) 70%, transparent);
-  backdrop-filter: blur(12px);
+  background-color: color-mix(
+    in srgb,
+    var(--surface) 76%,
+    transparent
+  );
   border: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background-color: var(--background);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans);
+  transition:
+    background-color 0.2s ease-out,
+    color 0.2s ease-out;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+::selection {
+  background-color: color-mix(
+    in srgb,
+    var(--primary) 36%,
+    transparent
+  );
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary-bright);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
+    scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
   }
-}
-
-body {
-  font-family: var(--font-sans);
-  background-color: var(--color-background);
-  color: var(--color-text);
-  transition: background-color 0.2s ease-out, color 0.2s ease-out;
 }

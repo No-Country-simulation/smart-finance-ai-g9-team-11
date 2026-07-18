@@ -1,48 +1,66 @@
 import { NavLink } from "react-router-dom";
+
+import { cn } from "@/lib/utils";
 import type { NavigationItem } from "@/types/navigation.types";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface SidebarItemProps {
   item: NavigationItem;
-  index: number;
   isCollapsed: boolean;
+  onNavigate?: () => void;
 }
 
-/**
- * Item individual de navegação.
- * Componente pequeno de propósito: só sabe renderizar UM item.
- * Quem decide QUAIS itens existem é o array em navigation.constants.ts.
- */
-export function SidebarItem({ item, index, isCollapsed }: SidebarItemProps) {
+export function SidebarItem({
+  item,
+  isCollapsed,
+  onNavigate,
+}: Readonly<SidebarItemProps>) {
   const Icon = item.icon;
 
-  const link = (
+  return (
     <NavLink
       to={item.path}
       end={item.path === "/"}
-      style={{ animationDelay: `${index * 60}ms` }}
+      onClick={onNavigate}
+      title={isCollapsed ? item.label : undefined}
       className={({ isActive }) =>
-        `group flex items-center gap-3 rounded-lg px-3 py-2.5 opacity-0 motion-safe:animate-slide-in transition-colors duration-200 ${
+        cn(
+          "group flex min-h-11 w-full min-w-0 items-center",
+          "visible opacity-100",
+          "rounded-xl px-3 py-2.5",
+          "transition-colors duration-200",
+          "focus-visible:outline-none",
+          "focus-visible:ring-2 focus-visible:ring-primary",
+          "focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
+          isCollapsed
+            ? "justify-center gap-0"
+            : "justify-start gap-3",
           isActive
             ? "bg-primary/10 text-primary"
-            : "text-text-muted hover:bg-surface-muted hover:text-text"
-        }`
+            : "text-text-muted hover:bg-surface-muted hover:text-text",
+        )
       }
     >
       {({ isActive }) => (
         <>
           <Icon
-            size={18}
-            className={`shrink-0 transition-colors duration-200 ${
-              isActive ? "text-primary" : "text-text-muted group-hover:text-text"
-            }`}
+            size={20}
+            strokeWidth={isActive ? 2.25 : 2}
+            className={cn(
+              "block shrink-0",
+              isActive
+                ? "text-primary"
+                : "text-text-muted group-hover:text-text",
+            )}
+            aria-hidden="true"
           />
+
           {!isCollapsed && (
-            <span className={`text-sm ${isActive ? "font-medium" : "font-normal"}`}>
+            <span
+              className={cn(
+                "block min-w-0 truncate text-sm",
+                isActive ? "font-semibold" : "font-medium",
+              )}
+            >
               {item.label}
             </span>
           )}
@@ -50,17 +68,4 @@ export function SidebarItem({ item, index, isCollapsed }: SidebarItemProps) {
       )}
     </NavLink>
   );
-
-  // Quando a sidebar está colapsada, o label some — então precisamos
-  // de um Tooltip pra não perder a informação de qual ícone é qual.
-  if (isCollapsed) {
-    return (
-      <Tooltip>
-        <TooltipTrigger>{link}</TooltipTrigger>
-        <TooltipContent side="right">{item.label}</TooltipContent>
-      </Tooltip>
-    );
-  }
-
-  return link;
 }

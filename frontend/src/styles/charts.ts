@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
 
-/**
- * Recharts needs literal color strings (stroke="#4F7CFF"), it can't consume
- * Tailwind classes. To avoid a second, hand-maintained copy of every color
- * that could drift from theme.css, this reads the CSS custom properties
- * directly off <html> at call time — theme.css stays the single source.
- */
 export interface ChartTheme {
   line1: string;
   line2: string;
@@ -13,52 +7,85 @@ export interface ChartTheme {
   tooltipBg: string;
   tooltipText: string;
   primary: string;
+  primaryBright: string;
+  secondary: string;
+  secondaryBright: string;
   success: string;
   warning: string;
   danger: string;
+  text: string;
   textMuted: string;
+  textSubtle: string;
+  surface: string;
+  surfaceElevated: string;
+  border: string;
 }
 
 function cssVar(name: string, fallback: string): string {
-  if (typeof window === "undefined") return fallback;
+  if (typeof window === "undefined") {
+    return fallback;
+  }
+
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue(name)
     .trim();
+
   return value || fallback;
 }
 
 export function getChartTheme(): ChartTheme {
   return {
-    line1: cssVar("--chart-line-1", "#4F7CFF"),
-    line2: cssVar("--chart-line-2", "#0F172A"),
-    grid: cssVar("--chart-grid", "#EEF0F3"),
-    tooltipBg: cssVar("--chart-tooltip-bg", "#0F172A"),
-    tooltipText: cssVar("--chart-tooltip-text", "#FFFFFF"),
-    primary: cssVar("--primary", "#4F7CFF"),
+    line1: cssVar("--chart-line-1", "#8B5CF6"),
+    line2: cssVar("--chart-line-2", "#3B82F6"),
+    grid: cssVar(
+      "--chart-grid",
+      "rgba(148, 163, 184, 0.09)",
+    ),
+    tooltipBg: cssVar("--chart-tooltip-bg", "#10182B"),
+    tooltipText: cssVar("--chart-tooltip-text", "#F8FAFC"),
+    primary: cssVar("--primary", "#7C3AED"),
+    primaryBright: cssVar("--primary-bright", "#8B5CF6"),
+    secondary: cssVar("--secondary", "#2563EB"),
+    secondaryBright: cssVar("--secondary-bright", "#3B82F6"),
     success: cssVar("--success", "#22C55E"),
     warning: cssVar("--warning", "#F59E0B"),
-    danger: cssVar("--danger", "#EF4444"),
-    textMuted: cssVar("--text-muted", "#64748B"),
+    danger: cssVar("--danger", "#F43F5E"),
+    text: cssVar("--text", "#F8FAFC"),
+    textMuted: cssVar("--text-muted", "#A7B0C3"),
+    textSubtle: cssVar("--text-subtle", "#6F7A91"),
+    surface: cssVar("--surface", "#080D1A"),
+    surfaceElevated: cssVar("--surface-elevated", "#10182B"),
+    border: cssVar(
+      "--border",
+      "rgba(148, 163, 184, 0.12)",
+    ),
   };
 }
 
-/**
- * Use inside any chart component. Re-reads tokens whenever ThemeProvider
- * toggles the `dark` class on <html>, so Recharts colors always match the
- * active theme without a page reload.
- */
 export function useChartTheme(): ChartTheme {
-  const [theme, setTheme] = useState<ChartTheme>(() => getChartTheme());
+  const [theme, setTheme] = useState<ChartTheme>(
+    getChartTheme,
+  );
 
   useEffect(() => {
     const root = document.documentElement;
-    const update = () => setTheme(getChartTheme());
-    update();
 
-    const observer = new MutationObserver(update);
-    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    const updateTheme = (): void => {
+      setTheme(getChartTheme());
+    };
 
-    return () => observer.disconnect();
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+
+    observer.observe(root, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   return theme;

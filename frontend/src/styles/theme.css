@@ -1,132 +1,208 @@
 /* ==========================================================================
    Finance AI — Design Tokens
-   Single source of truth for color, radius, shadow and typography.
-   Semantic CSS variables live in :root / .dark so components never touch
-   raw hex values — only tokens (bg-surface, text-muted, border-border...).
+
+   Fonte única de verdade para:
+   - cores;
+   - superfícies;
+   - bordas;
+   - sombras;
+   - glows;
+   - tipografia;
+   - radius;
+   - tokens dos gráficos.
+
+   Componentes devem utilizar tokens semânticos, evitando valores hexadecimais
+   ou sombras arbitrárias diretamente nas classes.
    ========================================================================== */
 
 :root {
   color-scheme: light;
 
-  /* Surfaces */
-  --background: #F7F8FA;
-  --surface: #FFFFFF;
-  --surface-muted: #F1F3F6;
-  --surface-accent: #EAF1FF;    /* tinted KPI card, e.g. "Views" */
-  --surface-accent-2: #EEF0FA;  /* secondary tint, e.g. "Active Users" */
+  /* Backgrounds and surfaces */
+  --background: #f6f7fb;
+  --surface: #ffffff;
+  --surface-muted: #f0f2f7;
+  --surface-elevated: #ffffff;
+  --surface-accent: #edf1ff;
+  --surface-accent-2: #f2efff;
+
+  /* Cards */
+  --card: rgba(255, 255, 255, 0.92);
+  --card-hover: rgba(255, 255, 255, 1);
 
   /* Borders */
-  --border: #E5E7EB;
-  --border-muted: #EEF0F3;
+  --border: rgba(71, 85, 105, 0.14);
+  --border-muted: rgba(100, 116, 139, 0.09);
+  --border-highlight: rgba(124, 58, 237, 0.28);
 
   /* Brand */
-  --primary: #4F7CFF;
-  --primary-foreground: #FFFFFF;
+  --primary: #7c3aed;
+  --primary-bright: #8b5cf6;
+  --primary-foreground: #ffffff;
+
+  --secondary: #2563eb;
+  --secondary-bright: #3b82f6;
+  --secondary-foreground: #ffffff;
 
   /* Feedback */
-  --success: #22C55E;
-  --warning: #F59E0B;
-  --danger: #EF4444;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #e11d48;
 
   /* Text */
-  --text: #0F172A;
-  --text-muted: #64748B;
-  --text-subtle: #94A3B8;
+  --text: #111827;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
 
-  /* Charts (kept as plain vars — consumed via getChartTheme(), not @theme,
-     because Recharts needs literal color strings, not Tailwind classes) */
-  --chart-line-1: #4F7CFF;
-  --chart-line-2: #0F172A;
-  --chart-grid: #EEF0F3;
-  --chart-tooltip-bg: #0F172A;
-  --chart-tooltip-text: #FFFFFF;
+  /* Visual effects */
+  --glow-primary: rgba(124, 58, 237, 0.16);
+  --glow-secondary: rgba(37, 99, 235, 0.14);
 
-  /* Raw RGB triplet used to build shadow colors with alpha below */
   --shadow-color: 15 23 42;
+
+  --shadow-card-value:
+    0 1px 2px rgb(var(--shadow-color) / 0.04),
+    0 10px 28px -16px rgb(var(--shadow-color) / 0.14);
+
+  --shadow-elevated-value:
+    0 6px 18px rgb(var(--shadow-color) / 0.08),
+    0 22px 48px -22px rgb(var(--shadow-color) / 0.22);
+
+  /* Charts */
+  --chart-line-1: #7c3aed;
+  --chart-line-2: #2563eb;
+  --chart-grid: rgba(100, 116, 139, 0.16);
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-text: #111827;
 }
 
 .dark {
   color-scheme: dark;
 
-  --background: #111315;
-  --surface: #1B1D20;
-  --surface-muted: #17191C;
-  --surface-accent: #22314F;
-  --surface-accent-2: #1F2226;
+  /* Backgrounds and surfaces */
+  --background: #050814;
+  --surface: #080d1a;
+  --surface-muted: #0b1120;
+  --surface-elevated: #10182b;
+  --surface-accent: rgba(124, 58, 237, 0.1);
+  --surface-accent-2: rgba(37, 99, 235, 0.1);
 
-  --border: #2B2F36;
-  --border-muted: #24272C;
+  /* Cards */
+  --card: rgba(13, 20, 38, 0.82);
+  --card-hover: rgba(20, 29, 52, 0.95);
 
-  --primary: #7EA1FF;
-  --primary-foreground: #0F1115;
+  /* Borders */
+  --border: rgba(148, 163, 184, 0.12);
+  --border-muted: rgba(148, 163, 184, 0.07);
+  --border-highlight: rgba(124, 58, 237, 0.32);
 
-  --success: #22C55E;
-  --warning: #F59E0B;
-  --danger: #EF4444;
+  /* Brand */
+  --primary: #7c3aed;
+  --primary-bright: #8b5cf6;
+  --primary-foreground: #ffffff;
 
-  --text: #F3F4F6;
-  --text-muted: #9CA3AF;
-  --text-subtle: #6B7280;
+  --secondary: #2563eb;
+  --secondary-bright: #3b82f6;
+  --secondary-foreground: #ffffff;
 
-  --chart-line-1: #7EA1FF;
-  --chart-line-2: #F3F4F6;
-  --chart-grid: #24272C;
-  --chart-tooltip-bg: #F3F4F6;
-  --chart-tooltip-text: #111315;
+  /* Feedback */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #f43f5e;
+
+  /* Text */
+  --text: #f8fafc;
+  --text-muted: #a7b0c3;
+  --text-subtle: #6f7a91;
+
+  /* Visual effects */
+  --glow-primary: rgba(124, 58, 237, 0.25);
+  --glow-secondary: rgba(37, 99, 235, 0.22);
 
   --shadow-color: 0 0 0;
+
+  --shadow-card-value:
+    0 1px 0 rgba(255, 255, 255, 0.025) inset,
+    0 14px 36px -22px rgb(var(--shadow-color) / 0.92);
+
+  --shadow-elevated-value:
+    0 1px 0 rgba(255, 255, 255, 0.035) inset,
+    0 22px 54px -26px rgb(var(--shadow-color) / 0.98),
+    0 0 28px -18px var(--glow-primary);
+
+  /* Charts */
+  --chart-line-1: #8b5cf6;
+  --chart-line-2: #3b82f6;
+  --chart-grid: rgba(148, 163, 184, 0.09);
+  --chart-tooltip-bg: #10182b;
+  --chart-tooltip-text: #f8fafc;
 }
 
-/* @theme inline re-reads the CSS custom properties above at runtime, so
-   switching the .dark class instantly updates every bg-*/text-*/border-*
-   utility without a rebuild. This is the correct v4 pattern for themeable
-   tokens (as opposed to static @theme, which bakes values at build time). */
 @theme inline {
+  /* Backgrounds and surfaces */
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
+  --color-surface-elevated: var(--surface-elevated);
   --color-surface-accent: var(--surface-accent);
   --color-surface-accent-2: var(--surface-accent-2);
 
+  /* Cards */
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+
+  /* Borders */
   --color-border: var(--border);
   --color-border-muted: var(--border-muted);
+  --color-border-highlight: var(--border-highlight);
 
+  /* Brand */
   --color-primary: var(--primary);
+  --color-primary-bright: var(--primary-bright);
   --color-primary-foreground: var(--primary-foreground);
 
+  --color-secondary: var(--secondary);
+  --color-secondary-bright: var(--secondary-bright);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  /* Feedback */
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
 
+  /* Text */
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
   --color-text-subtle: var(--text-subtle);
 
-  /* Radius namespace -> rounded-sm / rounded-md / rounded-card / rounded-lg / rounded-pill */
+  /* Visual effects */
+  --color-glow-primary: var(--glow-primary);
+  --color-glow-secondary: var(--glow-secondary);
+
+  /* Radius */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-card: 18px;
   --radius-lg: 20px;
   --radius-pill: 999px;
 
-  /* Shadow namespace -> shadow-card / shadow-elevated */
-  --shadow-card: 0 1px 2px rgb(var(--shadow-color) / 0.04), 0 8px 24px -12px rgb(var(--shadow-color) / 0.10);
-  --shadow-elevated: 0 4px 12px rgb(var(--shadow-color) / 0.06), 0 16px 40px -16px rgb(var(--shadow-color) / 0.16);
+  /* Shadows */
+  --shadow-card: var(--shadow-card-value);
+  --shadow-elevated: var(--shadow-elevated-value);
 
-  /* Type scale namespace -> text-display / text-heading / text-title / text-body / text-caption
-     (font-size + line-height pair; combine with font-semibold etc. for weight) */
-  --text-display: 2.5rem;
-  --text-display--line-height: 1.1;
+  /* Typography */
+  --text-display: 2rem;
+  --text-display--line-height: 1.08;
 
-  --text-heading: 1.5rem;
-  --text-heading--line-height: 1.25;
+  --text-heading: 1.75rem;
+  --text-heading--line-height: 1.15;
 
-  --text-title: 1.125rem;
+  --text-title: 1.0625rem;
   --text-title--line-height: 1.4;
 
-  --text-body: 0.9375rem;
+  --text-body: 0.875rem;
   --text-body--line-height: 1.55;
 
-  --text-caption: 0.8125rem;
-  --text-caption--line-height: 1.4;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.45;
 }

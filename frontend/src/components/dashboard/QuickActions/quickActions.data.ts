@@ -11,7 +11,7 @@ export const dashboardQuickActions = [
   {
     id: "add-transaction",
     title: "Nova transação",
-    description: "Registre uma receita ou despesa.",
+    description: "Registre uma nova receita ou despesa.",
     icon: Plus,
     variant: "primary",
   },
@@ -25,14 +25,14 @@ export const dashboardQuickActions = [
   {
     id: "view-recommendations",
     title: "Recomendações",
-    description: "Veja orientações geradas pela IA.",
+    description: "Veja orientações personalizadas geradas pela IA.",
     icon: Lightbulb,
     variant: "warning",
   },
   {
     id: "import-transactions",
     title: "Importar transações",
-    description: "Envie movimentações por arquivo.",
+    description: "Envie movimentações financeiras por arquivo.",
     icon: FileUp,
     variant: "neutral",
     disabled: true,

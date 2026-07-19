@@ -33,3 +33,11 @@ export interface QuickActionButtonProps {
   action: QuickAction;
   onAction?: (action: QuickAction) => void;
 }
+
+export interface QuickActionVisualConfig {
+  accentClassName: string;
+  iconContainerClassName: string;
+  iconClassName: string;
+  badgeClassName: string;
+  hoverBorderClassName: string;
+}

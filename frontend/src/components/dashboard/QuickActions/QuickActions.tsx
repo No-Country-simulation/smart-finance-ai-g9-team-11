@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/common/Card";
+import { cn } from "@/lib/utils";
 
 import { QuickActionButton } from "./QuickActionButton";
 import { dashboardQuickActions } from "./quickActions.data";
@@ -26,22 +27,32 @@ export function QuickActions({
             {title}
           </CardTitle>
 
-          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-xs leading-5 text-text-muted">
             {description}
           </p>
         </div>
 
         <div
-          className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800"
+          className={cn(
+            "flex size-9 shrink-0 items-center",
+            "justify-center rounded-lg",
+            "bg-surface-muted text-text-muted",
+          )}
           aria-hidden="true"
         >
-          <Zap className="size-4 text-slate-600 dark:text-slate-300" />
+          <Zap className="size-4" />
         </div>
       </CardHeader>
 
       <CardContent>
         {actions.length > 0 ? (
-          <div className="grid min-w-0 grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+          <div
+            className={cn(
+              "grid min-w-0 grid-cols-1 gap-3",
+              "sm:grid-cols-2",
+              "xl:grid-cols-2",
+            )}
+          >
             {actions.map((action) => (
               <QuickActionButton
                 key={action.id}
@@ -51,8 +62,14 @@ export function QuickActions({
             ))}
           </div>
         ) : (
-          <div className="flex min-h-28 items-center justify-center rounded-xl border border-dashed border-slate-200 px-4 py-6 text-center dark:border-slate-800">
-            <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">
+          <div
+            className={cn(
+              "flex min-h-28 items-center justify-center",
+              "rounded-xl border border-dashed",
+              "border-border px-4 py-6 text-center",
+            )}
+          >
+            <p className="text-xs leading-5 text-text-muted">
               Nenhuma ação rápida está disponível.
             </p>
           </div>

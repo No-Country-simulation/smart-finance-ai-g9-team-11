@@ -4,4 +4,5 @@ export interface InsightItemProps {
 
 export interface AIInsightsProps {
   title?: string;
+  subtitle?: string;
 }

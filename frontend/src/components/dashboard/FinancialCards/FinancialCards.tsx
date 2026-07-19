@@ -2,10 +2,31 @@ import { dashboardMock } from "@/mocks/dashboard.mock";
 
 import { FinancialCard } from "../FinancialCard";
 
+function isScoreCard(card: {
+  id?: string | number;
+  title: string;
+}): boolean {
+  const normalizedId = String(
+    card.id ?? "",
+  ).toLocaleLowerCase("pt-BR");
+
+  const normalizedTitle =
+    card.title.toLocaleLowerCase("pt-BR");
+
+  return (
+    normalizedId.includes("score") ||
+    normalizedTitle.includes("score")
+  );
+}
+
 export function FinancialCards() {
+  const summaryCards = dashboardMock.summary.filter(
+    (card) => !isScoreCard(card),
+  );
+
   return (
     <>
-      {dashboardMock.summary.map((card) => (
+      {summaryCards.map((card) => (
         <FinancialCard
           key={card.id ?? card.title}
           id={card.id}

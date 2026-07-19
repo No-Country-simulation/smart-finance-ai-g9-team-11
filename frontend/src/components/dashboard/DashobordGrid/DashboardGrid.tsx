@@ -15,22 +15,32 @@ import { TransactionsTable } from "../TransactionsTable";
 export function DashboardGrid() {
   const { alerts } = dashboardMock.financialHealth;
 
-  const handleQuickAction = (action: QuickAction): void => {
+  const handleQuickAction = (
+    action: QuickAction,
+  ): void => {
     switch (action.id) {
       case "add-transaction":
-        console.info("Abrir fluxo de nova transação.");
+        console.info(
+          "Abrir fluxo de nova transação.",
+        );
         break;
 
       case "run-analysis":
-        console.info("Executar nova análise financeira.");
+        console.info(
+          "Executar nova análise financeira.",
+        );
         break;
 
       case "view-recommendations":
-        console.info("Abrir recomendações financeiras.");
+        console.info(
+          "Abrir recomendações financeiras.",
+        );
         break;
 
       case "import-transactions":
-        console.info("Importação de transações indisponível.");
+        console.info(
+          "Importação de transações indisponível.",
+        );
         break;
 
       default: {
@@ -43,8 +53,9 @@ export function DashboardGrid() {
   return (
     <section
       className={cn(
-        "mt-6 min-w-0 space-y-5",
-        "sm:mt-8 sm:space-y-6",
+        "min-w-0 space-y-4",
+        "sm:space-y-5",
+        "2xl:space-y-6",
       )}
       aria-labelledby="dashboard-overview-title"
     >
@@ -55,63 +66,64 @@ export function DashboardGrid() {
         Visão geral financeira
       </h2>
 
-      {/* Resumo financeiro */}
       <div
         className={cn(
-          "grid min-w-0 grid-cols-1 gap-4",
-          "sm:gap-5",
-          "md:grid-cols-2",
-          "xl:grid-cols-4 xl:gap-6",
+          "grid min-w-0 grid-cols-1 items-stretch gap-4",
+          "sm:grid-cols-2 sm:gap-5",
+          "xl:grid-cols-[repeat(3,minmax(0,1fr))_minmax(280px,1.35fr)]",
+          "2xl:gap-6",
         )}
+        aria-label="Resumo financeiro"
       >
         <FinancialCards />
+
+        <div className="min-w-0 sm:col-span-2 xl:col-span-1">
+          <ScoreCard />
+        </div>
       </div>
 
-      {/* Fluxo financeiro e análises da IA */}
+      <div className="min-w-0">
+        <BalanceChart />
+      </div>
+
       <div
         className={cn(
-          "grid min-w-0 grid-cols-1 items-start gap-4",
+          "grid min-w-0 grid-cols-1 items-stretch gap-4",
           "sm:gap-5",
-          "xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]",
-          "xl:gap-6",
+          "xl:grid-cols-2",
+          "2xl:gap-6",
         )}
       >
-        <div className="min-w-0">
-          <BalanceChart />
-        </div>
-
         <div className="min-w-0">
           <AIInsights />
         </div>
+
+        <div className="min-w-0">
+          <Alerts
+            alerts={alerts}
+            maxVisibleAlerts={4}
+          />
+        </div>
       </div>
 
-      {/* Transações e widgets de saúde financeira */}
       <div
         className={cn(
           "grid min-w-0 grid-cols-1 items-start gap-4",
           "sm:gap-5",
-          "xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]",
-          "xl:gap-6",
+          "xl:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]",
+          "2xl:grid-cols-[minmax(0,3.2fr)_minmax(360px,1fr)]",
+          "2xl:gap-6",
         )}
       >
         <div className="min-w-0">
           <TransactionsTable />
         </div>
 
-        <aside
-          className={cn(
-            "grid min-w-0 content-start gap-4",
-            "sm:gap-5",
-            "xl:gap-6",
-          )}
-          aria-label="Saúde financeira e ações"
-        >
-          <ScoreCard />
-
-          <Alerts alerts={alerts} />
-
-          <QuickActions onAction={handleQuickAction} />
-        </aside>
+        <div className="min-w-0">
+          <QuickActions
+            onAction={handleQuickAction}
+          />
+        </div>
       </div>
     </section>
   );

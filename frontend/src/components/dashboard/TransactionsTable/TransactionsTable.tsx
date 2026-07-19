@@ -15,7 +15,8 @@ import { TransactionsTableSearch } from "./TransactionsTableSearch";
 export function TransactionsTable() {
   const [search, setSearch] = useState("");
 
-  const transactions = dashboardService.getTransactions();
+  const transactions =
+    dashboardService.getTransactions();
 
   const filteredTransactions = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -26,15 +27,19 @@ export function TransactionsTable() {
 
     return transactions.filter(
       ({ description, category }) =>
-        description.toLowerCase().includes(term) ||
+        description
+          .toLowerCase()
+          .includes(term) ||
         category.toLowerCase().includes(term),
     );
   }, [search, transactions]);
 
   return (
-    <Card>
+    <Card className="min-w-0 overflow-hidden">
       <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <CardTitle>Transações Recentes</CardTitle>
+        <CardTitle>
+          Transações recentes
+        </CardTitle>
 
         <TransactionsTableSearch
           value={search}
@@ -43,23 +48,25 @@ export function TransactionsTable() {
       </CardHeader>
 
       <CardContent className="p-0">
-        <div className="overflow-x-auto">
+        <div className="max-h-[520px] overflow-auto">
           <table className="min-w-full border-collapse">
             <TransactionsTableHeader />
 
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border-muted">
               {filteredTransactions.length > 0 ? (
-                filteredTransactions.map((transaction) => (
-                  <TransactionsTableRow
-                    key={transaction.id}
-                    transaction={transaction}
-                  />
-                ))
+                filteredTransactions.map(
+                  (transaction) => (
+                    <TransactionsTableRow
+                      key={transaction.id}
+                      transaction={transaction}
+                    />
+                  ),
+                )
               ) : (
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-12 text-center text-sm text-slate-500"
+                    className="px-6 py-12 text-center text-sm text-text-muted"
                   >
                     Nenhuma transação encontrada.
                   </td>

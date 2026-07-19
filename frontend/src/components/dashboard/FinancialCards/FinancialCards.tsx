@@ -3,7 +3,7 @@ import { dashboardMock } from "@/mocks/dashboard.mock";
 import { FinancialCard } from "../FinancialCard";
 
 function isScoreCard(card: {
-  id?: string | number;
+  id?: string;
   title: string;
 }): boolean {
   const normalizedId = String(

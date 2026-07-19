@@ -12,11 +12,16 @@ export const dashboardMock: DashboardMock = {
   summary: [
     {
       id: "balance",
-      title: "Saldo Atual",
+      title: "Saldo atual",
       value: "R$ 18.540,25",
       variation: "+8,4% este mês",
       trend: "up",
-      icon: <Wallet className="h-6 w-6 text-slate-700" />,
+      icon: (
+        <Wallet
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
     },
     {
       id: "income",
@@ -25,7 +30,10 @@ export const dashboardMock: DashboardMock = {
       variation: "+12,8%",
       trend: "up",
       icon: (
-        <ArrowUpCircle className="h-6 w-6 text-emerald-600" />
+        <ArrowUpCircle
+          className="size-5"
+          aria-hidden="true"
+        />
       ),
     },
     {
@@ -35,16 +43,24 @@ export const dashboardMock: DashboardMock = {
       variation: "-3,2%",
       trend: "down",
       icon: (
-        <ArrowDownCircle className="h-6 w-6 text-red-600" />
+        <ArrowDownCircle
+          className="size-5"
+          aria-hidden="true"
+        />
       ),
     },
     {
       id: "score",
-      title: "Score Financeiro",
+      title: "Score financeiro",
       value: "91",
       variation: "Excelente",
       trend: "up",
-      icon: <DollarSign className="h-6 w-6 text-blue-600" />,
+      icon: (
+        <DollarSign
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
     },
   ],
 
@@ -161,7 +177,7 @@ export const dashboardMock: DashboardMock = {
     },
     {
       id: 7,
-      description: "Conta de Energia",
+      description: "Conta de energia",
       category: "Moradia",
       amount: -245.8,
       date: "2026-07-13",
@@ -188,7 +204,7 @@ export const dashboardMock: DashboardMock = {
     insights: [
       "Você reduziu seus gastos com alimentação em 12% neste mês.",
       "Sua renda aumentou 8% em relação ao mês anterior.",
-      "Seu Score Financeiro permanece acima da média dos usuários.",
+      "Seu score financeiro permanece acima da média dos usuários.",
       "Você pode economizar até R$ 420 reduzindo gastos recorrentes.",
     ],
 

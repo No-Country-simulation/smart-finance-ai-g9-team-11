@@ -32,15 +32,17 @@ interface InsightPresentation {
   title: string;
 }
 
+interface InsightToneStyles {
+  iconContainer: string;
+  icon: string;
+  accent: string;
+}
+
 const MAX_VISIBLE_INSIGHTS = 4;
 
 const toneStyles: Record<
   InsightTone,
-  {
-    iconContainer: string;
-    icon: string;
-    accent: string;
-  }
+  InsightToneStyles
 > = {
   success: {
     iconContainer:
@@ -115,28 +117,29 @@ function getInsightPresentation(
     };
   }
 
-  const fallbackPresentations: InsightPresentation[] = [
-    {
-      icon: Sparkles,
-      tone: "success",
-      title: "Seu desempenho melhorou",
-    },
-    {
-      icon: Lightbulb,
-      tone: "warning",
-      title: "Você pode economizar",
-    },
-    {
-      icon: ArrowUpRight,
-      tone: "info",
-      title: "Movimentação financeira",
-    },
-    {
-      icon: TriangleAlert,
-      tone: "danger",
-      title: "Ponto de atenção",
-    },
-  ];
+  const fallbackPresentations: readonly InsightPresentation[] =
+    [
+      {
+        icon: Sparkles,
+        tone: "success",
+        title: "Seu desempenho melhorou",
+      },
+      {
+        icon: Lightbulb,
+        tone: "warning",
+        title: "Você pode economizar",
+      },
+      {
+        icon: ArrowUpRight,
+        tone: "info",
+        title: "Movimentação financeira",
+      },
+      {
+        icon: TriangleAlert,
+        tone: "danger",
+        title: "Ponto de atenção",
+      },
+    ];
 
   return (
     fallbackPresentations[
@@ -149,12 +152,11 @@ export function AIInsights({
   title = "AI Assistant",
   subtitle = "Insights e recomendações para você",
 }: Readonly<AIInsightsProps>) {
-  const insights = dashboardService.getInsights();
+  const insights: readonly string[] =
+    dashboardService.getInsights();
 
-  const visibleInsights = insights.slice(
-    0,
-    MAX_VISIBLE_INSIGHTS,
-  );
+  const visibleInsights: readonly string[] =
+    insights.slice(0, MAX_VISIBLE_INSIGHTS);
 
   const hiddenInsightsCount = Math.max(
     insights.length - visibleInsights.length,
@@ -173,10 +175,10 @@ export function AIInsights({
               "bg-gradient-to-br from-primary/20",
               "via-primary/10 to-secondary/15",
               "text-primary-bright",
-              "shadow-[0_0_24px_-10px_var(--glow-primary)]",
             )}
+            aria-hidden="true"
           >
-            <Bot size={20} aria-hidden="true" />
+            <Bot size={20} />
           </div>
 
           <div className="min-w-0">
@@ -224,71 +226,74 @@ export function AIInsights({
             )}
             aria-label="Mensagens do assistente financeiro"
           >
-            {visibleInsights.map((insight, index) => {
-              const presentation =
-                getInsightPresentation(
-                  insight,
-                  index,
-                );
+            {visibleInsights.map(
+              (
+                insight: string,
+                index: number,
+              ) => {
+                const presentation =
+                  getInsightPresentation(
+                    insight,
+                    index,
+                  );
 
-              const Icon = presentation.icon;
-              const styles =
-                toneStyles[presentation.tone];
+                const Icon = presentation.icon;
+                const styles =
+                  toneStyles[presentation.tone];
 
-              return (
-                <article
-                  key={`${index}-${insight}`}
-                  className={cn(
-                    "relative flex min-h-[150px]",
-                    "min-w-0 flex-col overflow-hidden",
-                    "rounded-[16px] border border-border",
-                    "bg-card/70 p-4 shadow-card",
-                    "transition-[background-color,border-color,transform]",
-                    "duration-200",
-                    "hover:-translate-y-px",
-                    "hover:border-border-highlight",
-                    "hover:bg-card-hover",
-                    "motion-reduce:transition-none",
-                    "motion-reduce:hover:translate-y-0",
-                  )}
-                >
-                  <span
+                return (
+                  <article
+                    key={`${index}-${insight}`}
                     className={cn(
-                      "absolute inset-y-0 left-0 w-0.5",
-                      styles.accent,
+                      "relative flex min-h-[150px]",
+                      "min-w-0 flex-col overflow-hidden",
+                      "rounded-[16px] border border-border",
+                      "bg-card/70 p-4 shadow-card",
+                      "transition-[background-color,border-color,transform]",
+                      "duration-200",
+                      "hover:-translate-y-px",
+                      "hover:border-border-highlight",
+                      "hover:bg-card-hover",
+                      "motion-reduce:transition-none",
+                      "motion-reduce:hover:translate-y-0",
                     )}
-                    aria-hidden="true"
-                  />
-
-                  <div className="flex items-start gap-3">
-                    <div
+                  >
+                    <span
                       className={cn(
-                        "flex size-9 shrink-0 items-center",
-                        "justify-center rounded-[11px]",
-                        "border",
-                        styles.iconContainer,
-                        styles.icon,
+                        "absolute inset-y-0 left-0 w-0.5",
+                        styles.accent,
                       )}
-                    >
-                      <Icon
-                        size={17}
+                      aria-hidden="true"
+                    />
+
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={cn(
+                          "flex size-9 shrink-0 items-center",
+                          "justify-center rounded-[11px]",
+                          "border",
+                          styles.iconContainer,
+                          styles.icon,
+                        )}
                         aria-hidden="true"
-                      />
-                    </div>
+                      >
+                        <Icon size={17} />
+                      </div>
 
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-text">
-                        {presentation.title}
-                      </p>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-text">
+                          {presentation.title}
+                        </p>
 
-                      <p className="mt-1 text-xs leading-5 text-text-muted">
-                        {insight}
-                      </p>
+                        <p className="mt-1 text-xs leading-5 text-text-muted">
+                          {insight}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </article>
-              );
-            })}
+                  </article>
+                );
+              },
+            )}
           </div>
         ) : (
           <div
@@ -367,7 +372,10 @@ export function AIInsights({
               "disabled:opacity-55",
             )}
           >
-            <Send size={16} aria-hidden="true" />
+            <Send
+              size={16}
+              aria-hidden="true"
+            />
           </button>
         </div>
 

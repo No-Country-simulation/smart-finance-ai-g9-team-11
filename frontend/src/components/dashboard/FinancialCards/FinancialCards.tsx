@@ -1,11 +1,13 @@
 import { dashboardMock } from "@/mocks/dashboard.mock";
 
-import { FinancialCard } from "../FinancialCard";
+import {
+  FinancialCard,
+  type FinancialCardProps,
+} from "../FinancialCard";
 
-function isScoreCard(card: {
-  id?: string;
-  title: string;
-}): boolean {
+function isScoreCard(
+  card: FinancialCardProps,
+): boolean {
   const normalizedId = String(
     card.id ?? "",
   ).toLocaleLowerCase("pt-BR");
@@ -20,23 +22,29 @@ function isScoreCard(card: {
 }
 
 export function FinancialCards() {
-  const summaryCards = dashboardMock.summary.filter(
-    (card) => !isScoreCard(card),
-  );
+  const summaryCards: FinancialCardProps[] =
+    dashboardMock.summary.filter(
+      (card: FinancialCardProps) =>
+        !isScoreCard(card),
+    );
 
   return (
     <>
-      {summaryCards.map((card) => (
-        <FinancialCard
-          key={card.id ?? card.title}
-          id={card.id}
-          title={card.title}
-          value={card.value}
-          variation={card.variation}
-          trend={card.trend}
-          icon={card.icon}
-        />
-      ))}
+      {summaryCards.map(
+        (card: FinancialCardProps) => (
+          <FinancialCard
+            key={card.id ?? card.title}
+            id={card.id}
+            title={card.title}
+            value={card.value}
+            variation={card.variation}
+            trend={card.trend}
+            icon={card.icon}
+            updatedAt={card.updatedAt}
+            className={card.className}
+          />
+        ),
+      )}
     </>
   );
 }

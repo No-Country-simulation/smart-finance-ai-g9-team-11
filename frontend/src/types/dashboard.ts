@@ -1,28 +1,39 @@
-import {
-  useId,
-  type ReactNode,
-} from "react";
+import type { FinancialAlert } from "@/components/dashboard/Alerts";
+import type { BalanceChartData } from "@/components/dashboard/BalanceChart";
+import type { ExpenseCategory } from "@/components/dashboard/ExpenseChart/ExpenseChart.types";
+import type { FinancialCardProps } from "@/components/dashboard/FinancialCard";
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/common/Card";
-import { cn } from "@/lib/utils";
+export interface Transaction {
+  id: number;
+  description: string;
+  category: string;
+  amount: number;
+  date: string;
+  type: "income" | "expense";
+  status: "completed" | "pending";
+}
 
-type FinancialCardTrend =
-  | "up"
-  | "down"
-  | "neutral";
-
-export interface FinancialCardProps {
-  id?: string;
-  title: string;
-  value: string;
+export interface FinancialScore {
+  score: number;
+  maxScore: number;
+  classification:
+    | "Excelente"
+    | "Bom"
+    | "Regular"
+    | "Baixo";
   variation: string;
-  trend: FinancialCardTrend;
-  icon: ReactNode;
-  updatedAt?: string;
-  className?: string;
+}
+
+export interface FinancialHealth
+  extends FinancialScore {
+  insights: string[];
+  alerts: FinancialAlert[];
+}
+
+export interface DashboardMock {
+  summary: FinancialCardProps[];
+  cashFlow: BalanceChartData[];
+  categories: ExpenseCategory[];
+  transactions: Transaction[];
+  financialHealth: FinancialHealth;
 }

@@ -21,41 +21,45 @@ const alertVisualConfig: Record<
   info: {
     icon: Info,
     label: "Informativo",
-    iconClassName: "text-blue-600 dark:text-blue-400",
+    accentClassName: "bg-primary-bright",
+    iconClassName: "text-primary-bright",
     iconContainerClassName:
-      "bg-blue-50 ring-blue-100 dark:bg-blue-500/10 dark:ring-blue-500/20",
+      "border-primary/20 bg-primary/10",
     badgeClassName:
-      "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300",
+      "border-primary/20 bg-primary/10 text-primary-bright",
   },
 
   success: {
     icon: BadgeCheck,
     label: "Positivo",
-    iconClassName: "text-emerald-600 dark:text-emerald-400",
+    accentClassName: "bg-success",
+    iconClassName: "text-success",
     iconContainerClassName:
-      "bg-emerald-50 ring-emerald-100 dark:bg-emerald-500/10 dark:ring-emerald-500/20",
+      "border-success/20 bg-success/10",
     badgeClassName:
-      "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
+      "border-success/20 bg-success/10 text-success",
   },
 
   warning: {
     icon: CircleAlert,
     label: "Atenção",
-    iconClassName: "text-amber-600 dark:text-amber-400",
+    accentClassName: "bg-warning",
+    iconClassName: "text-warning",
     iconContainerClassName:
-      "bg-amber-50 ring-amber-100 dark:bg-amber-500/10 dark:ring-amber-500/20",
+      "border-warning/20 bg-warning/10",
     badgeClassName:
-      "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300",
+      "border-warning/20 bg-warning/10 text-warning",
   },
 
   danger: {
     icon: AlertCircle,
     label: "Crítico",
-    iconClassName: "text-red-600 dark:text-red-400",
+    accentClassName: "bg-danger",
+    iconClassName: "text-danger",
     iconContainerClassName:
-      "bg-red-50 ring-red-100 dark:bg-red-500/10 dark:ring-red-500/20",
+      "border-danger/20 bg-danger/10",
     badgeClassName:
-      "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300",
+      "border-danger/20 bg-danger/10 text-danger",
   },
 };
 
@@ -66,79 +70,104 @@ export function AlertItem({
   const config = alertVisualConfig[alert.type];
   const Icon = config.icon;
 
-  const hasAction = Boolean(alert.actionLabel && onAction);
+  const hasAction = Boolean(
+    alert.actionLabel && onAction,
+  );
 
   return (
     <article
       className={cn(
-        "group flex min-w-0 items-start gap-3 rounded-xl border",
-        "border-slate-200/80 bg-white p-3.5",
-        "transition-colors duration-200",
-        "hover:bg-slate-50/80",
-        "dark:border-slate-800 dark:bg-slate-950/40",
-        "dark:hover:bg-slate-900/60",
+        "group relative flex min-h-[156px]",
+        "min-w-0 flex-col overflow-hidden",
+        "rounded-[16px] border border-border",
+        "bg-surface-elevated/55 p-4",
+        "transition-[border-color,background-color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-px",
+        "hover:border-border-highlight",
+        "hover:bg-card-hover",
+        "hover:shadow-card",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
       )}
       aria-label={`${config.label}: ${alert.title}`}
     >
-      <div
+      <span
         className={cn(
-          "flex size-9 shrink-0 items-center justify-center rounded-lg",
-          "ring-1 ring-inset",
-          config.iconContainerClassName,
+          "absolute inset-y-0 left-0 w-0.5",
+          config.accentClassName,
         )}
-      >
-        <Icon
-          className={cn("size-4", config.iconClassName)}
+        aria-hidden="true"
+      />
+
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <div
+          className={cn(
+            "flex size-9 shrink-0 items-center",
+            "justify-center rounded-[11px] border",
+            config.iconContainerClassName,
+            config.iconClassName,
+          )}
           aria-hidden="true"
-        />
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <h3 className="min-w-0 text-sm font-semibold text-slate-950 dark:text-slate-50">
-            {alert.title}
-          </h3>
-
-          <span
-            className={cn(
-              "inline-flex shrink-0 items-center rounded-full",
-              "px-2 py-0.5 text-[10px] font-medium",
-              config.badgeClassName,
-            )}
-          >
-            {config.label}
-          </span>
+        >
+          <Icon className="size-4" />
         </div>
 
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center",
+            "rounded-full border px-2 py-1",
+            "text-[9px] font-semibold uppercase",
+            "tracking-[0.08em]",
+            config.badgeClassName,
+          )}
+        >
+          {config.label}
+        </span>
+      </div>
+
+      <div className="mt-3 min-w-0 flex-1">
+        <h4 className="text-sm font-semibold leading-5 text-text">
+          {alert.title}
+        </h4>
+
         {alert.description && (
-          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+          <p className="mt-1.5 text-xs leading-5 text-text-muted">
             {alert.description}
           </p>
         )}
-
-        {hasAction && (
-          <button
-            type="button"
-            onClick={() => onAction?.(alert)}
-            className={cn(
-              "mt-2 inline-flex items-center gap-1.5",
-              "text-xs font-semibold text-slate-700",
-              "transition-colors hover:text-slate-950",
-              "focus-visible:outline-none focus-visible:ring-2",
-              "focus-visible:ring-blue-500 focus-visible:ring-offset-2",
-              "dark:text-slate-300 dark:hover:text-white",
-              "dark:focus-visible:ring-offset-slate-950",
-            )}
-          >
-            {alert.actionLabel}
-
-            <ArrowRight
-              className="size-3.5 transition-transform group-hover:translate-x-0.5"
-              aria-hidden="true"
-            />
-          </button>
-        )}
       </div>
+
+      {hasAction && (
+        <button
+          type="button"
+          onClick={() => onAction?.(alert)}
+          className={cn(
+            "mt-3 inline-flex w-fit items-center gap-1.5",
+            "rounded-lg text-xs font-semibold",
+            "text-primary-bright",
+            "transition-[color,transform]",
+            "hover:text-primary",
+            "focus-visible:outline-none",
+            "focus-visible:ring-2",
+            "focus-visible:ring-primary/40",
+            "focus-visible:ring-offset-2",
+            "focus-visible:ring-offset-background",
+          )}
+        >
+          {alert.actionLabel}
+
+          <ArrowRight
+            className={cn(
+              "size-3.5 transition-transform",
+              "group-hover:translate-x-0.5",
+              "motion-reduce:transition-none",
+              "motion-reduce:translate-x-0",
+            )}
+            aria-hidden="true"
+          />
+        </button>
+      )}
     </article>
   );
 }

@@ -30,6 +30,7 @@ export interface AlertItemProps {
 export interface AlertVisualConfig {
   icon: LucideIcon;
   label: string;
+  accentClassName: string;
   iconClassName: string;
   iconContainerClassName: string;
   badgeClassName: string;

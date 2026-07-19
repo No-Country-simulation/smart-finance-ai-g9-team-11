@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react";
 import {
   ArrowUpRight,
   Bot,
@@ -18,60 +17,38 @@ import {
 import { cn } from "@/lib/utils";
 import { dashboardService } from "@/services/dashboard.service";
 
-import type { AIInsightsProps } from "./AIInsights.types";
+import { InsightItem } from "./InsightItem";
 
-type InsightTone =
-  | "success"
-  | "warning"
-  | "danger"
-  | "info";
+import type {
+  AIInsightsProps,
+  InsightPresentation,
+} from "./AIInsights.types";
 
-interface InsightPresentation {
-  icon: LucideIcon;
-  tone: InsightTone;
-  title: string;
-}
+const DEFAULT_MAX_VISIBLE_INSIGHTS = 4;
 
-interface InsightToneStyles {
-  iconContainer: string;
-  icon: string;
-  accent: string;
-}
-
-const MAX_VISIBLE_INSIGHTS = 4;
-
-const toneStyles: Record<
-  InsightTone,
-  InsightToneStyles
-> = {
-  success: {
-    iconContainer:
-      "border-success/20 bg-success/10",
-    icon: "text-success",
-    accent: "bg-success",
-  },
-
-  warning: {
-    iconContainer:
-      "border-warning/20 bg-warning/10",
-    icon: "text-warning",
-    accent: "bg-warning",
-  },
-
-  danger: {
-    iconContainer:
-      "border-danger/20 bg-danger/10",
-    icon: "text-danger",
-    accent: "bg-danger",
-  },
-
-  info: {
-    iconContainer:
-      "border-primary/20 bg-primary/10",
-    icon: "text-primary-bright",
-    accent: "bg-primary-bright",
-  },
-};
+const fallbackPresentations: readonly InsightPresentation[] =
+  [
+    {
+      icon: Sparkles,
+      tone: "success",
+      title: "Seu desempenho melhorou",
+    },
+    {
+      icon: Lightbulb,
+      tone: "warning",
+      title: "Oportunidade de economia",
+    },
+    {
+      icon: ArrowUpRight,
+      tone: "info",
+      title: "Movimentação financeira",
+    },
+    {
+      icon: TriangleAlert,
+      tone: "danger",
+      title: "Ponto de atenção",
+    },
+  ];
 
 function getInsightPresentation(
   insight: string,
@@ -95,7 +72,8 @@ function getInsightPresentation(
   if (
     normalizedInsight.includes("economizar") ||
     normalizedInsight.includes("gasto") ||
-    normalizedInsight.includes("despesa")
+    normalizedInsight.includes("despesa") ||
+    normalizedInsight.includes("reduziu")
   ) {
     return {
       icon: Lightbulb,
@@ -108,6 +86,7 @@ function getInsightPresentation(
     normalizedInsight.includes("aument") ||
     normalizedInsight.includes("crescimento") ||
     normalizedInsight.includes("receita") ||
+    normalizedInsight.includes("renda") ||
     normalizedInsight.includes("score")
   ) {
     return {
@@ -116,30 +95,6 @@ function getInsightPresentation(
       title: "Evolução positiva",
     };
   }
-
-  const fallbackPresentations: readonly InsightPresentation[] =
-    [
-      {
-        icon: Sparkles,
-        tone: "success",
-        title: "Seu desempenho melhorou",
-      },
-      {
-        icon: Lightbulb,
-        tone: "warning",
-        title: "Você pode economizar",
-      },
-      {
-        icon: ArrowUpRight,
-        tone: "info",
-        title: "Movimentação financeira",
-      },
-      {
-        icon: TriangleAlert,
-        tone: "danger",
-        title: "Ponto de atenção",
-      },
-    ];
 
   return (
     fallbackPresentations[
@@ -150,13 +105,21 @@ function getInsightPresentation(
 
 export function AIInsights({
   title = "AI Assistant",
-  subtitle = "Insights e recomendações para você",
+  subtitle = "Insights e recomendações inteligentes para suas finanças.",
+  maxVisibleInsights = DEFAULT_MAX_VISIBLE_INSIGHTS,
 }: Readonly<AIInsightsProps>) {
   const insights: readonly string[] =
     dashboardService.getInsights();
 
-  const visibleInsights: readonly string[] =
-    insights.slice(0, MAX_VISIBLE_INSIGHTS);
+  const safeMaxVisibleInsights = Math.max(
+    0,
+    maxVisibleInsights,
+  );
+
+  const visibleInsights = insights.slice(
+    0,
+    safeMaxVisibleInsights,
+  );
 
   const hiddenInsightsCount = Math.max(
     insights.length - visibleInsights.length,
@@ -166,7 +129,7 @@ export function AIInsights({
   return (
     <Card className="flex h-full min-w-0 flex-col overflow-hidden">
       <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-start gap-3">
           <div
             className={cn(
               "flex size-10 shrink-0 items-center",
@@ -175,6 +138,7 @@ export function AIInsights({
               "bg-gradient-to-br from-primary/20",
               "via-primary/10 to-secondary/15",
               "text-primary-bright",
+              "shadow-[0_0_24px_-12px_var(--glow-primary)]",
             )}
             aria-hidden="true"
           >
@@ -182,7 +146,7 @@ export function AIInsights({
           </div>
 
           <div className="min-w-0">
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
               <span className="truncate">
                 {title}
               </span>
@@ -209,22 +173,26 @@ export function AIInsights({
           )}
         >
           <span
-            className="size-1.5 rounded-full bg-success"
+            className="relative flex size-1.5"
             aria-hidden="true"
-          />
+          >
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-50 motion-reduce:animate-none" />
+
+            <span className="relative inline-flex size-1.5 rounded-full bg-success" />
+          </span>
 
           Online
         </span>
       </CardHeader>
 
-      <CardContent className="flex flex-1 flex-col">
+      <CardContent className="flex flex-1 flex-col pt-4">
         {visibleInsights.length > 0 ? (
           <div
             className={cn(
               "grid min-w-0 flex-1 grid-cols-1 gap-3",
               "md:grid-cols-2",
             )}
-            aria-label="Mensagens do assistente financeiro"
+            aria-label="Insights do assistente financeiro"
           >
             {visibleInsights.map(
               (
@@ -237,60 +205,12 @@ export function AIInsights({
                     index,
                   );
 
-                const Icon = presentation.icon;
-                const styles =
-                  toneStyles[presentation.tone];
-
                 return (
-                  <article
+                  <InsightItem
                     key={`${index}-${insight}`}
-                    className={cn(
-                      "relative flex min-h-[150px]",
-                      "min-w-0 flex-col overflow-hidden",
-                      "rounded-[16px] border border-border",
-                      "bg-card/70 p-4 shadow-card",
-                      "transition-[background-color,border-color,transform]",
-                      "duration-200",
-                      "hover:-translate-y-px",
-                      "hover:border-border-highlight",
-                      "hover:bg-card-hover",
-                      "motion-reduce:transition-none",
-                      "motion-reduce:hover:translate-y-0",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "absolute inset-y-0 left-0 w-0.5",
-                        styles.accent,
-                      )}
-                      aria-hidden="true"
-                    />
-
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={cn(
-                          "flex size-9 shrink-0 items-center",
-                          "justify-center rounded-[11px]",
-                          "border",
-                          styles.iconContainer,
-                          styles.icon,
-                        )}
-                        aria-hidden="true"
-                      >
-                        <Icon size={17} />
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-text">
-                          {presentation.title}
-                        </p>
-
-                        <p className="mt-1 text-xs leading-5 text-text-muted">
-                          {insight}
-                        </p>
-                      </div>
-                    </div>
-                  </article>
+                    insight={insight}
+                    presentation={presentation}
+                  />
                 );
               },
             )}
@@ -298,25 +218,32 @@ export function AIInsights({
         ) : (
           <div
             className={cn(
-              "flex min-h-48 flex-col items-center",
-              "justify-center rounded-xl",
-              "border border-dashed border-border",
-              "px-4 py-6 text-center",
+              "flex min-h-[280px] flex-col",
+              "items-center justify-center",
+              "rounded-[16px] border",
+              "border-dashed border-border",
+              "px-6 text-center",
             )}
           >
-            <Bot
-              size={22}
-              className="text-primary-bright"
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-primary/20",
+                "bg-primary/10 text-primary-bright",
+              )}
               aria-hidden="true"
-            />
+            >
+              <Bot size={22} />
+            </div>
 
-            <p className="mt-3 text-sm font-semibold text-text">
+            <p className="mt-4 text-sm font-semibold text-text">
               Nenhum insight disponível
             </p>
 
-            <p className="mt-1 text-xs text-text-muted">
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
               Uma nova análise financeira poderá gerar
-              recomendações.
+              recomendações personalizadas.
             </p>
           </div>
         )}
@@ -334,7 +261,9 @@ export function AIInsights({
           className={cn(
             "mt-4 flex min-w-0 items-center gap-2",
             "rounded-[14px] border border-border",
-            "bg-background/60 p-1.5",
+            "bg-background/50 p-1.5",
+            "transition-colors duration-200",
+            "focus-within:border-primary/40",
           )}
         >
           <label
@@ -368,8 +297,9 @@ export function AIInsights({
               "justify-center rounded-[11px]",
               "bg-gradient-to-br from-primary",
               "to-secondary text-white",
+              "shadow-sm transition-opacity",
               "disabled:cursor-not-allowed",
-              "disabled:opacity-55",
+              "disabled:opacity-50",
             )}
           >
             <Send
@@ -379,10 +309,16 @@ export function AIInsights({
           </button>
         </div>
 
-        <p className="mt-2 text-center text-[10px] text-text-subtle">
-          Chat interativo disponível após a integração com o
-          backend.
-        </p>
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-text-subtle">
+          <Sparkles
+            size={11}
+            aria-hidden="true"
+          />
+
+          <span>
+            Chat disponível após a integração com o backend.
+          </span>
+        </div>
       </CardContent>
     </Card>
   );

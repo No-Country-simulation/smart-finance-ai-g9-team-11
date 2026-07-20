@@ -1,0 +1,123 @@
+﻿FINANCE AI - RELATORIO DE STATUS ATUAL
+Gerado em: 2026-07-18 13:25:38
+
+==================================================
+GIT STATUS
+==================================================
+On branch feature/frontend
+Your branch is up to date with 'origin/feature/frontend'.
+
+nothing to commit, working tree clean
+
+==================================================
+ULTIMOS COMMITS
+==================================================
+4ab23b7 fix(frontend): align profile navigation and add resizable sidebar
+e4c9801 style(frontend): redesign premium responsive header
+431433d style(frontend): redesign premium responsive sidebar
+58deeda style(frontend): refine global background and app layout
+e8a023d style(frontend): consolidate premium dashboard design tokens
+
+
+==================================================
+package.json
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+tsconfig.json
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+src/main.tsx
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+src/index.css
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+src/components/ui/dropdown-menu.tsx
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+src/components/layout/UserMenu/UserMenu.tsx
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+src/pages/Profile/ProfilePage.tsx
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+src/layouts/AppLayout/AppLayout.tsx
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+src/components/layout/Sidebar/Sidebar.tsx
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+src/components/layout/Header/Header.tsx
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+src/components/layout/Header/HeaderActions.tsx
+==================================================
+ARQUIVO NAO ENCONTRADO
+
+==================================================
+NPM RUN LINT
+==================================================
+node.exe : npm error code ENOENT
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm error code ENOENT:String) [], Rem 
+   oteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm error syscall open
+npm error path 
+C:\Users\geanc\OneDrive\Desktop\Hackathon\smart-finance-ai-g9-team-11\package.json
+npm error errno -4058
+npm error enoent Could not read package.json: Error: ENOENT: no such file or 
+directory, open 'C:\Users\geanc\OneDrive\Desktop\Hackathon\smart-finance-ai-g9-team
+-11\package.json'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error A complete log of this run can be found in: 
+C:\Users\geanc\AppData\Local\npm-cache\_logs\2026-07-18T16_25_38_983Z-debug-0.log
+
+
+==================================================
+NPM RUN BUILD
+==================================================
+node.exe : npm error code ENOENT
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm error code ENOENT:String) [], Rem 
+   oteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm error syscall open
+npm error path 
+C:\Users\geanc\OneDrive\Desktop\Hackathon\smart-finance-ai-g9-team-11\package.json
+npm error errno -4058
+npm error enoent Could not read package.json: Error: ENOENT: no such file or 
+directory, open 'C:\Users\geanc\OneDrive\Desktop\Hackathon\smart-finance-ai-g9-team
+-11\package.json'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error A complete log of this run can be found in: 
+C:\Users\geanc\AppData\Local\npm-cache\_logs\2026-07-18T16_25_39_742Z-debug-0.log
+

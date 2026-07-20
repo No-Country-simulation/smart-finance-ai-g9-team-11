@@ -1,0 +1,1527 @@
+﻿FINANCE AI - FRONTEND AUDIT
+Generated at: 2026-07-18 11:25:24
+
+=== PROJECT STRUCTURE ===
+
+[src/components]
+src\components\common\.gitkeep
+src\components\common\Card\Card.tsx
+src\components\common\Card\Card.types.ts
+src\components\common\Card\CardContent.tsx
+src\components\common\Card\CardFooter.tsx
+src\components\common\Card\CardHeader.tsx
+src\components\common\Card\CardTitle.tsx
+src\components\common\Card\CardValue.tsx
+src\components\common\Card\index.ts
+src\components\common\Chart\Chart.types.ts
+src\components\common\Chart\ChartContainer.tsx
+src\components\common\Chart\ChartLegend.tsx
+src\components\common\Chart\ChartTheme.ts
+src\components\common\Chart\ChartTooltip.tsx
+src\components\common\Chart\index.ts
+src\components\dashboard\.gitkeep
+src\components\dashboard\AIInsights\AIInsights.tsx
+src\components\dashboard\AIInsights\AIInsights.types.ts
+src\components\dashboard\AIInsights\index.ts
+src\components\dashboard\AIInsights\InsightItem.tsx
+src\components\dashboard\Alerts\AlertItem.tsx
+src\components\dashboard\Alerts\Alerts.tsx
+src\components\dashboard\Alerts\Alerts.types.ts
+src\components\dashboard\Alerts\index.ts
+src\components\dashboard\BalanceChart\BalanceChart.tsx
+src\components\dashboard\BalanceChart\BalanceChart.types.ts
+src\components\dashboard\BalanceChart\BalanceChartTooltip.tsx
+src\components\dashboard\BalanceChart\index.ts
+src\components\dashboard\DashobordGrid\DashboardGrid.tsx
+src\components\dashboard\DashobordGrid\index.ts
+src\components\dashboard\ExpenseChart\ExpenseChart.tsx
+src\components\dashboard\ExpenseChart\ExpenseChart.types.ts
+src\components\dashboard\ExpenseChart\index.ts
+src\components\dashboard\FinancialCard\FinancialCard.tsx
+src\components\dashboard\FinancialCard\FinancialCard.types.ts
+src\components\dashboard\FinancialCard\index.ts
+src\components\dashboard\FinancialCards\FinancialCards.tsx
+src\components\dashboard\FinancialCards\index.ts
+src\components\dashboard\QuickActions\index.ts
+src\components\dashboard\QuickActions\QuickActionButton.tsx
+src\components\dashboard\QuickActions\quickActions.data.ts
+src\components\dashboard\QuickActions\QuickActions.tsx
+src\components\dashboard\QuickActions\QuickActions.types.ts
+src\components\dashboard\ScoreCard\index.ts
+src\components\dashboard\ScoreCard\ScoreCard.tsx
+src\components\dashboard\ScoreCard\ScoreCard.types.ts
+src\components\dashboard\ScoreCard\ScoreGauge.tsx
+src\components\dashboard\TransactionsTable\index.ts
+src\components\dashboard\TransactionsTable\TransactionsTable.tsx
+src\components\dashboard\TransactionsTable\TransactionsTable.types.ts
+src\components\dashboard\TransactionsTable\TransactionsTableHeader.tsx
+src\components\dashboard\TransactionsTable\TransactionsTableRow.tsx
+src\components\dashboard\TransactionsTable\TransactionsTableSearch.tsx
+src\components\forms\.gitkeep
+src\components\layout\Header\.gitkeep
+src\components\layout\Header\DateRangePicker.tsx
+src\components\layout\Header\Header.tsx
+src\components\layout\Header\HeaderActions.tsx
+src\components\layout\Header\HeaderGreeting.tsx
+src\components\layout\Header\index.ts
+src\components\layout\Header\NotificationButton.tsx
+src\components\layout\Header\SyncButton.tsx
+src\components\layout\Header\ThemeToggle.tsx
+src\components\layout\Navigation\.gitkeep
+src\components\layout\Navigation\navigation.constants.ts
+src\components\layout\Navigation\navigations.types.ts
+src\components\layout\SearchBar\.gitkeep
+src\components\layout\Sidebar\.gitkeep
+src\components\layout\Sidebar\Sidebar.tsx
+src\components\layout\Sidebar\SidebarItem.tsx
+src\components\layout\Sidebar\SidebarMain.tsx
+src\components\layout\UserMenu\.gitkeep
+src\components\layout\UserMenu\index.ts
+src\components\layout\UserMenu\UserMenu.tsx
+src\components\layout\UserMenu\UserMenu.types.ts
+src\components\settings\SettingsRow\SettingsRow.tsx
+src\components\settings\SettingsRow\SettingsRow.types.ts
+src\components\settings\SettingsSection\index.ts
+src\components\settings\SettingsSection\SettingsSection.tsx
+src\components\settings\SettingsSection\SettingsSection.types.ts
+src\components\settings\ThemeSelector\index.ts
+src\components\settings\ThemeSelector\ThemeSelector.tsx
+src\components\settings\ThemeSelector\ThemeSelector.types.ts
+src\components\ui\avatar.tsx
+src\components\ui\dropdown-menu.tsx
+src\components\ui\input.tsx
+src\components\ui\tooltip.tsx
+
+[src/pages]
+src\pages\Analysis\.gitkeep
+src\pages\Analysis\AnalysisPage.tsx
+src\pages\Analysis\index.ts
+src\pages\Dashboard\.gitkeep
+src\pages\Dashboard\DashboardPage.tsx
+src\pages\Dashboard\index.ts
+src\pages\Profile\.gitkeep
+src\pages\Profile\index.ts
+src\pages\Profile\ProfilePage.tsx
+src\pages\Settings\.gitkeep
+src\pages\Settings\index.ts
+src\pages\Settings\SettingsPage.tsx
+src\pages\Transactions\.gitkeep
+src\pages\Transactions\index.ts
+src\pages\Transactions\TransactionsPage.tsx
+
+[src/styles]
+src\styles\.gitkeep
+src\styles\charts.ts
+src\styles\colors.ts
+src\styles\radius.ts
+src\styles\shadows.ts
+src\styles\spacing.ts
+src\styles\theme.css
+src\styles\tokens.ts
+src\styles\typography.ts
+
+[src/hooks]
+src\hooks\.gitkeep
+
+[src/contexts]
+src\contexts\.gitkeep
+src\contexts\UserContext\index.ts
+src\contexts\UserContext\UserContext.tsx
+src\contexts\UserContext\UserContext.types.ts
+
+[src/routes]
+src\routes\.gitkeep
+src\routes\AppRouter.tsx
+src\routes\index.ts
+
+[src/lib]
+src\lib\.gitkeep
+src\lib\utils.ts
+
+=== ROOT AND CONFIGURATION FILES ===
+
+----- package.json -----
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.6.0",
+    "@fontsource-variable/geist": "^5.2.9",
+    "@hookform/resolvers": "^5.4.0",
+    "@radix-ui/react-dialog": "^1.1.19",
+    "axios": "^1.18.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.24.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-hook-form": "^7.81.0",
+    "react-router-dom": "^7.18.1",
+    "recharts": "^3.9.2",
+    "shadcn": "^4.13.0",
+    "tailwind-merge": "^3.6.0",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "autoprefixer": "^10.5.2",
+    "eslint": "^10.6.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^4.3.2",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.62.0",
+    "vite": "^8.1.1",
+    "vite-tsconfig-paths": "^6.1.1"
+  }
+}
+
+
+----- components.json -----
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-nova",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "tailwind.config.js",
+    "css": "src/index.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "rtl": false,
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "menuColor": "default",
+  "menuAccent": "subtle",
+  "registries": {}
+}
+
+
+----- vite.config.ts -----
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import tsconfigPaths from "vite-tsconfig-paths";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss(), tsconfigPaths()],
+});
+
+----- vite.config.js -----
+FILE NOT FOUND
+
+----- tailwind.config.ts -----
+FILE NOT FOUND
+
+----- tailwind.config.js -----
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        background: "#0f172a", // Dark mode elegante (Slate 900)
+        surface: "#1e293b",    // Elementos de cards (Slate 800)
+        border: "#334155",     // Bordas sutis (Slate 700)
+      }
+    },
+  },
+  plugins: [],
+}
+
+----- src/main.tsx -----
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+import App from "./App";
+import "./index.css";
+
+const rootElement = document.getElementById("root");
+
+if (!rootElement) {
+  throw new Error(
+    'Elemento raiz com id "root" nÃ£o foi encontrado no index.html.',
+  );
+}
+
+createRoot(rootElement).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+
+----- src/App.tsx -----
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
+import { AppLayout } from "@/layouts/AppLayout";
+import { DashboardPage } from "@/pages/Dashboard";
+import { ProfilePage } from "@/pages/Profile";
+import { SettingsPage } from "@/pages/Settings";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+
+function App() {
+  return (
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route index element={<DashboardPage />} />
+
+            <Route
+              path="/profile"
+              element={<ProfilePage />}
+            />
+
+            <Route
+              path="/settings"
+              element={<SettingsPage />}
+            />
+
+            <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
+  );
+}
+
+export default App;
+
+----- src/index.css -----
+@import "tailwindcss";
+@import "./styles/theme.css";
+
+/* Tailwind v4 defaults `dark:` to prefers-color-scheme. We want an explicit
+   toggle (Light / Dark / System) controlled by ThemeProvider via a `.dark`
+   class on <html>, so we override the variant. This was missing before â€”
+   it's why a theme toggle button would have had no visual effect. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-slide-in: slide-in 0.35s ease forwards;
+  --animate-fade-up: fade-up 0.4s ease forwards;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility glass-panel {
+  background-color: color-mix(in srgb, var(--surface) 70%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: background-color 0.2s ease-out, color 0.2s ease-out;
+}
+
+
+=== RELEVANT SOURCE FILES ===
+
+----- src\components\layout\Header\.gitkeep -----
+
+----- src\components\layout\Header\DateRangePicker.tsx -----
+import { Calendar } from "lucide-react";
+
+export function DateRangePicker() {
+  return (
+    <button
+      className="
+      flex
+      items-center
+      gap-3
+      rounded-xl
+      border
+      border-border
+      bg-surface
+      px-5
+      py-3
+      text-sm
+      font-medium
+      text-text
+      shadow-card
+      transition-all
+      duration-200
+      ease-out
+      hover:-translate-y-0.5
+      hover:shadow-elevated
+      "
+    >
+      01 Mai - 31 Mai 2026
+      <Calendar size={18} />
+    </button>
+  );
+}
+
+
+----- src\components\layout\Header\Header.tsx -----
+import { Menu } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import { HeaderActions } from "./HeaderActions";
+import { HeaderGreeting } from "./HeaderGreeting";
+
+interface HeaderProps {
+  onOpenMobileSidebar?: () => void;
+}
+
+export function Header({
+  onOpenMobileSidebar,
+}: Readonly<HeaderProps>) {
+  return (
+    <header
+      className={cn(
+        "sticky top-0 z-30 flex min-w-0 items-center",
+        "justify-between gap-3 border-b border-border",
+        "bg-surface/95 px-4 py-4 backdrop-blur",
+        "supports-[backdrop-filter]:bg-surface/80",
+        "sm:px-6 sm:py-5",
+        "lg:px-8 lg:py-6",
+      )}
+    >
+      <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+        {onOpenMobileSidebar && (
+          <button
+            type="button"
+            onClick={onOpenMobileSidebar}
+            className={cn(
+              "flex size-10 shrink-0 items-center justify-center",
+              "rounded-xl border border-border bg-surface",
+              "text-text shadow-card transition-colors",
+              "hover:bg-surface-muted",
+              "focus-visible:outline-none focus-visible:ring-2",
+              "focus-visible:ring-primary",
+              "md:hidden",
+            )}
+            aria-label="Abrir menu principal"
+          >
+            <Menu size={20} aria-hidden="true" />
+          </button>
+        )}
+
+        <HeaderGreeting />
+      </div>
+
+      <HeaderActions />
+    </header>
+  );
+}
+
+----- src\components\layout\Header\HeaderActions.tsx -----
+import { userMock } from "@/mocks/user.mock";
+
+import { UserMenu } from "../UserMenu";
+
+import { DateRangePicker } from "./DateRangePicker";
+import { NotificationButton } from "./NotificationButton";
+import { SyncButton } from "./SyncButton";
+import { ThemeToggle } from "./ThemeToggle";
+
+export function HeaderActions() {
+  return (
+    <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
+      <div className="hidden xl:block">
+        <DateRangePicker />
+      </div>
+
+      <div className="hidden sm:block">
+        <ThemeToggle />
+      </div>
+
+      <NotificationButton />
+
+      <div className="hidden lg:block">
+        <SyncButton />
+      </div>
+
+      <UserMenu user={userMock} />
+    </div>
+  );
+}
+
+----- src\components\layout\Header\HeaderGreeting.tsx -----
+import { userMock } from "@/mocks/user.mock";
+
+export function HeaderGreeting() {
+  const firstName =
+    userMock.name.trim().split(/\s+/)[0] ?? "usuÃ¡rio";
+
+  return (
+    <div className="min-w-0">
+      <h1 className="truncate text-xl font-bold tracking-tight text-text sm:text-2xl lg:text-3xl xl:text-4xl">
+        OlÃ¡, {firstName}!
+      </h1>
+
+      <p className="mt-1 hidden text-sm text-text-muted sm:block lg:text-base">
+        Aqui estÃ¡ o resumo da sua saÃºde financeira de hoje.
+      </p>
+    </div>
+  );
+}
+
+----- src\components\layout\Header\index.ts -----
+export { Header } from "./Header";
+export { HeaderActions } from "./HeaderActions";
+export { HeaderGreeting } from "./HeaderGreeting";
+export { DateRangePicker } from "./DateRangePicker";
+export { NotificationButton } from "./NotificationButton";
+export { SyncButton } from "./SyncButton";
+export { ThemeToggle } from "./ThemeToggle";
+
+
+----- src\components\layout\Header\NotificationButton.tsx -----
+import { Bell } from "lucide-react";
+
+export function NotificationButton() {
+  return (
+    <button
+      aria-label="NotificaÃ§Ãµes"
+      className="
+      relative
+      flex
+      h-12
+      w-12
+      items-center
+      justify-center
+      rounded-xl
+      border
+      border-border
+      bg-surface
+      text-text
+      shadow-card
+      transition-all
+      duration-200
+      ease-out
+      hover:-translate-y-0.5
+      hover:shadow-elevated
+      "
+    >
+      <Bell size={20} />
+
+      <span
+        className="
+        absolute
+        right-3
+        top-3
+        h-2
+        w-2
+        rounded-full
+        bg-danger
+        "
+      />
+    </button>
+  );
+}
+
+
+----- src\components\layout\Header\SyncButton.tsx -----
+import { RefreshCw } from "lucide-react";
+
+export function SyncButton() {
+  return (
+    <button
+      className="
+      flex
+      items-center
+      gap-2
+      rounded-xl
+      border
+      border-border
+      bg-surface
+      px-5
+      py-3
+      text-sm
+      font-medium
+      text-text
+      shadow-card
+      transition-all
+      duration-200
+      ease-out
+      hover:-translate-y-0.5
+      hover:shadow-elevated
+      "
+    >
+      <RefreshCw size={18} />
+      Sincronizar dados
+    </button>
+  );
+}
+
+
+----- src\components\layout\Header\ThemeToggle.tsx -----
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/providers/ThemeProvider";
+
+/**
+ * Toggle simples light/dark. O ThemeProvider jÃ¡ suporta "system" tambÃ©m
+ * (ver src/providers/ThemeProvider.tsx) â€” se quiser expor as 3 opÃ§Ãµes em
+ * vez de sÃ³ alternar entre claro/escuro, troque este botÃ£o por um
+ * DropdownMenu com as 3 opÃ§Ãµes chamando setTheme("light"|"dark"|"system").
+ */
+export function ThemeToggle() {
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  return (
+    <button
+      onClick={toggleTheme}
+      aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
+      className="
+      flex
+      h-12
+      w-12
+      items-center
+      justify-center
+      rounded-xl
+      border
+      border-border
+      bg-surface
+      text-text
+      shadow-card
+      transition-all
+      duration-200
+      ease-out
+      hover:-translate-y-0.5
+      hover:shadow-elevated
+      "
+    >
+      {isDark ? <Sun size={20} /> : <Moon size={20} />}
+    </button>
+  );
+}
+
+
+----- src\components\layout\Navigation\.gitkeep -----
+
+----- src\components\layout\Navigation\navigation.constants.ts -----
+import {
+  LayoutDashboard,
+  Settings,
+  UserRound,
+} from "lucide-react";
+
+import type { NavigationItem } from "@/types/navigation.types";
+
+export const NAVIGATION_ITEMS = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    path: "/",
+    icon: LayoutDashboard,
+  },
+  {
+    id: "profile",
+    label: "Meu perfil",
+    path: "/profile",
+    icon: UserRound,
+  },
+  {
+    id: "settings",
+    label: "ConfiguraÃ§Ãµes",
+    path: "/settings",
+    icon: Settings,
+  },
+] satisfies readonly NavigationItem[];
+
+----- src\components\layout\Navigation\navigations.types.ts -----
+import type { LucideIcon } from "lucide-react";
+
+export interface NavigationItem {
+  id: string;
+  label: string;
+  path: string;
+  icon: LucideIcon;
+}
+
+----- src\components\layout\SearchBar\.gitkeep -----
+
+----- src\components\layout\Sidebar\.gitkeep -----
+
+----- src\components\layout\Sidebar\Sidebar.tsx -----
+import { useState } from "react";
+import {
+  ChevronLeft,
+  TrendingUp,
+  X,
+} from "lucide-react";
+
+import { NAVIGATION_ITEMS } from "@/constants/navigation.constants";
+import { cn } from "@/lib/utils";
+
+import { SidebarItem } from "./SidebarItem";
+
+interface SidebarProps {
+  isMobileOpen: boolean;
+  onCloseMobile: () => void;
+}
+
+export function Sidebar({
+  isMobileOpen,
+  onCloseMobile,
+}: Readonly<SidebarProps>) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleCollapsed = (): void => {
+    setIsCollapsed((currentState) => !currentState);
+  };
+
+  return (
+    <>
+      {isMobileOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={onCloseMobile}
+          aria-label="Fechar menu principal"
+        />
+      )}
+
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50",
+          "flex flex-col",
+          "border-r border-border bg-surface",
+          "transition-[width,transform] duration-300 ease-out",
+          "w-[min(18rem,calc(100vw-2rem))]",
+          isMobileOpen
+            ? "translate-x-0"
+            : "-translate-x-full",
+          "md:static md:translate-x-0",
+          isCollapsed ? "md:w-[76px]" : "md:w-64",
+        )}
+        aria-label="Menu principal"
+      >
+        <div
+          className={cn(
+            "flex min-h-[72px] items-center",
+            "border-b border-border",
+            isCollapsed
+              ? "justify-between px-4 md:justify-center md:px-2"
+              : "justify-between px-5",
+          )}
+        >
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              className={cn(
+                "flex size-9 shrink-0 items-center justify-center",
+                "rounded-xl bg-primary/10 text-primary",
+              )}
+            >
+              <TrendingUp size={20} aria-hidden="true" />
+            </div>
+
+            <span
+              className={cn(
+                "truncate text-base font-bold text-text",
+                isCollapsed && "md:hidden",
+              )}
+            >
+              Finance AI
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className={cn(
+              "flex size-9 shrink-0 items-center justify-center",
+              "rounded-lg text-text-muted",
+              "transition-colors",
+              "hover:bg-surface-muted hover:text-text",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2 focus-visible:ring-primary",
+              "md:hidden",
+            )}
+            aria-label="Fechar menu principal"
+          >
+            <X size={19} aria-hidden="true" />
+          </button>
+        </div>
+
+        <nav
+          className={cn(
+            "flex min-h-0 flex-1 flex-col",
+            "gap-1 overflow-y-auto px-3 py-4",
+          )}
+          aria-label="NavegaÃ§Ã£o da aplicaÃ§Ã£o"
+        >
+          {NAVIGATION_ITEMS.map((item) => (
+            <SidebarItem
+              key={item.id}
+              item={item}
+              isCollapsed={isCollapsed}
+              onNavigate={onCloseMobile}
+            />
+          ))}
+        </nav>
+
+        <div className="border-t border-border p-3">
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            className={cn(
+              "hidden min-h-10 w-full items-center",
+              "rounded-xl text-sm font-medium text-text-muted",
+              "transition-colors duration-200",
+              "hover:bg-surface-muted hover:text-text",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2 focus-visible:ring-primary",
+              "md:flex",
+              isCollapsed
+                ? "justify-center px-2"
+                : "justify-start gap-3 px-3",
+            )}
+            aria-label={
+              isCollapsed
+                ? "Expandir menu lateral"
+                : "Recolher menu lateral"
+            }
+            aria-expanded={!isCollapsed}
+          >
+            <ChevronLeft
+              size={17}
+              className={cn(
+                "shrink-0 transition-transform duration-300",
+                isCollapsed && "rotate-180",
+              )}
+              aria-hidden="true"
+            />
+
+            {!isCollapsed && <span>Recolher menu</span>}
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+}
+
+----- src\components\layout\Sidebar\SidebarItem.tsx -----
+import { NavLink } from "react-router-dom";
+
+import { cn } from "@/lib/utils";
+import type { NavigationItem } from "@/types/navigation.types";
+
+interface SidebarItemProps {
+  item: NavigationItem;
+  isCollapsed: boolean;
+  onNavigate?: () => void;
+}
+
+export function SidebarItem({
+  item,
+  isCollapsed,
+  onNavigate,
+}: Readonly<SidebarItemProps>) {
+  const Icon = item.icon;
+
+  return (
+    <NavLink
+      to={item.path}
+      end={item.path === "/"}
+      onClick={onNavigate}
+      title={isCollapsed ? item.label : undefined}
+      className={({ isActive }) =>
+        cn(
+          "group flex min-h-11 w-full min-w-0 items-center",
+          "visible opacity-100",
+          "rounded-xl px-3 py-2.5",
+          "transition-colors duration-200",
+          "focus-visible:outline-none",
+          "focus-visible:ring-2 focus-visible:ring-primary",
+          "focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
+          isCollapsed
+            ? "justify-center gap-0"
+            : "justify-start gap-3",
+          isActive
+            ? "bg-primary/10 text-primary"
+            : "text-text-muted hover:bg-surface-muted hover:text-text",
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Icon
+            size={20}
+            strokeWidth={isActive ? 2.25 : 2}
+            className={cn(
+              "block shrink-0",
+              isActive
+                ? "text-primary"
+                : "text-text-muted group-hover:text-text",
+            )}
+            aria-hidden="true"
+          />
+
+          {!isCollapsed && (
+            <span
+              className={cn(
+                "block min-w-0 truncate text-sm",
+                isActive ? "font-semibold" : "font-medium",
+              )}
+            >
+              {item.label}
+            </span>
+          )}
+        </>
+      )}
+    </NavLink>
+  );
+}
+
+----- src\components\layout\Sidebar\SidebarMain.tsx -----
+import { NAVIGATION_ITEMS } from "@/constants/navigation.constants";
+import { cn } from "@/lib/utils";
+
+import { SidebarItem } from "./SidebarItem";
+
+interface SidebarProps {
+  isMobileOpen: boolean;
+  onCloseMobile?: () => void;
+}
+
+export function Sidebar({
+  isMobileOpen,
+  onCloseMobile,
+}: Readonly<SidebarProps>) {
+  return (
+    <aside
+      className={cn(
+        "fixed inset-y-0 left-0 z-20",
+        "flex w-72 flex-col gap-4",
+        "border-r border-border bg-background p-4",
+        "transition-transform duration-300 ease-out",
+        "md:static md:translate-x-0",
+        isMobileOpen ? "translate-x-0" : "-translate-x-full",
+      )}
+      aria-label="NavegaÃ§Ã£o principal"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-muted">
+          Menu
+        </p>
+
+        {onCloseMobile ? (
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className={cn(
+              "rounded-lg px-2 py-1",
+              "text-sm font-medium text-text-muted",
+              "transition-colors duration-200",
+              "hover:bg-surface-muted hover:text-text",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2 focus-visible:ring-primary",
+              "md:hidden",
+            )}
+          >
+            Fechar
+          </button>
+        ) : null}
+      </div>
+
+      <nav
+        className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto"
+        aria-label="Links principais"
+      >
+        {NAVIGATION_ITEMS.map((item) => (
+          <SidebarItem
+            key={item.id}
+            item={item}
+            isCollapsed={false}
+            onNavigate={onCloseMobile}
+          />
+        ))}
+      </nav>
+    </aside>
+  );
+}
+
+----- src\components\layout\UserMenu\.gitkeep -----
+
+----- src\components\layout\UserMenu\index.ts -----
+export { UserMenu } from "./UserMenu";
+
+export type { UserMenuProps } from "./UserMenu.types";
+
+----- src\components\layout\UserMenu\UserMenu.tsx -----
+import {
+  CircleHelp,
+  LogOut,
+  Settings,
+  UserRound,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+
+import type { UserMenuProps } from "./UserMenu.types";
+
+function getUserInitials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+export function UserMenu({
+  user,
+  onLogout,
+}: Readonly<UserMenuProps>) {
+  const navigate = useNavigate();
+  const initials = getUserInitials(user.name);
+
+  const handleNavigate = (path: string): void => {
+    navigate(path);
+  };
+
+  const handleLogout = (): void => {
+    if (onLogout) {
+      onLogout();
+      return;
+    }
+
+    console.info(
+      "Logout serÃ¡ integrado ao fluxo de autenticaÃ§Ã£o.",
+    );
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className={cn(
+          "flex size-11 shrink-0 items-center justify-center",
+          "rounded-xl border border-border bg-surface",
+          "shadow-card transition-all duration-200 ease-out",
+          "hover:-translate-y-0.5 hover:shadow-elevated",
+          "focus-visible:outline-none focus-visible:ring-2",
+          "focus-visible:ring-primary focus-visible:ring-offset-2",
+          "focus-visible:ring-offset-background",
+        )}
+        aria-label={`Abrir menu de ${user.name}`}
+      >
+        <Avatar className="size-8">
+          <AvatarImage
+            src={user.avatar}
+            alt={`Foto de ${user.name}`}
+          />
+
+          <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        className="w-64"
+      >
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex min-w-0 items-center gap-3">
+            <Avatar className="size-10 shrink-0">
+              <AvatarImage
+                src={user.avatar}
+                alt={`Foto de ${user.name}`}
+              />
+
+              <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-text">
+                {user.name}
+              </p>
+
+              <p className="truncate text-xs text-text-muted">
+                {user.email}
+              </p>
+            </div>
+          </div>
+        </DropdownMenuLabel>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onSelect={() => handleNavigate("/profile")}
+          className="cursor-pointer gap-2"
+        >
+          <UserRound size={16} aria-hidden="true" />
+          Minha conta
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onSelect={() => handleNavigate("/settings")}
+          className="cursor-pointer gap-2"
+        >
+          <Settings size={16} aria-hidden="true" />
+          ConfiguraÃ§Ãµes
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          disabled
+          className="gap-2"
+        >
+          <CircleHelp size={16} aria-hidden="true" />
+
+          <span>Central de ajuda</span>
+
+          <span className="ml-auto text-[10px] text-text-muted">
+            Em breve
+          </span>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onSelect={handleLogout}
+          className="cursor-pointer gap-2 text-danger focus:text-danger"
+        >
+          <LogOut size={16} aria-hidden="true" />
+          Sair
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+----- src\components\layout\UserMenu\UserMenu.types.ts -----
+import type { User } from "@/types/user";
+
+export interface UserMenuProps {
+  user: User;
+  onLogout?: () => void;
+}
+
+----- src\pages\Dashboard\DashboardPage.tsx -----
+import { DashboardGrid } from "@/components/dashboard/DashobordGrid";
+
+export function DashboardPage() {
+  return (
+    <main className="space-y-2">
+     
+
+      <DashboardGrid />
+    </main>
+  );
+}
+
+export default DashboardPage;
+
+----- src\styles\.gitkeep -----
+
+----- src\styles\charts.ts -----
+import { useEffect, useState } from "react";
+
+/**
+ * Recharts needs literal color strings (stroke="#4F7CFF"), it can't consume
+ * Tailwind classes. To avoid a second, hand-maintained copy of every color
+ * that could drift from theme.css, this reads the CSS custom properties
+ * directly off <html> at call time â€” theme.css stays the single source.
+ */
+export interface ChartTheme {
+  line1: string;
+  line2: string;
+  grid: string;
+  tooltipBg: string;
+  tooltipText: string;
+  primary: string;
+  success: string;
+  warning: string;
+  danger: string;
+  textMuted: string;
+}
+
+function cssVar(name: string, fallback: string): string {
+  if (typeof window === "undefined") return fallback;
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+  return value || fallback;
+}
+
+export function getChartTheme(): ChartTheme {
+  return {
+    line1: cssVar("--chart-line-1", "#4F7CFF"),
+    line2: cssVar("--chart-line-2", "#0F172A"),
+    grid: cssVar("--chart-grid", "#EEF0F3"),
+    tooltipBg: cssVar("--chart-tooltip-bg", "#0F172A"),
+    tooltipText: cssVar("--chart-tooltip-text", "#FFFFFF"),
+    primary: cssVar("--primary", "#4F7CFF"),
+    success: cssVar("--success", "#22C55E"),
+    warning: cssVar("--warning", "#F59E0B"),
+    danger: cssVar("--danger", "#EF4444"),
+    textMuted: cssVar("--text-muted", "#64748B"),
+  };
+}
+
+/**
+ * Use inside any chart component. Re-reads tokens whenever ThemeProvider
+ * toggles the `dark` class on <html>, so Recharts colors always match the
+ * active theme without a page reload.
+ */
+export function useChartTheme(): ChartTheme {
+  const [theme, setTheme] = useState<ChartTheme>(() => getChartTheme());
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setTheme(getChartTheme());
+    update();
+
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return theme;
+}
+
+
+----- src\styles\colors.ts -----
+/**
+ * Reference palette â€” do NOT import raw hex values into components.
+ * Components must always consume tokens via Tailwind utility classes
+ * (bg-surface, text-text, border-border, etc.), which read the CSS
+ * custom properties defined in src/styles/theme.css.
+ *
+ * This file exists for non-CSS consumers only (chart fallback colors,
+ * canvas/SVG exports, PDF generation). If you change a value here,
+ * change it in theme.css too â€” theme.css is the source of truth.
+ */
+export const palette = {
+  light: {
+    background: "#F7F8FA",
+    surface: "#FFFFFF",
+    surfaceAccent: "#EAF1FF",
+    surfaceAccent2: "#EEF0FA",
+    border: "#E5E7EB",
+    primary: "#4F7CFF",
+    success: "#22C55E",
+    warning: "#F59E0B",
+    danger: "#EF4444",
+    text: "#0F172A",
+    textMuted: "#64748B",
+  },
+  dark: {
+    background: "#111315",
+    surface: "#1B1D20",
+    surfaceAccent: "#22314F",
+    surfaceAccent2: "#1F2226",
+    border: "#2B2F36",
+    primary: "#7EA1FF",
+    success: "#22C55E",
+    warning: "#F59E0B",
+    danger: "#EF4444",
+    text: "#F3F4F6",
+    textMuted: "#9CA3AF",
+  },
+} as const;
+
+export type ThemeMode = keyof typeof palette;
+export type PaletteToken = keyof typeof palette.light;
+
+
+----- src\styles\radius.ts -----
+/**
+ * Radius scale â€” mirrors the --radius-* tokens in theme.css (Tailwind v4
+ * `@theme` namespace), which generate the rounded-sm / rounded-md /
+ * rounded-card / rounded-lg / rounded-pill utilities.
+ *
+ * Cards use rounded-card (18px) everywhere, per the design brief.
+ * Don't reach for an arbitrary rounded-[Npx] value in a component â€”
+ * add a token here and in theme.css instead.
+ */
+export const radius = {
+  sm: "8px",
+  md: "12px",
+  card: "18px",
+  lg: "20px",
+  pill: "999px",
+} as const;
+
+
+----- src\styles\shadows.ts -----
+/**
+ * Shadow scale â€” mirrors --shadow-card / --shadow-elevated in theme.css.
+ * Elevation is intentionally subtle across the whole app (per brief:
+ * "sombras discretas"). Avoid adding new shadow values ad hoc â€” extend
+ * theme.css and this file together instead.
+ */
+export const shadows = {
+  card: "shadow-card", // resting state
+  elevated: "shadow-elevated", // hover state
+  none: "shadow-none",
+} as const;
+
+
+----- src\styles\spacing.ts -----
+/**
+ * Spacing reference. Tailwind's default 4px-based scale already covers
+ * this project â€” this file documents the subset we use consistently
+ * across dashboard components so padding never drifts card to card.
+ */
+export const spacing = {
+  cardPaddingX: "1.5rem", // px-6
+  cardPaddingTop: "1.5rem", // pt-6
+  cardPaddingY: "1.25rem", // py-5
+  sectionGap: "1.5rem", // gap-6 â€” space between dashboard cards/widgets
+  gridGap: "1.25rem", // gap-5 â€” space inside a card (legend items, stat rows)
+} as const;
+
+
+----- src\styles\theme.css -----
+/* ==========================================================================
+   Finance AI â€” Design Tokens
+   Single source of truth for color, radius, shadow and typography.
+   Semantic CSS variables live in :root / .dark so components never touch
+   raw hex values â€” only tokens (bg-surface, text-muted, border-border...).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --background: #F7F8FA;
+  --surface: #FFFFFF;
+  --surface-muted: #F1F3F6;
+  --surface-accent: #EAF1FF;    /* tinted KPI card, e.g. "Views" */
+  --surface-accent-2: #EEF0FA;  /* secondary tint, e.g. "Active Users" */
+
+  /* Borders */
+  --border: #E5E7EB;
+  --border-muted: #EEF0F3;
+
+  /* Brand */
+  --primary: #4F7CFF;
+  --primary-foreground: #FFFFFF;
+
+  /* Feedback */
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+
+  /* Text */
+  --text: #0F172A;
+  --text-muted: #64748B;
+  --text-subtle: #94A3B8;
+
+  /* Charts (kept as plain vars â€” consumed via getChartTheme(), not @theme,
+     because Recharts needs literal color strings, not Tailwind classes) */
+  --chart-line-1: #4F7CFF;
+  --chart-line-2: #0F172A;
+  --chart-grid: #EEF0F3;
+  --chart-tooltip-bg: #0F172A;
+  --chart-tooltip-text: #FFFFFF;
+
+  /* Raw RGB triplet used to build shadow colors with alpha below */
+  --shadow-color: 15 23 42;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: #111315;
+  --surface: #1B1D20;
+  --surface-muted: #17191C;
+  --surface-accent: #22314F;
+  --surface-accent-2: #1F2226;
+
+  --border: #2B2F36;
+  --border-muted: #24272C;
+
+  --primary: #7EA1FF;
+  --primary-foreground: #0F1115;
+
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+
+  --text: #F3F4F6;
+  --text-muted: #9CA3AF;
+  --text-subtle: #6B7280;
+
+  --chart-line-1: #7EA1FF;
+  --chart-line-2: #F3F4F6;
+  --chart-grid: #24272C;
+  --chart-tooltip-bg: #F3F4F6;
+  --chart-tooltip-text: #111315;
+
+  --shadow-color: 0 0 0;
+}
+
+/* @theme inline re-reads the CSS custom properties above at runtime, so
+   switching the .dark class instantly updates every bg-*/text-*/border-*
+   utility without a rebuild. This is the correct v4 pattern for themeable
+   tokens (as opposed to static @theme, which bakes values at build time). */
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-accent: var(--surface-accent);
+  --color-surface-accent-2: var(--surface-accent-2);
+
+  --color-border: var(--border);
+  --color-border-muted: var(--border-muted);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+
+  /* Radius namespace -> rounded-sm / rounded-md / rounded-card / rounded-lg / rounded-pill */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-card: 18px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Shadow namespace -> shadow-card / shadow-elevated */
+  --shadow-card: 0 1px 2px rgb(var(--shadow-color) / 0.04), 0 8px 24px -12px rgb(var(--shadow-color) / 0.10);
+  --shadow-elevated: 0 4px 12px rgb(var(--shadow-color) / 0.06), 0 16px 40px -16px rgb(var(--shadow-color) / 0.16);
+
+  /* Type scale namespace -> text-display / text-heading / text-title / text-body / text-caption
+     (font-size + line-height pair; combine with font-semibold etc. for weight) */
+  --text-display: 2.5rem;
+  --text-display--line-height: 1.1;
+
+  --text-heading: 1.5rem;
+  --text-heading--line-height: 1.25;
+
+  --text-title: 1.125rem;
+  --text-title--line-height: 1.4;
+
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.55;
+
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.4;
+}
+
+
+----- src\styles\tokens.ts -----
+export { palette } from "./colors";
+export type { ThemeMode, PaletteToken } from "./colors";
+
+export { spacing } from "./spacing";
+export { radius } from "./radius";
+export { typography } from "./typography";
+export { shadows } from "./shadows";
+
+export { getChartTheme, useChartTheme } from "./charts";
+export type { ChartTheme } from "./charts";
+
+
+----- src\styles\typography.ts -----
+/**
+ * Type scale â€” mirrors the --text-* tokens in theme.css, which generate
+ * the text-display / text-heading / text-title / text-body / text-caption
+ * utilities (font-size + line-height pairs).
+ *
+ * Usage: pair with a font-weight utility, e.g. `text-display font-semibold`.
+ *   display â€” big KPI numbers (e.g. "721K")
+ *   heading â€” page/section titles
+ *   title   â€” card titles (e.g. "Total Users")
+ *   body    â€” default paragraph/table text
+ *   caption â€” labels, timestamps, legends, muted metadata
+ */
+export const typography = {
+  display: { fontSize: "2.5rem", lineHeight: 1.1, className: "text-display" },
+  heading: { fontSize: "1.5rem", lineHeight: 1.25, className: "text-heading" },
+  title: { fontSize: "1.125rem", lineHeight: 1.4, className: "text-title" },
+  body: { fontSize: "0.9375rem", lineHeight: 1.55, className: "text-body" },
+  caption: { fontSize: "0.8125rem", lineHeight: 1.4, className: "text-caption" },
+} as const;
+

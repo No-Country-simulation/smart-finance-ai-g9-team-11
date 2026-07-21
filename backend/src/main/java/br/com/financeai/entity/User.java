@@ -4,6 +4,7 @@ package br.com.financeai.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,7 +27,7 @@ public class User {
     private String senha;
 
     @OneToMany(mappedBy = "usuario")
-    private List<FinancialAnalysis> analisesFinanceiras;
+    private List<FinancialAnalysis> analisesFinanceiras = new ArrayList<>();
 
 }
 

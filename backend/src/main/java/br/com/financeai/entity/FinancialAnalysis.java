@@ -47,7 +47,7 @@ public class FinancialAnalysis {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
-    private User usuario;
+    private AppUser usuario;
 
 
 

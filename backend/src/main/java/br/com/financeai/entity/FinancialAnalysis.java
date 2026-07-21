@@ -39,13 +39,16 @@ public class FinancialAnalysis {
     @Column(nullable = false, precision = 3, scale = 2)
     private BigDecimal probabilidade;
 
-    @OneToMany(mappedBy = "analise",
-                cascade = CascadeType.ALL,
-                orphanRemoval = true)
+    @OneToMany(mappedBy = "analise", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transacoes = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime dataAnalise;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private AppUser usuario;
+
 
 
 }

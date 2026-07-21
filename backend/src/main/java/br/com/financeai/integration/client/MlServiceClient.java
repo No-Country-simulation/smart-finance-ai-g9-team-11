@@ -3,6 +3,7 @@ package br.com.financeai.integration.client;
 import br.com.financeai.dto.request.FinancialAnalysisRequest;
 import br.com.financeai.dto.response.ExpenseSummaryResponse;
 import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.exception.ExternalServiceException;
 import br.com.financeai.integration.dto.MlRequest;
 import br.com.financeai.integration.dto.MlResponse;
 import org.springframework.http.MediaType;
@@ -37,7 +38,7 @@ public class MlServiceClient {
                 )
         );
 
-
+//       try {
 //        System.out.println(request);
 //        return restClient.post()
 //                .uri("/analise-financeira")
@@ -45,6 +46,10 @@ public class MlServiceClient {
 //                .body(request)
 //                .retrieve()
 //                .body(MlResponse.class);
-
+//
+//        } catch (Exception ex) {
+//           throw new ExternalServiceException("Serviço de Machine Learning Indisponível no momento.");
+//       }
+//
     }
 }

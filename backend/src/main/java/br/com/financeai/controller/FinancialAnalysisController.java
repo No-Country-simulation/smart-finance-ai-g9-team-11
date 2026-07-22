@@ -2,31 +2,31 @@ package br.com.financeai.controller;
 
 import br.com.financeai.dto.request.FinancialAnalysisRequest;
 import br.com.financeai.dto.request.TransactionRequest;
-import br.com.financeai.dto.response.ExpenseSummaryResponse;
 import br.com.financeai.dto.response.FinancialAnalysisResponse;
-import br.com.financeai.exception.ResourceNotFoundException;
-import br.com.financeai.integration.client.MlServiceClient;
+import br.com.financeai.dto.response.TransactionClassificationResponse;
 import br.com.financeai.service.FinancialAnalysisService;
+import br.com.financeai.service.TransactionClassificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
 
 
 @RestController
 public class FinancialAnalysisController {
 
     private final FinancialAnalysisService financialAnalysisService;
+    private final TransactionClassificationService transactionClassificationService;
 
-    public FinancialAnalysisController(FinancialAnalysisService financialAnalysisService) {
+
+    public FinancialAnalysisController(FinancialAnalysisService financialAnalysisService, TransactionClassificationService transactionClassificationService) {
         this.financialAnalysisService = financialAnalysisService;
+        this.transactionClassificationService = transactionClassificationService;
     }
+
     @Operation(
             summary = "Analyze financial profile",
             description = "Receives the user's financial data and returns a mocked financial analysis."
@@ -40,7 +40,7 @@ public class FinancialAnalysisController {
             description = "Invalid request data"
     )
     @PostMapping("/analise-financeira")
-    public ResponseEntity<FinancialAnalysisResponse> analyze(@Valid @RequestBody FinancialAnalysisRequest request){
+    public ResponseEntity<FinancialAnalysisResponse> analyze(@Valid @RequestBody FinancialAnalysisRequest request) {
 
         return ResponseEntity.ok(financialAnalysisService.analyze(request));
 
@@ -59,14 +59,12 @@ public class FinancialAnalysisController {
             description = "Invalid transaction data"
     )
     @PostMapping("/classificar-transacao")
-    public ExpenseSummaryResponse classificar(@Valid @RequestBody TransactionRequest request){
-        return new ExpenseSummaryResponse(
-                new BigDecimal("800.00"),
-                new BigDecimal("200.00"),
-                new BigDecimal("100.00"));
-    }
-    @GetMapping("/teste")
-    public String teste() {
-        throw new ResourceNotFoundException("Analise Financeira não encontrada.");
+    public ResponseEntity<TransactionClassificationResponse> classify(
+            @RequestBody TransactionRequest request
+    ) {
+
+        return ResponseEntity.ok(
+                transactionClassificationService.classify(request)
+        );
     }
 }

@@ -2,18 +2,18 @@ import { cn } from "@/lib/utils";
 import { dashboardMock } from "@/mocks/dashboard.mock";
 
 import { AIInsights } from "../AIInsights";
+import { AIProfileCard } from "../AIProfileCard";
 import { Alerts } from "../Alerts";
 import { BalanceChart } from "../BalanceChart";
+import { ExpenseDistribution } from "../ExpenseDistribution";
 import { FinancialCards } from "../FinancialCards";
+import { FinancialHealthRadar } from "../FinancialHealthRadar";
 import {
   QuickActions,
   type QuickAction,
 } from "../QuickActions";
 import { ScoreCard } from "../ScoreCard";
 import { TransactionsTable } from "../TransactionsTable";
-import { ExpenseDistribution } from "../ExpenseDistribution";
-import { FinancialHealthRadar } from "../FinancialHealthRadar";
-import { AIProfileCard } from "../AIProfileCard";
 
 export function DashboardGrid() {
   const { alerts } = dashboardMock.financialHealth;
@@ -88,15 +88,19 @@ export function DashboardGrid() {
       <div className="min-w-0">
         <BalanceChart />
       </div>
+
       <div className="min-w-0">
         <ExpenseDistribution />
       </div>
+
       <div className="min-w-0">
         <FinancialHealthRadar />
       </div>
+
       <div className="min-w-0">
         <AIProfileCard />
       </div>
+
       <div
         className={cn(
           "grid min-w-0 grid-cols-1 items-stretch gap-4",

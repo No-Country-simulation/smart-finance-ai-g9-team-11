@@ -11,6 +11,8 @@ import {
 } from "../QuickActions";
 import { ScoreCard } from "../ScoreCard";
 import { TransactionsTable } from "../TransactionsTable";
+import { ExpenseDistribution } from "../ExpenseDistribution";
+import { FinancialHealthRadar } from "../FinancialHealthRadar";
 
 export function DashboardGrid() {
   const { alerts } = dashboardMock.financialHealth;
@@ -84,6 +86,12 @@ export function DashboardGrid() {
 
       <div className="min-w-0">
         <BalanceChart />
+      </div>
+      <div className="min-w-0">
+        <ExpenseDistribution />
+      </div>
+      <div className="min-w-0">
+        <FinancialHealthRadar />
       </div>
 
       <div

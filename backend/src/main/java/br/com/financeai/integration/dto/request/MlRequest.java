@@ -1,4 +1,4 @@
-package br.com.financeai.integration.dto;
+package br.com.financeai.integration.dto.request;
 
 import br.com.financeai.dto.request.TransactionRequest;
 import br.com.financeai.enums.SavingFrequency;

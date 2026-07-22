@@ -1,4 +1,4 @@
-package br.com.financeai.integration.dto;
+package br.com.financeai.integration.dto.response;
 
 import br.com.financeai.dto.response.ExpenseSummaryResponse;
 import br.com.financeai.enums.FinancialProfile;

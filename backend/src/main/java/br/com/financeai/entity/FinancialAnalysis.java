@@ -49,6 +49,8 @@ public class FinancialAnalysis {
     @JoinColumn(name = "usuario_id")
     private AppUser usuario;
 
-
-
+    public void addTransaction(Transaction transaction) {
+        transacoes.add(transaction);
+        transaction.setAnalise(this);
+    }
 }

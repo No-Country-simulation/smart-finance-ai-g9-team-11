@@ -2,27 +2,36 @@ package br.com.financeai.service;
 
 import br.com.financeai.dto.request.FinancialAnalysisRequest;
 import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.dto.response.TransactionClassificationResponse;
+import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.FinancialAnalysis;
+import br.com.financeai.entity.Transaction;
 import br.com.financeai.exception.InvalidRequestException;
-import br.com.financeai.integration.client.MlServiceClient;
-import br.com.financeai.integration.dto.MlRequest;
-import br.com.financeai.integration.dto.MlResponse;
+import br.com.financeai.exception.UserNotFoundException;
+import br.com.financeai.integration.client.MlClient;
+import br.com.financeai.integration.dto.request.MlRequest;
+import br.com.financeai.integration.dto.response.MlResponse;
 import br.com.financeai.repository.FinancialAnalysisRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.financeai.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 public class FinancialAnalysisService {
 
-    @Autowired
-    private FinancialAnalysisRepository financialAnalysisRepository;
+    private final FinancialAnalysisRepository financialAnalysisRepository;
+    private final UserRepository userRepository;
+    private final MlClient mlClient;
+    private final TransactionClassificationService transactionClassificationService;
 
-    private  MlServiceClient mlServiceClient;
 
-    public FinancialAnalysisService(MlServiceClient mlServiceClient) {
-        this.mlServiceClient = mlServiceClient;
+    public FinancialAnalysisService(MlClient mlClient, FinancialAnalysisRepository financialAnalysisRepository, UserRepository userRepository, TransactionClassificationService transactionClassificationService) {
+        this.mlClient = mlClient;
+        this.financialAnalysisRepository = financialAnalysisRepository;
+        this.userRepository = userRepository;
+        this.transactionClassificationService = transactionClassificationService;
     }
 
     public FinancialAnalysisResponse analyze(FinancialAnalysisRequest analysisRequest) {
@@ -34,6 +43,8 @@ public class FinancialAnalysisService {
                 analysisRequest.transacoes().size() > 10) {
             throw new InvalidRequestException("Informação financeira inválida.");
         }
+
+
         
         // 1. Criamos o seu MlRequest pegando os dados limpos que vieram do controller
         MlRequest mlRequest = new MlRequest(
@@ -44,7 +55,41 @@ public class FinancialAnalysisService {
         );
 
         // 2. Agora passamos o mlRequest (que o client espera receber)
-        MlResponse mlResponse = mlServiceClient.analyze(mlRequest);
+        MlResponse mlResponse = mlClient.analyze(mlRequest);
+
+        FinancialAnalysis analysis = new FinancialAnalysis();
+
+        //Persistindo análise financeira
+        AppUser appUser = userRepository.findByEmail("teste@financeai.com").orElseThrow(() ->
+                new UserNotFoundException("Usuário de teste não encontrado."));
+
+        //Persistência entrada de dados do usuário
+        analysis.setUsuario(appUser);
+        analysis.setRendaMensal(analysisRequest.rendaMensal());
+        analysis.setNivelEndividamento(analysisRequest.nivelEndividamento());
+        analysis.setFrequenciaPoupanca(analysisRequest.frequenciaPoupanca());
+        analysis.setDataAnalise(LocalDateTime.now());
+
+        //persistência reposta da API
+        analysis.setPerfilFinanceiro(mlResponse.perfilFinanceiro());
+        analysis.setProbabilidade(mlResponse.probabilidade());
+
+        //persistência das transações
+        analysisRequest.transacoes().forEach(transactionRequest -> {
+
+            TransactionClassificationResponse classified = transactionClassificationService.classify(transactionRequest);
+
+            Transaction transaction = new Transaction();
+
+            transaction.setDescricao(classified.descricao());
+            transaction.setValor(classified.valor());
+            transaction.setCategoria(classified.categoria());
+            transaction.setAnalise(analysis);
+
+            analysis.addTransaction(transaction);
+        });
+
+        financialAnalysisRepository.save(analysis);
 
         return new FinancialAnalysisResponse(
                 mlResponse.perfilFinanceiro(),
@@ -52,6 +97,7 @@ public class FinancialAnalysisService {
                 mlResponse.resumoGastos(),
                 mlResponse.recomendacoes()
         );
+
     }
 
 }

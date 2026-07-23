@@ -56,7 +56,8 @@ export function DashboardGrid() {
   return (
     <section
       className={cn(
-        "min-w-0 space-y-4",
+        "w-full min-w-0",
+        "space-y-4",
         "sm:space-y-5",
         "2xl:space-y-6",
       )}
@@ -71,7 +72,8 @@ export function DashboardGrid() {
 
       <div
         className={cn(
-          "grid min-w-0 grid-cols-1 items-stretch gap-4",
+          "grid w-full min-w-0",
+          "grid-cols-1 items-stretch gap-4",
           "sm:grid-cols-2 sm:gap-5",
           "xl:grid-cols-[repeat(3,minmax(0,1fr))_minmax(280px,1.35fr)]",
           "2xl:gap-6",
@@ -80,34 +82,54 @@ export function DashboardGrid() {
       >
         <FinancialCards />
 
-        <div className="min-w-0 sm:col-span-2 xl:col-span-1">
+        <div
+          className={cn(
+            "min-w-0",
+            "sm:col-span-2",
+            "xl:col-span-1",
+          )}
+        >
           <ScoreCard />
         </div>
       </div>
 
-      <div className="min-w-0">
+      <div
+        className="w-full min-w-0"
+        aria-label="Fluxo financeiro"
+      >
         <BalanceChart />
       </div>
 
-      <div className="min-w-0">
+      <div
+        className="w-full min-w-0"
+        aria-label="Distribuição dos gastos"
+      >
         <ExpenseDistribution />
       </div>
 
-      <div className="min-w-0">
+      <div
+        className="w-full min-w-0"
+        aria-label="Saúde financeira"
+      >
         <FinancialHealthRadar />
       </div>
 
-      <div className="min-w-0">
+      <div
+        className="w-full min-w-0"
+        aria-label="Classificação financeira pela inteligência artificial"
+      >
         <AIProfileCard />
       </div>
 
       <div
         className={cn(
-          "grid min-w-0 grid-cols-1 items-stretch gap-4",
+          "grid w-full min-w-0",
+          "grid-cols-1 items-stretch gap-4",
           "sm:gap-5",
-          "xl:grid-cols-2",
+          "lg:grid-cols-2",
           "2xl:gap-6",
         )}
+        aria-label="Insights e alertas financeiros"
       >
         <div className="min-w-0">
           <AIInsights />
@@ -123,12 +145,14 @@ export function DashboardGrid() {
 
       <div
         className={cn(
-          "grid min-w-0 grid-cols-1 items-start gap-4",
+          "grid w-full min-w-0",
+          "grid-cols-1 items-start gap-4",
           "sm:gap-5",
-          "xl:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]",
-          "2xl:grid-cols-[minmax(0,3.2fr)_minmax(360px,1fr)]",
+          "xl:grid-cols-[minmax(0,3fr)_minmax(300px,1fr)]",
+          "2xl:grid-cols-[minmax(0,3.2fr)_minmax(340px,1fr)]",
           "2xl:gap-6",
         )}
+        aria-label="Transações recentes e ações rápidas"
       >
         <div className="min-w-0">
           <TransactionsTable />

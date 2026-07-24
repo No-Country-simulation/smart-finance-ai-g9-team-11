@@ -1,8 +1,17 @@
 package br.com.financeai.entity;
 
-
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,25 +29,41 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(
+            name = "nome",
+            nullable = false,
+            length = 100
+    )
     private String nome;
 
-    @Column(nullable = false, unique = true)
+    @Column(
+            name = "email",
+            nullable = false,
+            unique = true,
+            length = 150
+    )
     private String email;
 
-    @Column(nullable = false)
+    @Column(
+            name = "senha",
+            nullable = false,
+            length = 255
+    )
     private String senha;
 
-    @Column(nullable = false)
+    @Column(
+            name = "ativo",
+            nullable = false
+    )
     private boolean ativo = true;
 
     @OneToMany(mappedBy = "usuario")
     private List<FinancialAnalysis> analisesFinanceiras = new ArrayList<>();
 
-//    private LocalDateTime dataCriacao;
-
-//    @UpdateTimestamp
-//    private LocalDateTime dataAtualizacao;
-
+    /*
+     * O mappedBy aponta para o atributo "usuario" da entidade Transaction.
+     * O usuário passa a ser o proprietário lógico de suas movimentações.
+     */
+    @OneToMany(mappedBy = "usuario")
+    private List<Transaction> transacoes = new ArrayList<>();
 }
-

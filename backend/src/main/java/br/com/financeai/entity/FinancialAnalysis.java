@@ -51,6 +51,5 @@ public class FinancialAnalysis {
 
     public void addTransaction(Transaction transaction) {
         transacoes.add(transaction);
-        transaction.setAnalise(this);
     }
 }

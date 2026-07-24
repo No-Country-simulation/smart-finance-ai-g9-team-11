@@ -84,7 +84,6 @@ public class FinancialAnalysisService {
             transaction.setDescricao(classified.descricao());
             transaction.setValor(classified.valor());
             transaction.setCategoria(classified.categoria());
-            transaction.setAnalise(analysis);
 
             analysis.addTransaction(transaction);
         });

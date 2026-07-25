@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 
-# ATENÇÃO: margem_sobra, comprometimento_renda, taxa_poupanca e meses_reserva
-# foram usados para DEFINIR o rótulo 'perfil'. Por isso NÃO entram no dataset
-# final (evita vazamento de dados / data leakage no treino do modelo).
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
+
 FEATURES_MODELO_PERFIL = [
     "renda_mensal_liquida",
     "despesa_total",
@@ -23,7 +23,8 @@ def _classificar_perfil_regra(renda, gastos, endividamento, poupanca_mensal,
                                 reserva_financeira, meses_saldo_negativo, rng):
     """
     Classifica o perfil com base em regras de negócio, com ruído controlado
-    nas fronteiras para simular imperfeições de dados reais (Sprint 1).
+    que adicionei nas fronteiras para simular imperfeições de dados reais
+    (Sprint 1).
     """
     margem = renda - gastos
     comprometimento = (gastos / renda * 100) if renda > 0 else 100
@@ -37,8 +38,6 @@ def _classificar_perfil_regra(renda, gastos, endividamento, poupanca_mensal,
     else:
         perfil = "em_observacao"
 
-    # Ruído: 7% de chance de "vazar" para a classe vizinha, simulando
-    # sobreposição real entre perfis limítrofes.
     if rng.random() < 0.07:
         vizinhos = {
             "em_risco": ["em_observacao"],
@@ -85,7 +84,9 @@ def gerar_dataset_perfil_simulado(n_amostras: int = 1200, seed: int = 42) -> pd.
         )
 
         if forcar_saudavel:
-            meses_saldo_negativo = int(rng.integers(0, 1))
+            # Uma observação: Corrigido o rng.integers(0, 1) sempre retornava 0 (high é exclusivo).
+            # Agora permite 0 ou 1 mês de saldo negativo mesmo no cenário saudável.
+            meses_saldo_negativo = int(rng.integers(0, 2))
         else:
             meses_saldo_negativo = int(rng.integers(0, 6)) if percentual_gasto > 1 else int(rng.integers(0, 2))
 
@@ -108,8 +109,9 @@ def gerar_dataset_perfil_simulado(n_amostras: int = 1200, seed: int = 42) -> pd.
             "percentual_essenciais": percentual_essenciais,
             "ticket_medio": ticket_medio,
             "percentual_recorrentes": percentual_recorrentes,
-            # Mantidas no DataFrame apenas para auditoria/depuração,
-            # mas EXCLUÍDAS de FEATURES_MODELO_PERFIL (data leakage).
+            # Observação: foram mantidas no DataFrame apenas para auditoria/depuração,
+            # mas EXCLUÍDAS de FEATURES_MODELO_PERFIL (data leakage) por quetões de
+            # vazamentos. 
             "margem_sobra": round(renda_mensal - total_gastos, 2),
             "comprometimento_renda": round((total_gastos / renda_mensal) * 100, 2),
             "taxa_poupanca": round((poupanca_mensal / renda_mensal) * 100, 2),

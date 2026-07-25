@@ -1,33 +1,34 @@
 package br.com.financeai.dto.request;
 
-import br.com.financeai.enums.SavingFrequency;
-import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
-import java.math.BigDecimal;
-import java.util.List;
+
+import java.time.LocalDate;
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record FinancialAnalysisRequest(
-        @NotNull(message = "A renda mensal é obrigatória.")
-        @PositiveOrZero(message = "A renda mensal não pode ser negativa.")
+        @NotNull(message = "A data inicial é obrigatória.")
+        @JsonProperty("data_inicial")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+       LocalDate dataInicial,
 
-        @JsonProperty("renda_mensal") BigDecimal rendaMensal,
+       @NotNull(message = "A data final é obrigatória.")
+       @JsonProperty("data_final")
+       @JsonFormat(pattern = "yyyy-MM-dd")
+       LocalDate dataFinal
+) {
+    @JsonIgnore
+    @AssertTrue(message = "A data inicial não pode ser posterior à data final.")
+    public boolean isPeriodoValido(){
+        if(dataInicial == null || dataFinal == null){
+            return true;
+        }
 
-        @NotNull(message = "O nível de endividamento é obrigatório.")
-        @PositiveOrZero(message = "O nível de endividamento não pode ser negativo.")
-
-        @JsonProperty("nivel_endividamento") Integer nivelEndividamento,
-
-        @NotNull(message = "A frequência de poupança é obrigatória.")
-        @JsonProperty("frequencia_poupanca") SavingFrequency frequenciaPoupanca,
-
-        @NotNull(message = "A lista de transações não pode ser nula.")
-        @Valid // Essencial para que o Spring valide os itens dentro da lista
-
-        List<TransactionRequest> transacoes
-) {}
+        return !dataInicial.isAfter(dataFinal);
+    }
+}

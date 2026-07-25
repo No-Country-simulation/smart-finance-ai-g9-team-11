@@ -2,13 +2,25 @@ package br.com.financeai.entity;
 
 import br.com.financeai.enums.FinancialProfile;
 import br.com.financeai.enums.SavingFrequency;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "analises_financeiras")
@@ -18,6 +30,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class FinancialAnalysis {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,17 +52,10 @@ public class FinancialAnalysis {
     @Column(nullable = false, precision = 3, scale = 2)
     private BigDecimal probabilidade;
 
-    @OneToMany(mappedBy = "analise", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> transacoes = new ArrayList<>();
-
     @Column(nullable = false)
     private LocalDateTime dataAnalise;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private AppUser usuario;
-
-    public void addTransaction(Transaction transaction) {
-        transacoes.add(transaction);
-    }
 }

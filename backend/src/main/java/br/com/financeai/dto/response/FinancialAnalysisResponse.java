@@ -4,13 +4,14 @@ import br.com.financeai.enums.FinancialProfile;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public record FinancialAnalysisResponse(
-        FinancialProfile perfilFinanceiro,
+        FinancialProfile financialProfile,
 
-        BigDecimal probabilidade,
+        BigDecimal score,
 
-        ExpenseSummaryResponse resumoGastos,
+        Map<String, BigDecimal> categorySummary,
 
-        List<String> recomendacoes
+        List<String> recommendation
 ) {}

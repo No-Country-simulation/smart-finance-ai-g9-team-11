@@ -7,12 +7,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record MlRequest(
-        BigDecimal rendaMensal,
-
-        Integer nivelEndividamento,
-
-        SavingFrequency frequenciaPoupanca,
-
-        List<TransactionRequest> transacoes
+        List<MlTransactionRequest> transactions
 ) {
 }

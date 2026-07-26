@@ -1,4 +1,7 @@
+import { BenefitsSection } from "@/components/landing/BenefitsSection";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { cn } from "@/lib/utils";
 
@@ -15,24 +18,9 @@ export function LandingPage() {
 
       <main>
         <HeroSection />
-
-        <section
-          id="beneficios"
-          className="scroll-mt-24"
-          aria-label="Benefícios do Finance AI"
-        />
-
-        <section
-          id="como-funciona"
-          className="scroll-mt-24"
-          aria-label="Como funciona o Finance AI"
-        />
-
-        <section
-          id="recursos"
-          className="scroll-mt-24"
-          aria-label="Recursos do Finance AI"
-        />
+        <BenefitsSection />
+        <HowItWorksSection />
+        <FeaturesSection />
 
         <section
           id="equipe"

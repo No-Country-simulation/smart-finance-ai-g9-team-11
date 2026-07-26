@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useState } from "react";
 import {
   Outlet,
   useLocation,
@@ -50,10 +47,6 @@ export function AppLayout() {
 
     setSidebarWidth(SIDEBAR_MAX_WIDTH);
   };
-
-  useEffect(() => {
-    setIsMobileSidebarOpen(false);
-  }, [location.pathname]);
 
   return (
     <div

@@ -2,7 +2,6 @@ import {
   ArrowRight,
   BadgeCheck,
   Play,
-  Sparkles,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -80,16 +79,11 @@ export function HeroSection() {
                 "border-primary/20",
                 "bg-primary/8",
                 "px-3 py-1.5",
-                "text-[11px] font-semibold",
-                "text-primary-bright",
+                "text-[11px]",
+                "text-primary-foreground",
                 "backdrop-blur-xl",
               )}
             >
-              <Sparkles
-                size={13}
-                aria-hidden="true"
-              />
-
               Inteligência financeira ao seu
               alcance
             </div>

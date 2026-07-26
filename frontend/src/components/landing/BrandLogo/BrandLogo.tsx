@@ -37,7 +37,7 @@ export function BrandLogo({
         className={cn(
           "relative flex size-10 shrink-0",
           "items-center justify-center",
-          "rounded-2xl",
+          "rounded-full",
           "border border-primary/30",
           "bg-gradient-to-br",
           "from-primary/30",
@@ -78,6 +78,7 @@ export function BrandLogo({
             FINANCE AI
           </span>
 
+          {/*
           <span
             className={cn(
               "mt-0.5 block truncate",
@@ -88,6 +89,7 @@ export function BrandLogo({
           >
             Inteligência financeira
           </span>
+           */}
         </span>
       )}
     </Link>

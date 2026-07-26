@@ -16,6 +16,25 @@ interface UseScrollRevealResult<T extends HTMLElement> {
   isVisible: boolean;
 }
 
+function shouldRevealImmediately(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const prefersReducedMotion =
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+  const doesNotSupportIntersectionObserver =
+    typeof IntersectionObserver === "undefined";
+
+  return (
+    prefersReducedMotion ||
+    doesNotSupportIntersectionObserver
+  );
+}
+
 export function useScrollReveal<
   T extends HTMLElement = HTMLDivElement,
 >({
@@ -24,31 +43,16 @@ export function useScrollReveal<
   triggerOnce = true,
 }: UseScrollRevealOptions = {}): UseScrollRevealResult<T> {
   const ref = useRef<T>(null);
+
   const [isVisible, setIsVisible] =
-    useState(false);
+    useState<boolean>(
+      shouldRevealImmediately,
+    );
 
   useEffect(() => {
     const element = ref.current;
 
-    if (!element) {
-      return;
-    }
-
-    const prefersReducedMotion =
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-    if (prefersReducedMotion) {
-      setIsVisible(true);
-      return;
-    }
-
-    if (
-      typeof IntersectionObserver ===
-      "undefined"
-    ) {
-      setIsVisible(true);
+    if (!element || shouldRevealImmediately()) {
       return;
     }
 

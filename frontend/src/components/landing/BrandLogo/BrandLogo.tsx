@@ -22,7 +22,7 @@ export function BrandLogo({
       to={to}
       className={cn(
         "group inline-flex min-w-0",
-        "items-center gap-3",
+        "items-center gap-2.5", // Gap levemente reduzido para mais coesão
         "rounded-xl",
         "focus-visible:outline-none",
         "focus-visible:ring-2",
@@ -38,15 +38,18 @@ export function BrandLogo({
           "relative flex size-10 shrink-0",
           "items-center justify-center",
           "rounded-full",
-          "border border-primary/30",
-          "bg-gradient-to-br",
-          "from-primary/30",
-          "via-primary/15",
-          "to-secondary/20",
-          "text-primary-bright",
-          "shadow-[0_0_26px_-10px_var(--glow-primary)]",
-          "transition-transform duration-300",
-          "group-hover:scale-105",
+          // MUDANÇA: Borda mais sutil e neutra
+          "border border-border", 
+          // MUDANÇA: Removido gradiente complexo, adicionado fundo sólido e neutro
+          "bg-muted/50", 
+          // MUDANÇA: Cor do ícone base, não a "bright"
+          "text-primary", 
+          // MUDANÇA: REMOVIDO O SHADOW DE GLOW
+          // "shadow-[0_0_26px_-10px_var(--glow-primary)]", 
+          "transition-all duration-300",
+          // MUDANÇA: Feedback visual no hover mais sóbrio (muda o fundo)
+          "group-hover:bg-muted",
+          "group-hover:border-primary/20",
           "motion-reduce:transition-none",
         )}
         aria-hidden="true"
@@ -54,13 +57,16 @@ export function BrandLogo({
         <BrainCircuit
           size={22}
           strokeWidth={2.1}
+          // MUDANÇA: Ícone principal levemente mais opaco para transparência
+          className="opacity-90"
         />
 
         <Sparkles
           size={9}
           className={cn(
             "absolute right-1 top-1",
-            "text-secondary-bright",
+            // MUDANÇA: Cor neutra para os sparkles, para que pareçam detalhes técnicos e não "mágica"
+            "text-muted-foreground", 
           )}
         />
       </span>
@@ -70,9 +76,11 @@ export function BrandLogo({
           <span
             className={cn(
               "block truncate",
-              "text-sm font-bold",
-              "tracking-[-0.02em]",
-              "text-text",
+              // MUDANÇA: Fonte semibold em vez de bold e tamanho base
+              "text-base font-semibold", 
+              // MUDANÇA: Tracking neutro
+              "tracking-normal", 
+              "text-foreground", // Cor de texto padrão
             )}
           >
             FINANCE AI

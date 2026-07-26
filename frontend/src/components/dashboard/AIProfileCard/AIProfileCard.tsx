@@ -1,3 +1,5 @@
+﻿import type { LucideIcon } from "lucide-react";
+
 import {
   AlertTriangle,
   ArrowRight,
@@ -92,6 +94,15 @@ const classificationConfig: Record<
   },
 };
 
+const classificationIcons: Record<
+  AIFinancialClassification,
+  LucideIcon
+> = {
+  healthy: ShieldCheck,
+  attention: ShieldAlert,
+  risk: AlertTriangle,
+};
+
 const indicatorStatusConfig: Record<
   AIFinancialIndicatorStatus,
   {
@@ -122,21 +133,6 @@ const indicatorStatusConfig: Record<
   },
 };
 
-function getClassificationIcon(
-  classification: AIFinancialClassification,
-) {
-  switch (classification) {
-    case "healthy":
-      return ShieldCheck;
-
-    case "attention":
-      return ShieldAlert;
-
-    case "risk":
-      return AlertTriangle;
-  }
-}
-
 export function AIProfileCard({
   title = "Como a IA classificou sua situação?",
   description = "Perfil financeiro gerado pela análise inteligente.",
@@ -154,9 +150,9 @@ export function AIProfileCard({
     ];
 
   const ClassificationIcon =
-    getClassificationIcon(
-      profile.classification,
-    );
+    classificationIcons[
+      profile.classification
+    ];
 
   return (
     <Card className="flex h-full min-w-0 flex-col overflow-hidden">

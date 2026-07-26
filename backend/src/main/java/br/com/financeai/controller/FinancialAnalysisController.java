@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 
 @RestController
 public class FinancialAnalysisController {
@@ -58,13 +60,11 @@ public class FinancialAnalysisController {
             responseCode = "400",
             description = "Invalid transaction data"
     )
-    @PostMapping("/classificar-transacao")
-    public ResponseEntity<TransactionClassificationResponse> classify(
-            @RequestBody TransactionRequest request
+    @PostMapping("/classificar-transacoes")
+    public ResponseEntity<List<TransactionClassificationResponse>> createTransactions(
+            @Valid @RequestBody List<TransactionRequest> requests
     ) {
-
-        return ResponseEntity.ok(
-                transactionClassificationService.classify(request)
+        return ResponseEntity.ok(transactionClassificationService.createTransactions(requests)
         );
     }
 }

@@ -29,32 +29,16 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(
-            name = "nome",
-            nullable = false,
-            length = 100
-    )
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @Column(
-            name = "email",
-            nullable = false,
-            unique = true,
-            length = 150
-    )
+    @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(
-            name = "senha",
-            nullable = false,
-            length = 255
-    )
+    @Column(name = "senha", nullable = false, length = 255)
     private String senha;
 
-    @Column(
-            name = "ativo",
-            nullable = false
-    )
+    @Column(name = "ativo", nullable = false)
     private boolean ativo = true;
 
     @OneToMany(mappedBy = "usuario")

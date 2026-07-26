@@ -17,17 +17,15 @@ CREATE TABLE analises_financeiras (
 
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
-    renda_mensal DECIMAL(10,2) NOT NULL,
-
     nivel_endividamento INT NOT NULL,
 
     frequencia_poupanca VARCHAR(20) NOT NULL,
 
     perfil_financeiro VARCHAR(30),
 
-    probabilidade DECIMAL(5,2),
+    probabilidade DECIMAL(3,2),
 
-    data_analise TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_analise DATE NOT NULL,
 
     usuario_id BIGINT NOT NULL,
 
@@ -46,12 +44,14 @@ CREATE TABLE transacoes (
 
     valor DECIMAL(10,2) NOT NULL,
 
+    tipo VARCHAR(20) NOT NULL,
+
     categoria VARCHAR(30),
 
-    analise_id BIGINT NOT NULL,
+    data_transacao DATE NOT NULL,
 
-    CONSTRAINT fk_transacao_analise
-        FOREIGN KEY (analise_id)
-        REFERENCES analises_financeiras(id)
+    usuario_id BIGINT NOT NULL,
+
+     CONSTRAINT fk_transacao_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 
 );

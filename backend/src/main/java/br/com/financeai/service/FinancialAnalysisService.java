@@ -10,93 +10,78 @@ import br.com.financeai.exception.InvalidRequestException;
 import br.com.financeai.exception.UserNotFoundException;
 import br.com.financeai.integration.client.MlClient;
 import br.com.financeai.integration.dto.request.MlRequest;
+import br.com.financeai.integration.dto.request.MlTransactionRequest;
 import br.com.financeai.integration.dto.response.MlResponse;
 import br.com.financeai.repository.FinancialAnalysisRepository;
+import br.com.financeai.repository.TransactionRepository;
 import br.com.financeai.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class FinancialAnalysisService {
 
     private final FinancialAnalysisRepository financialAnalysisRepository;
+    private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final MlClient mlClient;
-    private final TransactionClassificationService transactionClassificationService;
 
 
-    public FinancialAnalysisService(MlClient mlClient, FinancialAnalysisRepository financialAnalysisRepository, UserRepository userRepository, TransactionClassificationService transactionClassificationService) {
+    public FinancialAnalysisService(MlClient mlClient, FinancialAnalysisRepository financialAnalysisRepository, TransactionRepository transactionRepository, UserRepository userRepository) {
         this.mlClient = mlClient;
         this.financialAnalysisRepository = financialAnalysisRepository;
+        this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
-        this.transactionClassificationService = transactionClassificationService;
     }
 
-    public FinancialAnalysisResponse analyze(FinancialAnalysisRequest analysisRequest) {
-        if (analysisRequest.transacoes().isEmpty()) {
-            throw new InvalidRequestException("A lista de transações não pode estar vazia");
+    public FinancialAnalysisResponse analyze(FinancialAnalysisRequest request) {
+
+        AppUser user = getTestUser();
+
+        List<Transaction> transactions = transactionRepository
+                .findByUsuarioAndDataTransacaoBetween(user, request.dataInicial(), request.dataFinal());
+
+        if (transactions.isEmpty()) {
+            throw new InvalidRequestException("Não há transações no período informado.");
         }
 
-        if (analysisRequest.rendaMensal().compareTo(BigDecimal.ZERO) == 0 &&
-                analysisRequest.transacoes().size() > 10) {
-            throw new InvalidRequestException("Informação financeira inválida.");
-        }
+        // Monta a lista que a IA precisa, a partir do que já está no banco
+        List<MlTransactionRequest> mlTransactions = transactions.stream()
+                .map(t -> new MlTransactionRequest(t.getDescricao(), t.getValor(), t.getTipo(), t.getDataTransacao()))
+                .toList();
 
-
-        
-        // 1. Criamos o seu MlRequest pegando os dados limpos que vieram do controller
-        MlRequest mlRequest = new MlRequest(
-                analysisRequest.rendaMensal(),
-                analysisRequest.nivelEndividamento(),
-                analysisRequest.frequenciaPoupanca(),
-                analysisRequest.transacoes()
-        );
-
-        // 2. Agora passamos o mlRequest (que o client espera receber)
+        MlRequest mlRequest = new MlRequest(mlTransactions);
         MlResponse mlResponse = mlClient.analyze(mlRequest);
 
         FinancialAnalysis analysis = new FinancialAnalysis();
-
-        //Persistindo análise financeira
-        AppUser appUser = userRepository.findByEmail("teste@financeai.com").orElseThrow(() ->
-                new UserNotFoundException("Usuário de teste não encontrado."));
-
-        //Persistência entrada de dados do usuário
-        analysis.setUsuario(appUser);
-        analysis.setRendaMensal(analysisRequest.rendaMensal());
-        analysis.setNivelEndividamento(analysisRequest.nivelEndividamento());
-        analysis.setFrequenciaPoupanca(analysisRequest.frequenciaPoupanca());
-        analysis.setDataAnalise(LocalDateTime.now());
-
-        //persistência reposta da API
-        analysis.setPerfilFinanceiro(mlResponse.perfilFinanceiro());
+        analysis.setUsuario(user);
+        analysis.setPerfilFinanceiro(mlResponse.financialProfile());
+        analysis.setFrequenciaPoupanca(mlResponse.frequenciaPoupanca());
+        analysis.setNivelEndividamento(mlResponse.nivelEndividamento());
         analysis.setProbabilidade(mlResponse.probabilidade());
-
-        //persistência das transações
-        analysisRequest.transacoes().forEach(transactionRequest -> {
-
-            TransactionClassificationResponse classified = transactionClassificationService.classify(transactionRequest);
-
-            Transaction transaction = new Transaction();
-
-            transaction.setDescricao(classified.descricao());
-            transaction.setValor(classified.valor());
-            transaction.setCategoria(classified.categoria());
-
-            analysis.addTransaction(transaction);
-        });
+        analysis.setDataAnalise(LocalDate.now());
 
         financialAnalysisRepository.save(analysis);
 
         return new FinancialAnalysisResponse(
-                mlResponse.perfilFinanceiro(),
+                mlResponse.financialProfile(),
                 mlResponse.probabilidade(),
                 mlResponse.resumoGastos(),
-                mlResponse.recomendacoes()
+                mlResponse.recommendations()
         );
+    }
 
+    private AppUser getTestUser() {
+
+        return userRepository.findByEmail("teste@financeai.com")
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "Usuário de teste não encontrado."
+                        ));
     }
 
 }

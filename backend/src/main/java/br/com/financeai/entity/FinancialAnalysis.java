@@ -1,12 +1,13 @@
 package br.com.financeai.entity;
 
+import br.com.financeai.dto.response.ExpenseSummaryResponse;
 import br.com.financeai.enums.FinancialProfile;
 import br.com.financeai.enums.SavingFrequency;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +24,6 @@ public class FinancialAnalysis {
     private Long id;
 
     @Column(nullable = false)
-    private BigDecimal rendaMensal;
-
-    @Column(nullable = false)
     private Integer nivelEndividamento;
 
     @Enumerated(EnumType.STRING)
@@ -39,17 +37,11 @@ public class FinancialAnalysis {
     @Column(nullable = false, precision = 3, scale = 2)
     private BigDecimal probabilidade;
 
-    @OneToMany(mappedBy = "analise", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> transacoes = new ArrayList<>();
-
     @Column(nullable = false)
-    private LocalDateTime dataAnalise;
+    private LocalDate dataAnalise;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private AppUser usuario;
 
-    public void addTransaction(Transaction transaction) {
-        transacoes.add(transaction);
-    }
 }

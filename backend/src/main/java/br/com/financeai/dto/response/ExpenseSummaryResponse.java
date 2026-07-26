@@ -4,6 +4,13 @@ import java.math.BigDecimal;
 
 public record ExpenseSummaryResponse(
         BigDecimal alimentacao,
+        BigDecimal moradia,
+        BigDecimal compras,
+        BigDecimal entretenimento,
+        BigDecimal investimento,
+        BigDecimal salario,
+        BigDecimal saude,
         BigDecimal transporte,
-        BigDecimal entretenimento
+        BigDecimal utilitarios,
+        BigDecimal outros
 ) {}

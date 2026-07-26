@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
 
+# Inicializa servidor
 app = FastAPI(title="Finance AI - ML Mock Service for Java Devs")
 
 # Esquema de dados que o Java vai enviar (Contrato de Entrada)
@@ -16,7 +17,7 @@ class AnaliseRequest(BaseModel):
     transacoes: List[Transacao]
 
 # Endpoint que o backend Java vai consumir
-@app.post("/predict")
+@app.post("/analise-financeira")
 def predict_financial_profile(payload: AnaliseRequest):
     try:
         # LOG para o Dev de DevOps (você) e os do Backend verem o dado chegando no terminal do Docker

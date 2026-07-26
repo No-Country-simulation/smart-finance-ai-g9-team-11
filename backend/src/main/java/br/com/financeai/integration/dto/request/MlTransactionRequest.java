@@ -1,11 +1,16 @@
 package br.com.financeai.integration.dto.request;
 
+import br.com.financeai.enums.TransactionType;
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public record MlTransactionRequest(
 
-        String descricao,
-
-        BigDecimal valor
+        LocalDate date,
+        String description,
+        BigDecimal amount,
+        TransactionType type,
+        String category
 ) {
 }

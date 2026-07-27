@@ -7,16 +7,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record MlTransactionResponse(
+        String descricao,
 
-        String temporaryId,
+        BigDecimal valor,
 
-        LocalDate date,
+        TransactionType tipo,
 
-        String description,
+        TransactionCategory categoria,
 
-        BigDecimal amount,
-
-        TransactionType type,
-
-        String category) {
+        LocalDate dataTransacao) {
 }

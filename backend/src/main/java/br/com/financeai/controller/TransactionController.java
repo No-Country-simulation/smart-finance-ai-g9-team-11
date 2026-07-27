@@ -5,6 +5,8 @@ import br.com.financeai.dto.request.UpdateTransactionRequest;
 import br.com.financeai.dto.response.TransactionResponse;
 import br.com.financeai.exception.InvalidRequestException;
 import br.com.financeai.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -33,19 +35,58 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+    @Operation(
+            summary = "Classify transaction",
+            description = "Receives a financial transaction and returns a mocked expense classification"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Transaction classified seccessfully"
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid transaction data"
+    )
+
     /**
-     * Cria uma transação para o usuário informado.
+     * Cria uma única transação para o usuário informado.
      *
      * O cabeçalho X-User-Id é provisório e deverá ser substituído
      * pelo usuário autenticado quando o JWT for implementado.
      */
     @PostMapping
-    public ResponseEntity<TransactionResponse> create(
+    public ResponseEntity<TransactionResponse> create(@RequestHeader("X-User-Id") Long usuarioId, @Valid @RequestBody CreateTransactionRequest request) {
+        TransactionResponse response = transactionService.create(usuarioId, request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @Operation(
+            summary = "Classify transaction",
+            description = "Receives a list of financial transaction and returns a mocked expense classification"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Transactions classified seccessfully"
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid transaction data"
+    )
+
+    /**
+     * Cria várias transações de uma vez para o usuário informado.
+     *
+     * Útil para importação de extratos ou cadastro em lote.
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<List<TransactionResponse>> createBatch(
             @RequestHeader("X-User-Id") Long usuarioId,
-            @Valid @RequestBody CreateTransactionRequest request
+            @Valid @RequestBody List<CreateTransactionRequest> requests
     ) {
-        TransactionResponse response =
-                transactionService.create(usuarioId, request);
+        List<TransactionResponse> response = transactionService.createBatch(usuarioId, requests);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

@@ -1,20 +1,24 @@
 package br.com.financeai.service;
 
 import br.com.financeai.dto.request.CreateTransactionRequest;
-import br.com.financeai.dto.request.TransactionRequest;
 import br.com.financeai.dto.request.UpdateTransactionRequest;
-import br.com.financeai.dto.response.TransactionClassificationResponse;
 import br.com.financeai.dto.response.TransactionResponse;
 import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.Transaction;
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.enums.TransactionType;
 import br.com.financeai.exception.InvalidRequestException;
 import br.com.financeai.exception.ResourceNotFoundException;
 import br.com.financeai.exception.UserNotFoundException;
+import br.com.financeai.integration.client.MlClient;
+import br.com.financeai.integration.dto.request.MlTransactionRequest;
+import br.com.financeai.integration.dto.response.MlTransactionResponse;
 import br.com.financeai.repository.TransactionRepository;
 import br.com.financeai.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,46 +27,57 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
-    private final TransactionClassificationService classificationService;
+    private final MlClient mlClient;
 
     public TransactionService(
             TransactionRepository transactionRepository,
             UserRepository userRepository,
-            TransactionClassificationService classificationService
+            MlClient mlClient
     ) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
-        this.classificationService = classificationService;
+        this.mlClient = mlClient;
     }
 
     /**
-     * Cria uma transação para o usuário informado.
+     * Cria uma única transação para o usuário informado.
      *
-     * A categoria é obtida pelo serviço de classificação antes
-     * da persistência do registro.
+     * Reaproveita o createBatch() internamente, tratando o caso
+     * de uma transação só como uma lista de tamanho 1.
      */
     @Transactional
-    public TransactionResponse create(
+    public TransactionResponse create(Long usuarioId, CreateTransactionRequest request) {
+
+        return createBatch(usuarioId, List.of(request)).get(0);
+    }
+
+    /**
+     * Cria uma ou várias transações de uma vez para o usuário informado.
+     *
+     * Cada transação é classificada individualmente antes do saveAll,
+     * mantendo a mesma regra de negócio usada na criação única.
+     */
+    @Transactional
+    public List<TransactionResponse> createBatch(
             Long usuarioId,
-            CreateTransactionRequest request
+            List<CreateTransactionRequest> requests
     ) {
         AppUser usuario = findUserById(usuarioId);
 
-        TransactionClassificationResponse classification =
-                classify(request.descricao(), request.valor());
+        List<Transaction> transactions = requests.stream()
+                .map(request -> buildTransaction(
+                        request.descricao(),
+                        request.valor(),
+                        request.tipo(),
+                        request.dataTransacao(),
+                        usuario
+                ))
+                .toList();
 
-        Transaction transaction = new Transaction();
-        transaction.setDescricao(request.descricao().trim());
-        transaction.setValor(request.valor());
-        transaction.setTipo(request.tipo());
-        transaction.setCategoria(classification.categoria());
-        transaction.setDataTransacao(request.dataTransacao());
-        transaction.setUsuario(usuario);
-
-        Transaction savedTransaction =
-                transactionRepository.save(transaction);
-
-        return toResponse(savedTransaction);
+        return transactionRepository.saveAll(transactions)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     /**
@@ -128,13 +143,17 @@ public class TransactionService {
         Transaction transaction =
                 findTransactionByIdAndUserId(transactionId, usuarioId);
 
-        TransactionClassificationResponse classification =
-                classify(request.descricao(), request.valor());
+        TransactionCategory categoria = classify(
+                request.descricao(),
+                request.valor(),
+                request.tipo(),
+                request.dataTransacao()
+        );
 
         transaction.setDescricao(request.descricao().trim());
         transaction.setValor(request.valor());
         transaction.setTipo(request.tipo());
-        transaction.setCategoria(classification.categoria());
+        transaction.setCategoria(categoria);
         transaction.setDataTransacao(request.dataTransacao());
 
         Transaction updatedTransaction =
@@ -157,6 +176,48 @@ public class TransactionService {
         transactionRepository.delete(transaction);
     }
 
+    /**
+     * Monta a entidade Transaction já classificada, pronta para persistir.
+     * Centraliza a lógica usada tanto pelo create() quanto pelo createBatch().
+     */
+    private Transaction buildTransaction(
+            String descricao,
+            BigDecimal valor,
+            TransactionType tipo,
+            LocalDate dataTransacao,
+            AppUser usuario
+    ) {
+        TransactionCategory categoria = classify(descricao, valor, tipo, dataTransacao);
+
+        Transaction transaction = new Transaction();
+        transaction.setDescricao(descricao.trim());
+        transaction.setValor(valor);
+        transaction.setTipo(tipo);
+        transaction.setCategoria(categoria);
+        transaction.setDataTransacao(dataTransacao);
+        transaction.setUsuario(usuario);
+
+        return transaction;
+    }
+
+    /**
+     * Chama o MlClient para obter a categoria da transação.
+     */
+    private TransactionCategory classify(
+            String descricao,
+            BigDecimal valor,
+            TransactionType tipo,
+            LocalDate dataTransacao
+    ) {
+        MlTransactionRequest mlRequest =
+                new MlTransactionRequest(descricao, valor, tipo, dataTransacao);
+
+        MlTransactionResponse mlResponse =
+                mlClient.classifyTransaction(mlRequest);
+
+        return mlResponse.categoria();
+    }
+
     private AppUser findUserById(Long usuarioId) {
         return userRepository
                 .findById(usuarioId)
@@ -174,16 +235,6 @@ public class TransactionService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Transação não encontrada para o usuário informado."
                 ));
-    }
-
-    private TransactionClassificationResponse classify(
-            String descricao,
-            java.math.BigDecimal valor
-    ) {
-        TransactionRequest classificationRequest =
-                new TransactionRequest(descricao, valor);
-
-        return classificationService.classify(classificationRequest);
     }
 
     private void validatePeriod(

@@ -37,7 +37,7 @@ def classificar_transacoes(payload: ClassificationRequest):
 
     for transacao in payload.transactions:
 
-        # Aqui será chamado seu modelo NLP
+        # Aqui será chamado o modelo NLP
         categoria = "Shopping"
 
         resultado.append(

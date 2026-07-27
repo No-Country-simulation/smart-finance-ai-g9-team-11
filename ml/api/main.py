@@ -11,7 +11,7 @@ class Transaction(BaseModel):
     date: date
     description: str
     amount: float
-    type: Literal["Income", "Expense"]
+    type: Literal["Receita", "Despesa"]
 
 class ClassificationRequest(BaseModel):
     transactions: List[Transaction]
@@ -21,9 +21,7 @@ class ClassifiedTransaction(BaseModel):
     date: date
     description: str
     amount: float
-    type: Literal["Income", "Expense"]
-    category: str
-
+    type: Literal["Receita", "Despesa"]
 
 class FinancialAnalysisRequest(BaseModel):
     transactions: List[ClassifiedTransaction]
@@ -46,7 +44,6 @@ def classificar_transacoes(payload: ClassificationRequest):
                 "description": transacao.description,
                 "amount": transacao.amount,
                 "type": transacao.type,
-                "category": categoria
             }
         )
 

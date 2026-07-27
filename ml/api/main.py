@@ -8,7 +8,6 @@ app = FastAPI(title="Finance AI - ML Mock Service for Java Devs")
 
 # Esquema de dados que o Java vai enviar (Contrato de Entrada)
 class Transaction(BaseModel):
-    temporaryId: str 
     date: date
     description: str
     amount: float
@@ -19,7 +18,6 @@ class ClassificationRequest(BaseModel):
 
 
 class ClassifiedTransaction(BaseModel):
-    temporaryId: str
     date: date
     description: str
     amount: float
@@ -44,7 +42,6 @@ def classificar_transacoes(payload: ClassificationRequest):
 
         resultado.append(
             {
-                "temporaryId": transacao.temporaryId,
                 "date": transacao.date,
                 "description": transacao.description,
                 "amount": transacao.amount,

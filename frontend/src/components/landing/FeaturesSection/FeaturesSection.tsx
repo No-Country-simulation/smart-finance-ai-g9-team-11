@@ -78,10 +78,82 @@ export function FeaturesSection() {
         <div
           className={cn(
             "grid gap-12",
-            "lg:grid-cols-[0.8fr_1.2fr]",
+            // ALTERADO: A coluna maior (1.2fr) agora vem na esquerda e a menor (0.8fr) na direita
+            "lg:grid-cols-[1.2fr_0.8fr]",
             "lg:items-start lg:gap-16",
           )}
         >
+          {/* MUDANÇA DE POSIÇÃO: O grid de cards passou para a esquerda (agora é o 1º elemento) */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {features.map(
+              (
+                {
+                  icon: Icon,
+                  title,
+                  description,
+                },
+                index,
+              ) => (
+                <article
+                  key={title}
+                  className={cn(
+                    "scroll-reveal",
+                    isVisible &&
+                      "scroll-reveal--visible",
+                    "group min-h-[220px]",
+                    "rounded-[22px]",
+                    "border border-border-muted",
+                    "bg-surface/35 p-6",
+                    "transition-[transform,border-color,background-color]",
+                    "duration-300",
+                    "hover:-translate-y-1",
+                    "hover:border-border-highlight",
+                    "hover:bg-surface/65",
+                    "motion-reduce:transition-none",
+                  )}
+                  style={{
+                    transitionDelay: `${index * 80}ms`,
+                  }}
+                >
+                  <Icon
+                    size={23}
+                    strokeWidth={1.8}
+                    className={cn(
+                      "text-primary-bright",
+                      "transition-transform",
+                      "duration-300",
+                      "group-hover:scale-110",
+                      "motion-reduce:transition-none",
+                    )}
+                    aria-hidden="true"
+                  />
+
+                  <h3
+                    className={cn(
+                      "mt-8 text-lg",
+                      "font-semibold",
+                      "tracking-[-0.02em]",
+                      "text-text",
+                    )}
+                  >
+                    {title}
+                  </h3>
+
+                  <p
+                    className={cn(
+                      "mt-3 text-sm",
+                      "leading-6",
+                      "text-text-muted",
+                    )}
+                  >
+                    {description}
+                  </p>
+                </article>
+              ),
+            )}
+          </div>
+
+          {/* MUDANÇA DE POSIÇÃO: O cabeçalho foi para a direita (agora é o 2º elemento) */}
           <header
             className={cn(
               "scroll-reveal",
@@ -160,75 +232,6 @@ export function FeaturesSection() {
               </p>
             </div>
           </header>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            {features.map(
-              (
-                {
-                  icon: Icon,
-                  title,
-                  description,
-                },
-                index,
-              ) => (
-                <article
-                  key={title}
-                  className={cn(
-                    "scroll-reveal",
-                    isVisible &&
-                      "scroll-reveal--visible",
-                    "group min-h-[220px]",
-                    "rounded-[22px]",
-                    "border border-border-muted",
-                    "bg-surface/35 p-6",
-                    "transition-[transform,border-color,background-color]",
-                    "duration-300",
-                    "hover:-translate-y-1",
-                    "hover:border-border-highlight",
-                    "hover:bg-surface/65",
-                    "motion-reduce:transition-none",
-                  )}
-                  style={{
-                    transitionDelay: `${index * 80}ms`,
-                  }}
-                >
-                  <Icon
-                    size={23}
-                    strokeWidth={1.8}
-                    className={cn(
-                      "text-primary-bright",
-                      "transition-transform",
-                      "duration-300",
-                      "group-hover:scale-110",
-                      "motion-reduce:transition-none",
-                    )}
-                    aria-hidden="true"
-                  />
-
-                  <h3
-                    className={cn(
-                      "mt-8 text-lg",
-                      "font-semibold",
-                      "tracking-[-0.02em]",
-                      "text-text",
-                    )}
-                  >
-                    {title}
-                  </h3>
-
-                  <p
-                    className={cn(
-                      "mt-3 text-sm",
-                      "leading-6",
-                      "text-text-muted",
-                    )}
-                  >
-                    {description}
-                  </p>
-                </article>
-              ),
-            )}
-          </div>
         </div>
       </div>
     </section>

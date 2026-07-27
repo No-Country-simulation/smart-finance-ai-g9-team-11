@@ -2,7 +2,11 @@ import { BenefitsSection } from "@/components/landing/BenefitsSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { LandingCTA } from "@/components/landing/LandingCTA";
+import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingHeader } from "@/components/landing/LandingHeader";
+import { TeamSection } from "@/components/landing/TeamSection";
+import { TechnologySection } from "@/components/landing/TechnologySection";
 import { cn } from "@/lib/utils";
 
 export function LandingPage() {
@@ -21,13 +25,12 @@ export function LandingPage() {
         <BenefitsSection />
         <HowItWorksSection />
         <FeaturesSection />
-
-        <section
-          id="equipe"
-          className="scroll-mt-24"
-          aria-label="Equipe do Finance AI"
-        />
+        <TechnologySection />
+        <TeamSection />
+        <LandingCTA />
       </main>
+
+      <LandingFooter />
     </div>
   );
 }

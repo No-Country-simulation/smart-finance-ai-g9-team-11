@@ -39,7 +39,7 @@ public class FinancialAnalysis {
     private Long id;
 
     @Column(nullable = false)
-    private Integer nivelEndividamento;
+    private BigDecimal nivelEndividamento;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

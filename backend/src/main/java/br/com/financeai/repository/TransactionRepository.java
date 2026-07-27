@@ -39,8 +39,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             LocalDate dataInicial,
             LocalDate dataFinal
     );
-}
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByUsuarioAndDataTransacaoBetween(AppUser user, LocalDate dataInical, LocalDate dataFinal);
 }
+

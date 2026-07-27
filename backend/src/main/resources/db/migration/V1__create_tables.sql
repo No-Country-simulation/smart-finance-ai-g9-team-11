@@ -17,7 +17,7 @@ CREATE TABLE analises_financeiras (
 
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
-    nivel_endividamento INT NOT NULL,
+    nivel_endividamento DECIMAL(3,2),
 
     frequencia_poupanca VARCHAR(20) NOT NULL,
 

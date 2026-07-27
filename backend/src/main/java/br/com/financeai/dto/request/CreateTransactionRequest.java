@@ -1,6 +1,8 @@
 package br.com.financeai.dto.request;
 
 import br.com.financeai.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -19,10 +21,7 @@ import java.time.LocalDate;
 public record CreateTransactionRequest(
 
         @NotBlank(message = "A descrição da transação é obrigatória.")
-        @Size(
-                max = 255,
-                message = "A descrição da transação deve possuir no máximo 255 caracteres."
-        )
+        @Size(max = 255, message = "A descrição da transação deve possuir no máximo 255 caracteres.")
         String descricao,
 
         @NotNull(message = "O valor da transação é obrigatório.")
@@ -33,9 +32,9 @@ public record CreateTransactionRequest(
         TransactionType tipo,
 
         @NotNull(message = "A data da transação é obrigatória.")
-        @PastOrPresent(
-                message = "A data da transação não pode estar no futuro."
-        )
+        @PastOrPresent(message = "A data da transação não pode estar no futuro.")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        @JsonProperty("data_transacao")
         LocalDate dataTransacao
 
 ) {

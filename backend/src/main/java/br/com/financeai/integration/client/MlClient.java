@@ -28,7 +28,7 @@ public class MlClient {
         //Mock resposta da análise financeira da API
         return new MlResponse(
                 FinancialProfile.EM_OBSERVACAO,
-                3,
+                new BigDecimal(3),
                 SavingFrequency.BAIXA,
                 new BigDecimal("0.82"),
                 new ExpenseSummaryResponse(

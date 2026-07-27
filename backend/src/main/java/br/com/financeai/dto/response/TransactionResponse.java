@@ -15,11 +15,17 @@ import java.time.LocalDate;
 public record TransactionResponse(
 
         Long id,
+
         String descricao,
+
         BigDecimal valor,
+
         TransactionType tipo,
+
         TransactionCategory categoria,
+
         LocalDate dataTransacao,
+
         Long usuarioId
 
 ) {

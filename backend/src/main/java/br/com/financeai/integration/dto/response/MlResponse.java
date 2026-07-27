@@ -12,7 +12,7 @@ public record MlResponse(
 
         FinancialProfile financialProfile,
 
-        Integer nivelEndividamento,
+        BigDecimal nivelEndividamento,
 
         SavingFrequency frequenciaPoupanca,
 

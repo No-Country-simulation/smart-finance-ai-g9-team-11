@@ -1,32 +1,29 @@
 package br.com.financeai.controller;
 
 import br.com.financeai.dto.request.FinancialAnalysisRequest;
-import br.com.financeai.dto.request.TransactionRequest;
 import br.com.financeai.dto.response.FinancialAnalysisResponse;
-import br.com.financeai.dto.response.TransactionClassificationResponse;
 import br.com.financeai.service.FinancialAnalysisService;
-import br.com.financeai.service.TransactionClassificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 
 @RestController
+@RequestMapping("/api/v1/financial-analysis")
 public class FinancialAnalysisController {
 
     private final FinancialAnalysisService financialAnalysisService;
-    private final TransactionClassificationService transactionClassificationService;
 
-
-    public FinancialAnalysisController(FinancialAnalysisService financialAnalysisService, TransactionClassificationService transactionClassificationService) {
+    public FinancialAnalysisController(FinancialAnalysisService financialAnalysisService) {
         this.financialAnalysisService = financialAnalysisService;
-        this.transactionClassificationService = transactionClassificationService;
+
     }
 
     @Operation(
@@ -41,30 +38,10 @@ public class FinancialAnalysisController {
             responseCode = "400",
             description = "Invalid request data"
     )
-    @PostMapping("/analise-financeira")
+    @PostMapping
     public ResponseEntity<FinancialAnalysisResponse> analyze(@Valid @RequestBody FinancialAnalysisRequest request) {
 
         return ResponseEntity.ok(financialAnalysisService.analyze(request));
 
-    }
-
-    @Operation(
-            summary = "Classify transaction",
-            description = "Receives a financial transaction and returns a mocked expense classification"
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Transaction classified seccessfully"
-    )
-    @ApiResponse(
-            responseCode = "400",
-            description = "Invalid transaction data"
-    )
-    @PostMapping("/classificar-transacoes")
-    public ResponseEntity<List<TransactionClassificationResponse>> createTransactions(
-            @Valid @RequestBody List<TransactionRequest> requests
-    ) {
-        return ResponseEntity.ok(transactionClassificationService.createTransactions(requests)
-        );
     }
 }

@@ -5,7 +5,7 @@ import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { LandingCTA } from "@/components/landing/LandingCTA";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingHeader } from "@/components/landing/LandingHeader";
-import { TeamSection } from "@/components/landing/TeamSection";
+import { TeamSection } from "@/components/landing/TeamSection/TeamSection";
 import { TechnologySection } from "@/components/landing/TechnologySection";
 import { cn } from "@/lib/utils";
 

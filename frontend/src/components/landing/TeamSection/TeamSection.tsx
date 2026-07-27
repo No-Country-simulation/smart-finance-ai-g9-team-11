@@ -4,8 +4,8 @@ import {
   ArrowUpRight,
   CheckCircle2,
   Code2,
-  Github,
-  Linkedin,
+  Code,
+  Share2,
   Sparkles,
   Star,
   UsersRound,
@@ -650,13 +650,13 @@ export function TeamSection() {
                   <SocialLink
                     href={member.githubUrl}
                     label="GitHub"
-                    icon={Github}
+                    icon={Code}
                   />
 
                   <SocialLink
                     href={member.linkedinUrl}
                     label="LinkedIn"
-                    icon={Linkedin}
+                    icon={Share2}
                   />
                 </div>
               </article>

@@ -10,3 +10,4 @@ public record MlRequest(
         List<MlTransactionRequest> transactions
 ) {
 }
+

@@ -1,5 +1,6 @@
 package br.com.financeai.entity;
 
+import br.com.financeai.dto.response.ExpenseSummaryResponse;
 import br.com.financeai.enums.FinancialProfile;
 import br.com.financeai.enums.SavingFrequency;
 import jakarta.persistence.Column;
@@ -20,7 +21,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "analises_financeiras")
@@ -34,9 +37,6 @@ public class FinancialAnalysis {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private BigDecimal rendaMensal;
 
     @Column(nullable = false)
     private Integer nivelEndividamento;
@@ -53,9 +53,10 @@ public class FinancialAnalysis {
     private BigDecimal probabilidade;
 
     @Column(nullable = false)
-    private LocalDateTime dataAnalise;
+    private LocalDate dataAnalise;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private AppUser usuario;
+
 }

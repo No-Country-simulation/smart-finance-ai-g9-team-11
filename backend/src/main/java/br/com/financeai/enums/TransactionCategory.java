@@ -4,18 +4,22 @@ public enum TransactionCategory {
 
     ALIMENTACAO,
 
-    TRANSPORTE,
+    MORADIA,
+
+    COMPRAS,
 
     ENTRETENIMENTO,
 
+    INVESTIMENTO,
+
+    SALARIO,
+
     SAUDE,
 
-    EDUCACAO,
+    TRANSPORTE,
 
-    MORADIA,
+    UTILITARIOS,
 
-    CONTAS,
-
-    OUTROS,
+    OUTROS
 
 }

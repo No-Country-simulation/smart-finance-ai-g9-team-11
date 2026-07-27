@@ -35,41 +35,21 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(
-            name = "descricao",
-            nullable = false,
-            length = 255
-    )
+    @Column(name = "descricao", nullable = false, length = 255)
     private String descricao;
 
-    @Column(
-            name = "valor",
-            nullable = false,
-            precision = 10,
-            scale = 2
-    )
+    @Column(name = "valor", nullable = false, precision = 10, scale = 2)
     private BigDecimal valor;
 
     @Enumerated(EnumType.STRING)
-    @Column(
-            name = "tipo",
-            nullable = false,
-            length = 20
-    )
+    @Column(name = "tipo", nullable = false, length = 20)
     private TransactionType tipo;
 
     @Enumerated(EnumType.STRING)
-    @Column(
-            name = "categoria",
-            nullable = false,
-            length = 30
-    )
+    @Column(name = "categoria", nullable = false, length = 30)
     private TransactionCategory categoria;
 
-    @Column(
-            name = "data_transacao",
-            nullable = false
-    )
+    @Column(name = "data_transacao", nullable = false)
     private LocalDate dataTransacao;
 
     /*
@@ -78,9 +58,6 @@ public class Transaction {
      * e pode ser utilizada em análises de diferentes períodos.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "usuario_id",
-            nullable = false
-    )
+    @JoinColumn(name = "usuario_id", nullable = false)
     private AppUser usuario;
 }

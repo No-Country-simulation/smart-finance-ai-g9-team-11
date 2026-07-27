@@ -1,42 +1,77 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Literal
+from datetime import date
 
 # Inicializa servidor
 app = FastAPI(title="Finance AI - ML Mock Service for Java Devs")
 
 # Esquema de dados que o Java vai enviar (Contrato de Entrada)
-class Transacao(BaseModel):
-    descricao: str
-    valor: float
+class Transaction(BaseModel):
+    date: date
+    description: str
+    amount: float
+    type: Literal["Income", "Expense"]
 
-class AnaliseRequest(BaseModel):
-    renda_mensal: float
-    nivel_endividamento: float
-    frequencia_poupanca: str
-    transacoes: List[Transacao]
+class ClassificationRequest(BaseModel):
+    transactions: List[Transaction]
 
-# Endpoint que o backend Java vai consumir
+
+class ClassifiedTransaction(BaseModel):
+    date: date
+    description: str
+    amount: float
+    type: Literal["Income", "Expense"]
+    category: str
+
+
+class FinancialAnalysisRequest(BaseModel):
+    transactions: List[ClassifiedTransaction]
+
+@app.post("/classificar-transacoes")
+def classificar_transacoes(payload: ClassificationRequest):
+
+    print(f"{len(payload.transactions)} transações recebidas.")
+
+    resultado = []
+
+    for transacao in payload.transactions:
+
+        # Aqui será chamado o modelo NLP
+        categoria = "Shopping"
+
+        resultado.append(
+            {
+                "date": transacao.date,
+                "description": transacao.description,
+                "amount": transacao.amount,
+                "type": transacao.type,
+                "category": categoria
+            }
+        )
+
+    return {
+        "transactions": resultado
+    }
+
 @app.post("/analise-financeira")
-def predict_financial_profile(payload: AnaliseRequest):
-    try:
-        # LOG para o Dev de DevOps (você) e os do Backend verem o dado chegando no terminal do Docker
-        print(f"Recebida requisição para análise. Renda: {payload.renda_mensal}")
-        
-        # MOCK SÊNIOR: Retorna uma estrutura idêntica à exigida no PDF do Hackathon
-        # Dica de arquitetura: Os campos aqui usam snake_case (padrão Python/ML)
-        return {
-            "perfil_financeiro": "Em observacao",
-            "probabilidade": 0.82,
-            "resumo_gastos": {
-                "alimentacao": 420.0,
-                "transporte": 300.0,
-                "entretenimento": 40.0
-            },
-            "recomendacoes": [
-                "Monitorar gastos recorrentes de entretenimento",
-                "Aumentar reserva financeira mensal"
-            ]
-        }
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Erro ao processar dados: {str(e)}")
+def analisar_financas(payload: FinancialAnalysisRequest):
+
+    print(f"Analisando {len(payload.transactions)} transações.")
+
+    # Aqui é chamado as features agregadas
+    # e chama o resultado do modelo de perfil financeiro
+
+    return {
+        "perfil_financeiro": "Equilibrado",
+        "probabilidade": 0.91,
+        "resumo_gastos": {
+            "alimentacao": 850.50,
+            "transporte": 310.40,
+            "compras": 420.80
+        },
+        "recomendacoes": [
+            "Continue mantendo uma reserva financeira.",
+            "Reduza gastos com compras não essenciais."
+        ]
+    }

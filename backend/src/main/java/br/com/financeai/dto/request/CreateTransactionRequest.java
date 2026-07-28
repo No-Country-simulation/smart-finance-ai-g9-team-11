@@ -20,13 +20,16 @@ import java.time.LocalDate;
  */
 public record CreateTransactionRequest(
 
+
         @NotBlank(message = "A descrição da transação é obrigatória.")
         @Size(max = 255, message = "A descrição da transação deve possuir no máximo 255 caracteres.")
         String descricao,
 
+
         @NotNull(message = "O valor da transação é obrigatório.")
         @Positive(message = "O valor da transação deve ser maior que zero.")
         BigDecimal valor,
+
 
         @NotNull(message = "O tipo da transação é obrigatório.")
         TransactionType tipo,
@@ -34,7 +37,6 @@ public record CreateTransactionRequest(
         @NotNull(message = "A data da transação é obrigatória.")
         @PastOrPresent(message = "A data da transação não pode estar no futuro.")
         @JsonFormat(pattern = "yyyy-MM-dd")
-        @JsonProperty("data_transacao")
         LocalDate dataTransacao
 
 ) {

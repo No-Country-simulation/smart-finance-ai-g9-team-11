@@ -4,10 +4,7 @@ from typing import List, Literal
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from fastapi import Request
 
-import joblib
-import pickle
 from scripts.algorithm1.predict import predizer_categoria
 
 app = FastAPI(title="Finance AI - ML Mock Service for Java Devs")
@@ -59,7 +56,7 @@ def classificar_transacao(payload: Transaction):
     print("Transação recebida:", payload)
 
     categoria = predizer_categoria(payload.description)
-    categoria = MAPA_CATEGORIAS.get(categoria, "OUTROS")
+   
     return {
         "date": payload.date,
         "description": payload.description,
@@ -74,7 +71,7 @@ def classificar_transacao(payload: Transaction):
 # ==========================
 
 
- class FinancialAnalysisRequest(BaseModel):
+class FinancialAnalysisRequest(BaseModel):
     transactions: List[Transaction]
 
 

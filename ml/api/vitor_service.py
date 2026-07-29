@@ -3,10 +3,8 @@ vitor_service.py
 Módulo responsável por:
 1. Classificar o texto/descrição de uma transação em categoria (NLP).
 2. Calcular a base financeira agregada a partir das transações.
-3. Separar as 9 features do modelo (sem vazamento) x indicadores de
-   negócio (com vazamento, só para exibição/recomendações) x resumo_gastos.
 
-⚠️ Módulo de integração provisório. Quando o código definitivo do Vitor
+Módulo de integração provisório. Quando o código definitivo do Vitor
 (TF-IDF + Random Forest) estiver disponível, substitua a lógica interna,
 mantendo as mesmas assinaturas para não quebrar o main.py.
 """
@@ -58,10 +56,7 @@ def classificar_transacao(description: str, amount: float, tipo: str) -> str:
 # 2. AGREGAÇÃO FINANCEIRA
 # ============================================================
 
-# Categorias consideradas "essenciais" (para percentual_essenciais)
 _ESSENCIAIS = {"MORADIA", "ALIMENTACAO", "SAUDE", "TRANSPORTE", "UTILITARIOS"}
-
-# Categorias consideradas "recorrentes" (mensalidades/contas fixas)
 _RECORRENTES = {"MORADIA", "UTILITARIOS", "SAUDE"}
 
 
@@ -118,18 +113,18 @@ def calcular_indicadores_financeiros(
     margem_sobra = (sobra / receita_total) * 100
     comprometimento_renda = (despesa_total / receita_total) * 100
     taxa_poupanca = max(margem_sobra, 0.0)
-    meses_reserva = (sobra / (despesa_total / 12)) if despesa_total > 0 else 0.0
+
+    # CORRIGIDO: removido o "/12" — agora bate com o treino (reserva/despesa_total)
+    meses_reserva = (sobra / despesa_total) if despesa_total > 0 else 0.0
 
     percentual_essenciais = (essenciais_total / despesa_total * 100) if despesa_total > 0 else 0.0
     percentual_recorrentes = (recorrentes_total / despesa_total * 100) if despesa_total > 0 else 0.0
     ticket_medio = (despesa_total / qtd_despesas) if qtd_despesas > 0 else 0.0
 
-    # Sem histórico multi-mês disponível, assume-se 0 meses de saldo
-    # negativo se houver sobra positiva, senão 1 (aproximação simplificada).
     meses_saldo_negativo = 0 if sobra >= 0 else 1
 
-    # Reserva financeira: aproximação simplificada (poupança acumulada
-    # estimada). Ajustar quando houver histórico real de meses.
+    #  PENDENTE DE DECISÃO: reserva_financeira ainda usa "sobra" como proxy.
+    # Ver observação: no treino é um valor acumulado, não a sobra do mês atual.
     reserva_financeira = max(sobra, 0.0)
 
     return {
@@ -147,57 +142,4 @@ def calcular_indicadores_financeiros(
         "ticket_medio": ticket_medio,
         "meses_saldo_negativo": meses_saldo_negativo,
         "reserva_financeira": reserva_financeira,
-    }
-
-
-# ============================================================
-# 3. SEPARAÇÃO: FEATURES DO MODELO x INDICADORES DE NEGÓCIO
-# ============================================================
-
-def separar_features_e_negocio(base: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Separa a base financeira agregada em:
-    - features_modelo: as 9 features exatas exigidas pelo pipeline
-      (dataset_profile.FEATURES_MODELO_PERFIL), sem vazamento.
-    - indicadores_negocio: métricas com vazamento, só para exibição
-      e para o motor de recomendações.
-    - resumo_gastos: totais por categoria (dashboard).
-    """
-    totais = base["totais_por_categoria"]
-
-    features_modelo = {
-        "renda_mensal_liquida": base["receita_total"],
-        "despesa_total": base["despesa_total"],
-        "nivel_endividamento": base["nivel_endividamento"],
-        "poupanca_mensal": base["sobra"],
-        "reserva_financeira": base["reserva_financeira"],
-        "meses_saldo_negativo": base["meses_saldo_negativo"],
-        "percentual_essenciais": base["percentual_essenciais"],
-        "ticket_medio": base["ticket_medio"],
-        "percentual_recorrentes": base["percentual_recorrentes"],
-    }
-
-    indicadores_negocio = {
-        "margemSobra": base["margem_sobra"],
-        "comprometimentoRenda": base["comprometimento_renda"],
-        "taxaPoupanca": base["taxa_poupanca"],
-        "mesesReserva": base["meses_reserva"],
-    }
-
-    resumo_gastos = {
-        "alimentacao": totais["ALIMENTACAO"],
-        "moradia": totais["MORADIA"],
-        "compras": totais["COMPRAS"],
-        "entretenimento": totais["ENTRETENIMENTO"],
-        "investimento": totais["INVESTIMENTO"],
-        "saude": totais["SAUDE"],
-        "transporte": totais["TRANSPORTE"],
-        "utilitarios": totais["UTILITARIOS"],
-        "outros": totais["OUTROS"],
-    }
-
-    return {
-        "features_modelo": features_modelo,
-        "indicadores_negocio": indicadores_negocio,
-        "resumo_gastos": resumo_gastos,
     }

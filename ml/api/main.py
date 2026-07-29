@@ -1,18 +1,5 @@
 """
 API FastAPI - FinanceAI
-Contrato atualizado conforme o Backend + correção de Data Leakage +
-integração com o módulo do Vitor (NLP e agregações financeiras).
-
-Regras aplicadas:
-1. /classificar-transacoes recebe UMA transação por vez (não lista).
-2. Enums padronizados: RECEITA/DESPESA e categorias em maiúsculas.
-3. /analise-financeira recebe List[ClassifiedTransaction].
-4. As 4 métricas com vazamento (margemSobra, comprometimentoRenda,
-   taxaPoupanca, mesesReserva) NÃO entram no modelo, mas continuam
-   disponíveis na resposta para uso no dashboard.
-5. Resposta em camelCase (financialProfile, resumoGastos, etc.).
-6. Classificação de texto e agregação financeira delegadas ao
-   módulo do Vitor via vitor_service.py.
 """
 
 from enum import Enum
@@ -26,8 +13,8 @@ from vitor_service import (
     VitorPayloadError,
     classificar_transacao,
     calcular_indicadores_financeiros,
-    separar_features_e_negocio,
 )
+from perfil_features import preparar_features_e_indicadores
 
 app = FastAPI(
     title="Finance AI - Classificação e Perfil de Risco",
@@ -105,10 +92,6 @@ class ResumoGastos(BaseModel):
 
 
 class IndicadoresNegocio(BaseModel):
-    """
-    Métricas removidas do treinamento do modelo (evita data leakage),
-    mas mantidas na resposta para exibição em dashboards e recomendações.
-    """
     margemSobra: float
     comprometimentoRenda: float
     taxaPoupanca: float
@@ -126,8 +109,7 @@ class FinancialAnalysisResponse(BaseModel):
 
 
 # ============================================================
-# ENDPOINT 1 - Classificação (uma transação por requisição)
-# Delegado ao Vitor (TF-IDF + Random Forest)
+# ENDPOINT 1 - Classificação
 # ============================================================
 
 @app.post("/classificar-transacoes", response_model=ClassifiedTransaction)
@@ -136,7 +118,6 @@ def classificar_transacoes(payload: Transaction):
         categoria = classificar_transacao(
             payload.description, payload.amount, payload.type.value
         )
-
         return ClassifiedTransaction(
             date=payload.date,
             description=payload.description,
@@ -152,7 +133,6 @@ def classificar_transacoes(payload: Transaction):
 
 # ============================================================
 # ENDPOINT 2 - Análise Financeira
-# Agregação delegada ao Vitor + separação modelo/negócio (Luciano)
 # ============================================================
 
 @app.post("/analise-financeira", response_model=FinancialAnalysisResponse)
@@ -160,17 +140,20 @@ def analise_financeira(payload: FinancialAnalysisRequest):
     try:
         transacoes_dict = [t.dict() for t in payload.transactions]
 
-        # 1. Vitor calcula a base financeira agregada (despesa_total, etc.)
+        # 1. Vitor calcula a base financeira agregada
         base_financeira = calcular_indicadores_financeiros(
             transacoes_dict, payload.nivel_endividamento
         )
 
-        # 2. Luciano separa em features_modelo (9, sem vazamento) x
-        #    indicadores_negocio (4, só exibição) x resumo_gastos
-        dados = separar_features_e_negocio(base_financeira)
+        # 2. Luciano separa em features_modelo x indicadores_negocio x resumo_gastos
+        dados = preparar_features_e_indicadores(base_financeira)
 
-        # 3. Pipeline do Luciano: Gradient Boosting + motor de recomendações
-        resultado = executar_pipeline(dados["features_modelo"])
+        # 3. Pipeline: Gradient Boosting + motor de recomendações
+        resultado = executar_pipeline(
+            dados["features_modelo"],
+            dados["indicadores_negocio"],
+            dados["resumo_gastos"],
+        )
 
         return FinancialAnalysisResponse(
             financialProfile=PerfilFinanceiro(resultado["perfil_financeiro"]),

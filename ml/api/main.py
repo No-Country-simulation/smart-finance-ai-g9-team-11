@@ -59,6 +59,7 @@ def classificar_transacao(payload: Transaction):
     print("Transação recebida:", payload)
 
     categoria = predizer_categoria(payload.description)
+    categoria = MAPA_CATEGORIAS.get(categoria, "OUTROS")
     return {
         "date": payload.date,
         "description": payload.description,

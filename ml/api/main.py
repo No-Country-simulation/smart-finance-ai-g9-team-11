@@ -8,13 +8,13 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from pipeline_completo import executar_pipeline
-from vitor_service import (
+from ml.scripts.pipeline.pipeline_completo import executar_pipeline
+from ml.vitor_service import (
     VitorPayloadError,
     classificar_transacao,
     calcular_indicadores_financeiros,
 )
-from perfil_features import preparar_features_e_indicadores
+from ml.scripts.perfil_features import preparar_features_e_indicadores
 
 app = FastAPI(
     title="Finance AI - Classificação e Perfil de Risco",
@@ -140,15 +140,12 @@ def analise_financeira(payload: FinancialAnalysisRequest):
     try:
         transacoes_dict = [t.dict() for t in payload.transactions]
 
-        # 1. Vitor calcula a base financeira agregada
         base_financeira = calcular_indicadores_financeiros(
             transacoes_dict, payload.nivel_endividamento
         )
 
-        # 2. Luciano separa em features_modelo x indicadores_negocio x resumo_gastos
         dados = preparar_features_e_indicadores(base_financeira)
 
-        # 3. Pipeline: Gradient Boosting + motor de recomendações
         resultado = executar_pipeline(
             dados["features_modelo"],
             dados["indicadores_negocio"],

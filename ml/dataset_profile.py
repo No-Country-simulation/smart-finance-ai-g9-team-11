@@ -32,17 +32,17 @@ def _classificar_perfil_regra(renda, gastos, endividamento, poupanca_mensal,
     meses_reserva = reserva_financeira / gastos if gastos > 0 else 0
 
     if margem < 0 or endividamento >= 50 or meses_saldo_negativo >= 2:
-        perfil = "em_risco"
+        perfil = "EM_RISCO"
     elif comprometimento <= 70 and endividamento <= 20 and taxa_poupanca >= 15 and meses_reserva >= 3:
-        perfil = "saudavel"
+        perfil = "SAUDAVEL"
     else:
-        perfil = "em_observacao"
+        perfil = "EM_OBSERVACAO"
 
     if rng.random() < 0.07:
         vizinhos = {
-            "em_risco": ["em_observacao"],
-            "em_observacao": ["em_risco", "saudavel"],
-            "saudavel": ["em_observacao"],
+            "EM_RISCO": ["EM_OBSERVACAO"],
+            "EM_OBSERVACAO": ["EM_RISCO", "SAUDAVEL"],
+            "SAUDAVEL": ["EM_OBSERVACAO"],
         }
         perfil = rng.choice(vizinhos[perfil])
 
@@ -84,8 +84,6 @@ def gerar_dataset_perfil_simulado(n_amostras: int = 1200, seed: int = 42) -> pd.
         )
 
         if forcar_saudavel:
-            # Uma observação: Corrigido o rng.integers(0, 1) sempre retornava 0 (high é exclusivo).
-            # Agora permite 0 ou 1 mês de saldo negativo mesmo no cenário saudável.
             meses_saldo_negativo = int(rng.integers(0, 2))
         else:
             meses_saldo_negativo = int(rng.integers(0, 6)) if percentual_gasto > 1 else int(rng.integers(0, 2))
@@ -109,9 +107,6 @@ def gerar_dataset_perfil_simulado(n_amostras: int = 1200, seed: int = 42) -> pd.
             "percentual_essenciais": percentual_essenciais,
             "ticket_medio": ticket_medio,
             "percentual_recorrentes": percentual_recorrentes,
-            # Observação: foram mantidas no DataFrame apenas para auditoria/depuração,
-            # mas EXCLUÍDAS de FEATURES_MODELO_PERFIL (data leakage) por quetões de
-            # vazamentos. 
             "margem_sobra": round(renda_mensal - total_gastos, 2),
             "comprometimento_renda": round((total_gastos / renda_mensal) * 100, 2),
             "taxa_poupanca": round((poupanca_mensal / renda_mensal) * 100, 2),

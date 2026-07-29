@@ -1,3 +1,4 @@
+feature/profile-risk
 """
 API FastAPI - FinanceAI
 """
@@ -174,3 +175,4 @@ def analise_financeira(payload: FinancialAnalysisRequest):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+ develop

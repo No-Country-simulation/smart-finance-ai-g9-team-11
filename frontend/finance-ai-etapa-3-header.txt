@@ -1,0 +1,469 @@
+﻿FINANCE AI - ETAPA 3
+Header
+Gerado em: 2026-07-18 12:29:23
+
+==================================================
+src/components/layout/Header/Header.tsx
+==================================================
+import { Menu } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import { HeaderActions } from "./HeaderActions";
+import { HeaderGreeting } from "./HeaderGreeting";
+
+interface HeaderProps {
+  onOpenMobileSidebar?: () => void;
+}
+
+export function Header({
+  onOpenMobileSidebar,
+}: Readonly<HeaderProps>) {
+  return (
+    <header
+      className={cn(
+        "sticky top-0 z-30 flex min-w-0 items-center",
+        "justify-between gap-3 border-b border-border",
+        "bg-surface/95 px-4 py-4 backdrop-blur",
+        "supports-[backdrop-filter]:bg-surface/80",
+        "sm:px-6 sm:py-5",
+        "lg:px-8 lg:py-6",
+      )}
+    >
+      <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+        {onOpenMobileSidebar && (
+          <button
+            type="button"
+            onClick={onOpenMobileSidebar}
+            className={cn(
+              "flex size-10 shrink-0 items-center justify-center",
+              "rounded-xl border border-border bg-surface",
+              "text-text shadow-card transition-colors",
+              "hover:bg-surface-muted",
+              "focus-visible:outline-none focus-visible:ring-2",
+              "focus-visible:ring-primary",
+              "md:hidden",
+            )}
+            aria-label="Abrir menu principal"
+          >
+            <Menu size={20} aria-hidden="true" />
+          </button>
+        )}
+
+        <HeaderGreeting />
+      </div>
+
+      <HeaderActions />
+    </header>
+  );
+}
+
+==================================================
+src/components/layout/Header/HeaderActions.tsx
+==================================================
+import { userMock } from "@/mocks/user.mock";
+
+import { UserMenu } from "../UserMenu";
+
+import { DateRangePicker } from "./DateRangePicker";
+import { NotificationButton } from "./NotificationButton";
+import { SyncButton } from "./SyncButton";
+import { ThemeToggle } from "./ThemeToggle";
+
+export function HeaderActions() {
+  return (
+    <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
+      <div className="hidden xl:block">
+        <DateRangePicker />
+      </div>
+
+      <div className="hidden sm:block">
+        <ThemeToggle />
+      </div>
+
+      <NotificationButton />
+
+      <div className="hidden lg:block">
+        <SyncButton />
+      </div>
+
+      <UserMenu user={userMock} />
+    </div>
+  );
+}
+
+==================================================
+src/components/layout/Header/HeaderGreeting.tsx
+==================================================
+import { userMock } from "@/mocks/user.mock";
+
+export function HeaderGreeting() {
+  const firstName =
+    userMock.name.trim().split(/\s+/)[0] ?? "usuÃ¡rio";
+
+  return (
+    <div className="min-w-0">
+      <h1 className="truncate text-xl font-bold tracking-tight text-text sm:text-2xl lg:text-3xl xl:text-4xl">
+        OlÃ¡, {firstName}!
+      </h1>
+
+      <p className="mt-1 hidden text-sm text-text-muted sm:block lg:text-base">
+        Aqui estÃ¡ o resumo da sua saÃºde financeira de hoje.
+      </p>
+    </div>
+  );
+}
+
+==================================================
+src/components/layout/Header/DateRangePicker.tsx
+==================================================
+import { Calendar } from "lucide-react";
+
+export function DateRangePicker() {
+  return (
+    <button
+      className="
+      flex
+      items-center
+      gap-3
+      rounded-xl
+      border
+      border-border
+      bg-surface
+      px-5
+      py-3
+      text-sm
+      font-medium
+      text-text
+      shadow-card
+      transition-all
+      duration-200
+      ease-out
+      hover:-translate-y-0.5
+      hover:shadow-elevated
+      "
+    >
+      01 Mai - 31 Mai 2026
+      <Calendar size={18} />
+    </button>
+  );
+}
+
+
+==================================================
+src/components/layout/Header/NotificationButton.tsx
+==================================================
+import { Bell } from "lucide-react";
+
+export function NotificationButton() {
+  return (
+    <button
+      aria-label="NotificaÃ§Ãµes"
+      className="
+      relative
+      flex
+      h-12
+      w-12
+      items-center
+      justify-center
+      rounded-xl
+      border
+      border-border
+      bg-surface
+      text-text
+      shadow-card
+      transition-all
+      duration-200
+      ease-out
+      hover:-translate-y-0.5
+      hover:shadow-elevated
+      "
+    >
+      <Bell size={20} />
+
+      <span
+        className="
+        absolute
+        right-3
+        top-3
+        h-2
+        w-2
+        rounded-full
+        bg-danger
+        "
+      />
+    </button>
+  );
+}
+
+
+==================================================
+src/components/layout/Header/ThemeToggle.tsx
+==================================================
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/providers/ThemeProvider";
+
+/**
+ * Toggle simples light/dark. O ThemeProvider jÃ¡ suporta "system" tambÃ©m
+ * (ver src/providers/ThemeProvider.tsx) â€” se quiser expor as 3 opÃ§Ãµes em
+ * vez de sÃ³ alternar entre claro/escuro, troque este botÃ£o por um
+ * DropdownMenu com as 3 opÃ§Ãµes chamando setTheme("light"|"dark"|"system").
+ */
+export function ThemeToggle() {
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  return (
+    <button
+      onClick={toggleTheme}
+      aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
+      className="
+      flex
+      h-12
+      w-12
+      items-center
+      justify-center
+      rounded-xl
+      border
+      border-border
+      bg-surface
+      text-text
+      shadow-card
+      transition-all
+      duration-200
+      ease-out
+      hover:-translate-y-0.5
+      hover:shadow-elevated
+      "
+    >
+      {isDark ? <Sun size={20} /> : <Moon size={20} />}
+    </button>
+  );
+}
+
+
+==================================================
+src/components/layout/Header/SyncButton.tsx
+==================================================
+import { RefreshCw } from "lucide-react";
+
+export function SyncButton() {
+  return (
+    <button
+      className="
+      flex
+      items-center
+      gap-2
+      rounded-xl
+      border
+      border-border
+      bg-surface
+      px-5
+      py-3
+      text-sm
+      font-medium
+      text-text
+      shadow-card
+      transition-all
+      duration-200
+      ease-out
+      hover:-translate-y-0.5
+      hover:shadow-elevated
+      "
+    >
+      <RefreshCw size={18} />
+      Sincronizar dados
+    </button>
+  );
+}
+
+
+==================================================
+src/components/layout/Header/index.ts
+==================================================
+export { Header } from "./Header";
+export { HeaderActions } from "./HeaderActions";
+export { HeaderGreeting } from "./HeaderGreeting";
+export { DateRangePicker } from "./DateRangePicker";
+export { NotificationButton } from "./NotificationButton";
+export { SyncButton } from "./SyncButton";
+export { ThemeToggle } from "./ThemeToggle";
+
+
+==================================================
+src/components/layout/UserMenu/UserMenu.tsx
+==================================================
+import {
+  CircleHelp,
+  LogOut,
+  Settings,
+  UserRound,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+
+import type { UserMenuProps } from "./UserMenu.types";
+
+function getUserInitials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+export function UserMenu({
+  user,
+  onLogout,
+}: Readonly<UserMenuProps>) {
+  const navigate = useNavigate();
+  const initials = getUserInitials(user.name);
+
+  const handleNavigate = (path: string): void => {
+    navigate(path);
+  };
+
+  const handleLogout = (): void => {
+    if (onLogout) {
+      onLogout();
+      return;
+    }
+
+    console.info(
+      "Logout serÃ¡ integrado ao fluxo de autenticaÃ§Ã£o.",
+    );
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className={cn(
+          "flex size-11 shrink-0 items-center justify-center",
+          "rounded-xl border border-border bg-surface",
+          "shadow-card transition-all duration-200 ease-out",
+          "hover:-translate-y-0.5 hover:shadow-elevated",
+          "focus-visible:outline-none focus-visible:ring-2",
+          "focus-visible:ring-primary focus-visible:ring-offset-2",
+          "focus-visible:ring-offset-background",
+        )}
+        aria-label={`Abrir menu de ${user.name}`}
+      >
+        <Avatar className="size-8">
+          <AvatarImage
+            src={user.avatar}
+            alt={`Foto de ${user.name}`}
+          />
+
+          <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        className="w-64"
+      >
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex min-w-0 items-center gap-3">
+            <Avatar className="size-10 shrink-0">
+              <AvatarImage
+                src={user.avatar}
+                alt={`Foto de ${user.name}`}
+              />
+
+              <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-text">
+                {user.name}
+              </p>
+
+              <p className="truncate text-xs text-text-muted">
+                {user.email}
+              </p>
+            </div>
+          </div>
+        </DropdownMenuLabel>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onSelect={() => handleNavigate("/profile")}
+          className="cursor-pointer gap-2"
+        >
+          <UserRound size={16} aria-hidden="true" />
+          Minha conta
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onSelect={() => handleNavigate("/settings")}
+          className="cursor-pointer gap-2"
+        >
+          <Settings size={16} aria-hidden="true" />
+          ConfiguraÃ§Ãµes
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          disabled
+          className="gap-2"
+        >
+          <CircleHelp size={16} aria-hidden="true" />
+
+          <span>Central de ajuda</span>
+
+          <span className="ml-auto text-[10px] text-text-muted">
+            Em breve
+          </span>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onSelect={handleLogout}
+          className="cursor-pointer gap-2 text-danger focus:text-danger"
+        >
+          <LogOut size={16} aria-hidden="true" />
+          Sair
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+==================================================
+src/components/layout/UserMenu/UserMenu.types.ts
+==================================================
+import type { User } from "@/types/user";
+
+export interface UserMenuProps {
+  user: User;
+  onLogout?: () => void;
+}
+
+==================================================
+src/components/layout/UserMenu/index.ts
+==================================================
+export { UserMenu } from "./UserMenu";
+
+export type { UserMenuProps } from "./UserMenu.types";
+

@@ -74,7 +74,7 @@ def classificar_transacao(payload: Transaction):
 # ==========================
 
 
-class FinancialAnalysisRequest(BaseModel):
+ class FinancialAnalysisRequest(BaseModel):
     transactions: List[Transaction]
 
 

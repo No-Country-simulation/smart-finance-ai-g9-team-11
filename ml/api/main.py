@@ -1,77 +1,128 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Literal
 from datetime import date
+from typing import List, Literal
 
-# Inicializa servidor
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from fastapi import Request
+
+import joblib
+import pickle
+from scripts.algorithm1.predict import predizer_categoria
+
 app = FastAPI(title="Finance AI - ML Mock Service for Java Devs")
 
-# Esquema de dados que o Java vai enviar (Contrato de Entrada)
+print("=== FASTAPI ATUALIZADO CARREGADO ===")
+
+# ==========================
+# ENUMS
+# ==========================
+
+TransactionType = Literal["RECEITA", "DESPESA"]
+
+TransactionCategory = Literal[
+    "ALIMENTACAO",
+    "MORADIA",
+    "COMPRAS",
+    "ENTRETENIMENTO",
+    "INVESTIMENTO",
+    "SALARIO",
+    "SAUDE",
+    "TRANSPORTE",
+    "UTILITARIOS",
+    "OUTROS",
+]
+
+
+# ==========================
+# CLASSIFICAÇÃO DE TRANSAÇÃO
+# ==========================
+
+
 class Transaction(BaseModel):
     date: date
     description: str
     amount: float
-    type: Literal["Income", "Expense"]
-
-class ClassificationRequest(BaseModel):
-    transactions: List[Transaction]
+    type: TransactionType
 
 
 class ClassifiedTransaction(BaseModel):
     date: date
     description: str
     amount: float
-    type: Literal["Income", "Expense"]
-    category: str
+    type: TransactionType
+    category: TransactionCategory
+
+
+@app.post("/classificar-transacoes")
+def classificar_transacao(payload: Transaction):
+    print("Transação recebida:", payload)
+
+    categoria = predizer_categoria(payload.description)
+    return {
+        "date": payload.date,
+        "description": payload.description,
+        "amount": payload.amount,
+        "type": payload.type,
+        "category": categoria,
+    }
+
+
+# ==========================
+# ANÁLISE FINANCEIRA (MOCK)
+# ==========================
 
 
 class FinancialAnalysisRequest(BaseModel):
-    transactions: List[ClassifiedTransaction]
+    transactions: List[Transaction]
 
-@app.post("/classificar-transacoes")
-def classificar_transacoes(payload: ClassificationRequest):
 
-    print(f"{len(payload.transactions)} transações recebidas.")
+class ExpenseSummary(BaseModel):
+    alimentacao: float
+    moradia: float
+    compras: float
+    entretenimento: float
+    investimento: float
+    salario: float
+    saude: float
+    transporte: float
+    utilitarios: float
+    outros: float
 
-    resultado = []
 
-    for transacao in payload.transactions:
+class FinancialAnalysisResponse(BaseModel):
+    financialProfile: str
+    nivelEndividamento: float
+    frequenciaPoupanca: str
+    probabilidade: float
+    resumoGastos: ExpenseSummary
+    recommendations: List[str]
 
-        # Aqui será chamado o modelo NLP
-        categoria = "Shopping"
 
-        resultado.append(
-            {
-                "date": transacao.date,
-                "description": transacao.description,
-                "amount": transacao.amount,
-                "type": transacao.type,
-                "category": categoria
-            }
-        )
-
-    return {
-        "transactions": resultado
-    }
-
-@app.post("/analise-financeira")
+@app.post("/analise-financeira", response_model=FinancialAnalysisResponse)
 def analisar_financas(payload: FinancialAnalysisRequest):
 
     print(f"Analisando {len(payload.transactions)} transações.")
 
-    # Aqui é chamado as features agregadas
-    # e chama o resultado do modelo de perfil financeiro
-
-    return {
-        "perfil_financeiro": "Equilibrado",
-        "probabilidade": 0.91,
-        "resumo_gastos": {
-            "alimentacao": 850.50,
-            "transporte": 310.40,
-            "compras": 420.80
-        },
-        "recomendacoes": [
+    return FinancialAnalysisResponse(
+        financialProfile="EM_OBSERVACAO",
+        nivelEndividamento=3,
+        frequenciaPoupanca="BAIXA",
+        probabilidade=0.91,
+        resumoGastos=ExpenseSummary(
+            alimentacao=850.50,
+            moradia=0,
+            compras=420.80,
+            entretenimento=0,
+            investimento=0,
+            salario=5000,
+            saude=0,
+            transporte=310.40,
+            utilitarios=0,
+            outros=0,
+        ),
+        recommendations=[
             "Continue mantendo uma reserva financeira.",
-            "Reduza gastos com compras não essenciais."
-        ]
-    }
+            "Reduza gastos com compras não essenciais.",
+        ],
+    )

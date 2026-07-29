@@ -1,18 +1,18 @@
 import joblib
-import pandas as pd
+import numpy as np
 
-# Carrega o modelo apenas uma vez
+from scripts.text_utils import limpar_texto
+
 modelo = joblib.load("models/transaction_classifier.pkl")
 
-def classificar_transacoes(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Classifica todas as transações utilizando o modelo NLP.
-    """
 
-    df = df.copy()
+def predizer_categoria(descricao: str, limite_confianca: float = 0.5) -> str:
+    descricao = limpar_texto(descricao)
 
-    df["Category"] = modelo.predict(
-        df["Transaction Description"]
-    )
+    probabilidades = modelo.predict_proba([descricao])[0]
+    maior_probabilidade = np.max(probabilidades)
 
-    return df
+    if maior_probabilidade < limite_confianca:
+        return "OUTROS"
+
+    return modelo.classes_[np.argmax(probabilidades)]

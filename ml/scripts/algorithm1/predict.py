@@ -13,6 +13,6 @@ def predizer_categoria(descricao: str, limite_confianca: float = 0.5) -> str:
     maior_probabilidade = np.max(probabilidades)
 
     if maior_probabilidade < limite_confianca:
-        return "OUTROS"
+        return "Outros"
 
     return modelo.classes_[np.argmax(probabilidades)]

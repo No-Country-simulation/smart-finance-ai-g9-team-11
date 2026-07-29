@@ -35,7 +35,7 @@ public class MlClient {
             );
 
             MlResponse response = restClient.post()
-                    .uri("/analise-financeira")
+                    .uri("/api/v1/financial-analysis")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .body(request)

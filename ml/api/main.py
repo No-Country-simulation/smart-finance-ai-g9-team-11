@@ -15,19 +15,20 @@ print("=== FASTAPI ATUALIZADO CARREGADO ===")
 # ENUMS
 # ==========================
 
-TransactionType = Literal["RECEITA", "DESPESA"]
+TransactionType = Literal["Receita", "Despesa"]
 
 TransactionCategory = Literal[
-    "ALIMENTACAO",
-    "MORADIA",
-    "COMPRAS",
-    "ENTRETENIMENTO",
-    "INVESTIMENTO",
-    "SALARIO",
-    "SAUDE",
-    "TRANSPORTE",
-    "UTILITARIOS",
-    "OUTROS",
+    
+    "Alimentação",
+    "Utilitários",
+    "Aluguel",
+    "Investimento",
+    "Compras",
+    "Saúde",
+    "Entretenimento",
+    "Trajeto",
+    "Salário",
+    "Outros",
 ]
 
 
@@ -77,14 +78,14 @@ class FinancialAnalysisRequest(BaseModel):
 
 class ExpenseSummary(BaseModel):
     alimentacao: float
-    moradia: float
-    compras: float
-    entretenimento: float
-    investimento: float
-    salario: float
-    saude: float
-    transporte: float
     utilitarios: float
+    Aluguel: float
+    Investimento: float
+    Compras: float
+    saude: float
+    Entretenimento: float
+    Trajeto: float
+    Salario: float
     outros: float
 
 
@@ -97,7 +98,7 @@ class FinancialAnalysisResponse(BaseModel):
     recommendations: List[str]
 
 
-@app.post("/analise-financeira", response_model=FinancialAnalysisResponse)
+@app.post("/api/v1/financial-analysis", response_model=FinancialAnalysisResponse)
 def analisar_financas(payload: FinancialAnalysisRequest):
 
     print(f"Analisando {len(payload.transactions)} transações.")
@@ -109,14 +110,14 @@ def analisar_financas(payload: FinancialAnalysisRequest):
         probabilidade=0.91,
         resumoGastos=ExpenseSummary(
             alimentacao=850.50,
-            moradia=0,
-            compras=420.80,
-            entretenimento=0,
-            investimento=0,
-            salario=5000,
-            saude=0,
-            transporte=310.40,
             utilitarios=0,
+            aluguel=420.80,
+            investimento=0,
+            compras=0,
+            saude=5000,
+            entretenimento=0,
+            trajetoria=310.40,
+            salarios=0,
             outros=0,
         ),
         recommendations=[

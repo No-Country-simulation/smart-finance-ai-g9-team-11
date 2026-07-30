@@ -76,6 +76,8 @@ public class FinancialAnalysisService {
 
         return new FinancialAnalysisResponse(
                 mlResponse.perfilFinanceiro(),
+                mlResponse.nivelEndividamento(),
+                mlResponse.frequenciaPoupanca(),
                 mlResponse.probabilidade(),
                 mlResponse.resumoGastos(),
                 mlResponse.recomendacoes()

@@ -9,18 +9,13 @@ import java.time.LocalDate;
 
 public record MlTransactionResponse(
 
-        @JsonProperty("description")
         String descricao,
 
-        @JsonProperty("amount")
         BigDecimal valor,
 
-        @JsonProperty("type")
         TransactionType tipo,
 
-        @JsonProperty("category")
         TransactionCategory categoria,
 
-        @JsonProperty("date")
-        LocalDate dataTransacao) {
+        LocalDate data) {
 }

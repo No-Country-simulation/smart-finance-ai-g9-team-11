@@ -24,7 +24,7 @@ public record TransactionResponse(
 
         TransactionCategory categoria,
 
-        LocalDate dataTransacao,
+        LocalDate data,
 
         Long usuarioId
 

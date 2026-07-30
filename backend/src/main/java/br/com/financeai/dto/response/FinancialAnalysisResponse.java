@@ -17,7 +17,6 @@ public record FinancialAnalysisResponse(
 
         @JsonProperty("resumo_gastos")
         ExpenseSummaryResponse resumoGastos,
-
         @JsonProperty("recomendacoes")
-        List<String> recommendation
+        List<String> recomendacoes
 ) {}

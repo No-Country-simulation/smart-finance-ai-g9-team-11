@@ -50,7 +50,7 @@ public class Transaction {
     private TransactionCategory categoria;
 
     @Column(name = "data_transacao", nullable = false)
-    private LocalDate dataTransacao;
+    private LocalDate data;
 
     /*
      * A transação pertence diretamente ao usuário.

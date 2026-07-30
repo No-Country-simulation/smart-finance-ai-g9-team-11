@@ -69,7 +69,7 @@ public class TransactionService {
                         request.descricao(),
                         request.valor(),
                         request.tipo(),
-                        request.dataTransacao(),
+                        request.data(),
                         usuario
                 ))
                 .toList();
@@ -87,7 +87,7 @@ public class TransactionService {
         findUserById(usuarioId);
 
         return transactionRepository
-                .findAllByUsuarioIdOrderByDataTransacaoDescIdDesc(usuarioId)
+                .findAllByUsuarioIdOrderByDataDescIdDesc(usuarioId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -105,7 +105,7 @@ public class TransactionService {
         validatePeriod(dataInicial, dataFinal);
 
         return transactionRepository
-                .findAllByUsuarioIdAndDataTransacaoBetweenOrderByDataTransacaoDescIdDesc(
+                .findAllByUsuarioIdAndDataBetweenOrderByDataDescIdDesc(
                         usuarioId,
                         dataInicial,
                         dataFinal
@@ -147,14 +147,14 @@ public class TransactionService {
                 request.descricao(),
                 request.valor(),
                 request.tipo(),
-                request.dataTransacao()
+                request.data()
         );
 
         transaction.setDescricao(request.descricao().trim());
         transaction.setValor(request.valor());
         transaction.setTipo(request.tipo());
         transaction.setCategoria(categoria);
-        transaction.setDataTransacao(request.dataTransacao());
+        transaction.setData(request.data());
 
         Transaction updatedTransaction =
                 transactionRepository.save(transaction);
@@ -194,7 +194,7 @@ public class TransactionService {
         transaction.setValor(valor);
         transaction.setTipo(tipo);
         transaction.setCategoria(categoria);
-        transaction.setDataTransacao(dataTransacao);
+        transaction.setData(dataTransacao);
         transaction.setUsuario(usuario);
 
         return transaction;
@@ -261,7 +261,7 @@ public class TransactionService {
                 transaction.getValor(),
                 transaction.getTipo(),
                 transaction.getCategoria(),
-                transaction.getDataTransacao(),
+                transaction.getData(),
                 transaction.getUsuario().getId()
         );
     }

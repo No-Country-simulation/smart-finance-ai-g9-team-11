@@ -36,7 +36,7 @@ public record UpdateTransactionRequest(
         @PastOrPresent(
                 message = "A data da transação não pode estar no futuro."
         )
-        LocalDate dataTransacao
+        LocalDate data
 
 ) {
 }

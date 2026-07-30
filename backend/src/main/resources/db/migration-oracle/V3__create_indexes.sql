@@ -1,2 +1,0 @@
-CREATE INDEX idx_transacoes_analise
-ON transacoes(analise_financeira_id);

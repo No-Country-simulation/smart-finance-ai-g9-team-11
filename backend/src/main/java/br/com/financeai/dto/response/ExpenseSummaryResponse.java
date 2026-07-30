@@ -10,7 +10,7 @@ public record ExpenseSummaryResponse(
         BigDecimal investimento,
         BigDecimal salario,
         BigDecimal saude,
-        BigDecimal transporte,
+        BigDecimal trajeto,
         BigDecimal utilitarios,
         BigDecimal outros
 ) {}

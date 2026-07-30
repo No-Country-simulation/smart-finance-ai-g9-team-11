@@ -1,25 +1,39 @@
 package br.com.financeai.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum TransactionCategory {
 
-    ALIMENTACAO,
+    ALIMENTACAO("Alimentação"),
 
-    MORADIA,
+    UTILITARIOS("Utilitários"),
 
-    COMPRAS,
+    MORADIA("Moradia"),
 
-    ENTRETENIMENTO,
+    INVESTIMENTO("Investimento"),
 
-    INVESTIMENTO,
+    COMPRAS("Compras"),
 
-    SALARIO,
+    SAUDE("Saúde"),
 
-    SAUDE,
+    ENTRETENIMENTO("Entretenimento"),
 
-    TRANSPORTE,
+    TRAJETO("Trajeto"),
 
-    UTILITARIOS,
+    SALARIO("Salário"),
 
-    OUTROS
+    OUTROS("Outros");
+
+    private final String label;
+
+    TransactionCategory(String label) {
+        this.label = label;
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
 
 }

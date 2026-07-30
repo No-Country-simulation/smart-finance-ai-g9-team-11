@@ -16,9 +16,7 @@ import br.com.financeai.repository.TransactionRepository;
 import br.com.financeai.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -44,7 +42,7 @@ public class FinancialAnalysisService {
         AppUser user = getTestUser();
 
         List<Transaction> transactions = transactionRepository
-                .findByUsuarioAndDataTransacaoBetween(user, request.dataInicial(), request.dataFinal());
+                .findByUsuarioAndDataBetween(user, request.dataInicial(), request.dataFinal());
 
         if (transactions.isEmpty()) {
             throw new InvalidRequestException("Não há transações no período informado.");
@@ -52,7 +50,7 @@ public class FinancialAnalysisService {
 
         // Monta a lista que a IA precisa, a partir do que já está no banco
         List<MlTransactionRequest> mlTransactions = transactions.stream()
-                .map(t -> new MlTransactionRequest(t.getDescricao(), t.getValor(), t.getTipo(), t.getDataTransacao()))
+                .map(t -> new MlTransactionRequest(t.getDescricao(), t.getValor(), t.getTipo(), t.getData()))
                 .toList();
 
         MlRequest mlRequest = new MlRequest(mlTransactions);
@@ -68,7 +66,7 @@ public class FinancialAnalysisService {
 
         FinancialAnalysis analysis = new FinancialAnalysis();
         analysis.setUsuario(user);
-        analysis.setPerfilFinanceiro(mlResponse.financialProfile());
+        analysis.setPerfilFinanceiro(mlResponse.perfilFinanceiro());
         analysis.setFrequenciaPoupanca(mlResponse.frequenciaPoupanca());
         analysis.setNivelEndividamento(mlResponse.nivelEndividamento());
         analysis.setProbabilidade(mlResponse.probabilidade());
@@ -77,10 +75,10 @@ public class FinancialAnalysisService {
         financialAnalysisRepository.save(analysis);
 
         return new FinancialAnalysisResponse(
-                mlResponse.financialProfile(),
+                mlResponse.perfilFinanceiro(),
                 mlResponse.probabilidade(),
                 mlResponse.resumoGastos(),
-                mlResponse.recommendations()
+                mlResponse.recomendacoes()
         );
     }
 

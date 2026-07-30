@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/transactions")
+@RequestMapping("/classificar-transacoes")
 public class TransactionController {
 
     private final TransactionService transactionService;

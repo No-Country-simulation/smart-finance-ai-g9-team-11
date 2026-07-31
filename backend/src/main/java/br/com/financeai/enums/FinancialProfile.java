@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum FinancialProfile {
 
-    SAUDAVEL("Saudavel"),
+    SAUDAVEL("Saudável"),
 
-    EM_OBSERVACAO("Em observacao"),
+    EM_OBSERVACAO("Em observação"),
 
     EM_RISCO("Em risco");
 

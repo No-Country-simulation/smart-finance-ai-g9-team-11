@@ -143,7 +143,7 @@ public class MlClient {
 //}
 
 
-        public MlTransactionResponse classifyTransaction(MlTransactionRequest request){
+    public MlTransactionResponse classifyTransaction(MlTransactionRequest request){
 
         //Mock da Classificao de transacoes
 
@@ -158,7 +158,7 @@ public class MlClient {
         );
     }
 
-        private TransactionCategory inferirCategoria(String descricao) {
+    private TransactionCategory inferirCategoria(String descricao) {
         String texto = descricao.toLowerCase();
 
         if (texto.contains("supermercado") || texto.contains("mercado") || texto.contains("restaurante")) {
@@ -167,6 +167,17 @@ public class MlClient {
         if (texto.contains("uber") || texto.contains("combustivel") || texto.contains("onibus")) {
             return TransactionCategory.TRAJETO;
         }
+        if (texto.contains("cinema") || texto.contains("netflix") || texto.contains("show")) {
+            return TransactionCategory.ENTRETENIMENTO;
+        }
+        if (texto.contains("farmacia") || texto.contains("consulta") || texto.contains("plano de saude")) {
+            return TransactionCategory.SAUDE;
+        }
+        if (texto.contains("aluguel") || texto.contains("condominio")) {
+            return TransactionCategory.MORADIA;
+        }
+
+        return TransactionCategory.OUTROS;
     }
 
     public MlResponse analyze(MlRequest request) {
@@ -197,6 +208,3 @@ public class MlClient {
     }
 
 }
-
-
-

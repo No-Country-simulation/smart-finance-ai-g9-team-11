@@ -22,6 +22,18 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Responsável pelo CRUD completo de transações: criar (uma ou em lote),
+ * listar, buscar por id, atualizar e excluir.
+ *
+ * Toda transação criada ou editada passa pela IA (MlClient) para receber
+ * uma categoria — o usuário nunca informa a categoria manualmente.
+ *
+ * O usuário é identificado pelo header X-User-Id (placeholder provisório,
+ * até existir autenticação real via JWT), e toda operação valida que a
+ * transação pertence de fato ao usuário informado, evitando que alguém
+ * acesse/edite/exclua dados de outra pessoa só adivinhando um ID.
+ */
 @Service
 public class TransactionService {
 
@@ -62,8 +74,11 @@ public class TransactionService {
             Long usuarioId,
             List<CreateTransactionRequest> requests
     ) {
+        // Garante que o usuário existe antes de processar qualquer transação
         AppUser usuario = findUserById(usuarioId);
 
+        // Para cada transação recebida: classifica (chama a IA) e monta a entidade
+        // pronta para ser salva. O mapeamento acontece uma transação por vez.
         List<Transaction> transactions = requests.stream()
                 .map(request -> buildTransaction(
                         request.descricao(),
@@ -74,6 +89,9 @@ public class TransactionService {
                 ))
                 .toList();
 
+        // Persiste todas de uma vez (uma única operação no banco, mesmo que
+        // sejam várias transações), e converte cada entidade salva de volta
+        // para o formato de resposta da API.
         return transactionRepository.saveAll(transactions)
                 .stream()
                 .map(this::toResponse)
@@ -102,6 +120,8 @@ public class TransactionService {
             LocalDate dataFinal
     ) {
         findUserById(usuarioId);
+        // Garante que as duas datas foram informadas e que fazem sentido
+        // (dataInicial não pode vir depois de dataFinal) antes de consultar.
         validatePeriod(dataInicial, dataFinal);
 
         return transactionRepository
@@ -122,6 +142,9 @@ public class TransactionService {
             Long usuarioId,
             Long transactionId
     ) {
+        // findTransactionByIdAndUserId já garante a posse do recurso:
+        // se a transação existir mas for de outro usuário, é tratada
+        // como "não encontrada" (não vaza a existência do dado de terceiros).
         Transaction transaction =
                 findTransactionByIdAndUserId(transactionId, usuarioId);
 
@@ -140,9 +163,12 @@ public class TransactionService {
             Long transactionId,
             UpdateTransactionRequest request
     ) {
+        // Só busca a transação se ela realmente pertencer a esse usuário
         Transaction transaction =
                 findTransactionByIdAndUserId(transactionId, usuarioId);
 
+        // Recalcula a categoria com os dados novos, já que descrição/valor
+        // podem ter mudado o suficiente para mudar a classificação da IA.
         TransactionCategory categoria = classify(
                 request.descricao(),
                 request.valor(),
@@ -150,6 +176,7 @@ public class TransactionService {
                 request.data()
         );
 
+        // Aplica os novos valores na entidade já existente (não cria uma nova)
         transaction.setDescricao(request.descricao().trim());
         transaction.setValor(request.valor());
         transaction.setTipo(request.tipo());
@@ -170,6 +197,8 @@ public class TransactionService {
             Long usuarioId,
             Long transactionId
     ) {
+        // Reaproveita a mesma validação de posse usada em findById/update —
+        // se a transação não for do usuário, lança ResourceNotFoundException.
         Transaction transaction =
                 findTransactionByIdAndUserId(transactionId, usuarioId);
 
@@ -187,6 +216,7 @@ public class TransactionService {
             LocalDate dataTransacao,
             AppUser usuario
     ) {
+        // A categoria nunca é informada pelo usuário — sempre vem da IA
         TransactionCategory categoria = classify(descricao, valor, tipo, dataTransacao);
 
         Transaction transaction = new Transaction();
@@ -202,6 +232,11 @@ public class TransactionService {
 
     /**
      * Chama o MlClient para obter a categoria da transação.
+     *
+     * É o único ponto de contato com a IA para classificação — tanto o
+     * cadastro (buildTransaction) quanto a edição (update) passam por aqui,
+     * garantindo que a regra de "quem classifica é a IA" nunca seja
+     * duplicada ou implementada de forma diferente em outro lugar.
      */
     private TransactionCategory classify(
             String descricao,
@@ -218,6 +253,10 @@ public class TransactionService {
         return mlResponse.categoria();
     }
 
+    /**
+     * Busca o usuário pelo ID, lançando erro claro se ele não existir.
+     * Usado no início de toda operação que precisa saber "de quem" é a transação.
+     */
     private AppUser findUserById(Long usuarioId) {
         return userRepository
                 .findById(usuarioId)
@@ -226,6 +265,11 @@ public class TransactionService {
                 ));
     }
 
+    /**
+     * Busca uma transação validando, na própria consulta, que ela pertence
+     * ao usuário informado — evita que alguém acesse/edite/exclua uma
+     * transação de outro usuário só sabendo o ID dela.
+     */
     private Transaction findTransactionByIdAndUserId(
             Long transactionId,
             Long usuarioId
@@ -237,6 +281,11 @@ public class TransactionService {
                 ));
     }
 
+    /**
+     * Valida que o período informado para o filtro faz sentido:
+     * as duas datas precisam estar presentes, e a inicial não pode
+     * ser posterior à final.
+     */
     private void validatePeriod(
             LocalDate dataInicial,
             LocalDate dataFinal
@@ -254,6 +303,10 @@ public class TransactionService {
         }
     }
 
+    /**
+     * Converte a entidade Transaction (formato de banco) para o DTO
+     * de resposta da API (formato exposto ao frontend).
+     */
     private TransactionResponse toResponse(Transaction transaction) {
         return new TransactionResponse(
                 transaction.getId(),

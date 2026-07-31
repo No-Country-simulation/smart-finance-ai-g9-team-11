@@ -17,6 +17,33 @@ from ml.vitor_service import (
 )
 
 app = FastAPI(title="Finance AI - ML Mock Service for Java Devs")
+print("=== FASTAPI ATUALIZADO CARREGADO ===")
+
+
+# ==========================
+# ENUMS
+# ==========================
+
+TransactionType = Literal["RECEITA", "DESPESA"]
+
+TransactionCategory = Literal[
+    "ALIMENTACAO",
+    "MORADIA",
+    "COMPRAS",
+    "ENTRETENIMENTO",
+    "INVESTIMENTO",
+    "SALARIO",
+    "SAUDE",
+    "TRANSPORTE",
+    "UTILITARIOS",
+    "OUTROS",
+]
+
+
+# ==========================
+# CLASSIFICAÇÃO DE TRANSAÇÃO
+# ==========================
+
 
 print("=== FASTAPI ATUALIZADO CARREGADO ===")
 

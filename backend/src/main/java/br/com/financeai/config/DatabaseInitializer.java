@@ -4,6 +4,7 @@ import br.com.financeai.entity.AppUser;
 import br.com.financeai.repository.UserRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,9 +13,12 @@ public class DatabaseInitializer implements ApplicationRunner {
     private static final String TEST_USER_EMAIL = "teste@financeai.com";
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    DatabaseInitializer(UserRepository userRepository){
+
+    DatabaseInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -26,7 +30,7 @@ public class DatabaseInitializer implements ApplicationRunner {
 
             appUser.setNome("Usuário Teste");
             appUser.setEmail(TEST_USER_EMAIL);
-            appUser.setSenha("123456"); // Criptografar com BCrypt
+            appUser.setSenha(passwordEncoder.encode("123456"));
 
             userRepository.save(appUser);
 

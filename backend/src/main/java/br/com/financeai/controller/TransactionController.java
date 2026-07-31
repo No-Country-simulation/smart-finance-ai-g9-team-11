@@ -1,5 +1,7 @@
 package br.com.financeai.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import br.com.financeai.entity.AppUser;
 import br.com.financeai.dto.request.CreateTransactionRequest;
 import br.com.financeai.dto.request.UpdateTransactionRequest;
 import br.com.financeai.dto.response.TransactionResponse;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,8 +56,9 @@ public class TransactionController {
      * pelo usuário autenticado quando o JWT for implementado.
      */
     @PostMapping
-    public ResponseEntity<TransactionResponse> create(@RequestHeader("X-User-Id") Long usuarioId, @Valid @RequestBody CreateTransactionRequest request) {
-        TransactionResponse response = transactionService.create(usuarioId, request);
+    public ResponseEntity<TransactionResponse> create(
+            @AuthenticationPrincipal AppUser loggedUser, @Valid @RequestBody CreateTransactionRequest request) {
+        TransactionResponse response = transactionService.create(loggedUser.getId(), request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -83,10 +85,10 @@ public class TransactionController {
      */
     @PostMapping("/batch")
     public ResponseEntity<List<TransactionResponse>> createBatch(
-            @RequestHeader("X-User-Id") Long usuarioId,
+            @AuthenticationPrincipal AppUser loggedUser,
             @Valid @RequestBody List<CreateTransactionRequest> requests
     ) {
-        List<TransactionResponse> response = transactionService.createBatch(usuarioId, requests);
+        List<TransactionResponse> response = transactionService.createBatch(loggedUser.getId(), requests);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -101,7 +103,7 @@ public class TransactionController {
      */
     @GetMapping
     public ResponseEntity<List<TransactionResponse>> findAll(
-            @RequestHeader("X-User-Id") Long usuarioId,
+            @AuthenticationPrincipal AppUser loggedUser,
 
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -117,13 +119,13 @@ public class TransactionController {
 
         if (dataInicial != null) {
             response = transactionService.findAllByPeriod(
-                    usuarioId,
+                    loggedUser.getId(),
                     dataInicial,
                     dataFinal
             );
         }
         else {
-            response = transactionService.findAll(usuarioId);
+            response = transactionService.findAll(loggedUser.getId());
         }
 
         return ResponseEntity.ok(response);
@@ -135,11 +137,11 @@ public class TransactionController {
      */
     @GetMapping("/{transactionId}")
     public ResponseEntity<TransactionResponse> findById(
-            @RequestHeader("X-User-Id") Long usuarioId,
+            @AuthenticationPrincipal AppUser loggedUser,
             @PathVariable Long transactionId
     ) {
         TransactionResponse response =
-                transactionService.findById(usuarioId, transactionId);
+                transactionService.findById(loggedUser.getId(), transactionId);
 
         return ResponseEntity.ok(response);
     }
@@ -152,13 +154,13 @@ public class TransactionController {
      */
     @PutMapping("/{transactionId}")
     public ResponseEntity<TransactionResponse> update(
-            @RequestHeader("X-User-Id") Long usuarioId,
+            @AuthenticationPrincipal AppUser loggedUser,
             @PathVariable Long transactionId,
             @Valid @RequestBody UpdateTransactionRequest request
     ) {
         TransactionResponse response =
                 transactionService.update(
-                        usuarioId,
+                        loggedUser.getId(),
                         transactionId,
                         request
                 );
@@ -171,10 +173,10 @@ public class TransactionController {
      */
     @DeleteMapping("/{transactionId}")
     public ResponseEntity<Void> delete(
-            @RequestHeader("X-User-Id") Long usuarioId,
+            @AuthenticationPrincipal AppUser loggedUser,
             @PathVariable Long transactionId
     ) {
-        transactionService.delete(usuarioId, transactionId);
+        transactionService.delete(loggedUser.getId(), transactionId);
 
         return ResponseEntity.noContent().build();
     }

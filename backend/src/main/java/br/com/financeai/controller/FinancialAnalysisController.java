@@ -16,7 +16,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/v1/financial-analysis")
+@RequestMapping("/analise-financeira")
 public class FinancialAnalysisController {
 
     private final FinancialAnalysisService financialAnalysisService;

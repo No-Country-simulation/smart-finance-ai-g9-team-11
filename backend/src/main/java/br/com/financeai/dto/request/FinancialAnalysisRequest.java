@@ -15,7 +15,7 @@ public record FinancialAnalysisRequest(
         @NotNull(message = "A data inicial é obrigatória.")
         @JsonProperty("data_inicial")
         @JsonFormat(pattern = "yyyy-MM-dd")
-       LocalDate dataInicial,
+        LocalDate dataInicial,
 
        @NotNull(message = "A data final é obrigatória.")
        @JsonProperty("data_final")

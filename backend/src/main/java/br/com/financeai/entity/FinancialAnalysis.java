@@ -2,25 +2,11 @@ package br.com.financeai.entity;
 
 import br.com.financeai.enums.FinancialProfile;
 import br.com.financeai.enums.SavingFrequency;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "analises_financeiras")
@@ -35,11 +21,8 @@ public class FinancialAnalysis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private BigDecimal rendaMensal;
-
-    @Column(nullable = false)
-    private Integer nivelEndividamento;
+    @Column(nullable = false, precision = 5, scale = 3)
+    private BigDecimal nivelEndividamento;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -53,9 +36,10 @@ public class FinancialAnalysis {
     private BigDecimal probabilidade;
 
     @Column(nullable = false)
-    private LocalDateTime dataAnalise;
+    private LocalDate dataAnalise;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private AppUser usuario;
+
 }

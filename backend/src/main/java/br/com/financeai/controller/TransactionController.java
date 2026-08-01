@@ -1,10 +1,14 @@
 package br.com.financeai.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import br.com.financeai.entity.AppUser;
 import br.com.financeai.dto.request.CreateTransactionRequest;
 import br.com.financeai.dto.request.UpdateTransactionRequest;
 import br.com.financeai.dto.response.TransactionResponse;
 import br.com.financeai.exception.InvalidRequestException;
 import br.com.financeai.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -15,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +27,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/transactions")
+@RequestMapping("/classificar-transacoes")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -33,19 +36,59 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+    @Operation(
+            summary = "Classify transaction",
+            description = "Receives a financial transaction and returns a mocked expense classification"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Transaction classified seccessfully"
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid transaction data"
+    )
+
     /**
-     * Cria uma transação para o usuário informado.
+     * Cria uma única transação para o usuário informado.
      *
      * O cabeçalho X-User-Id é provisório e deverá ser substituído
      * pelo usuário autenticado quando o JWT for implementado.
      */
     @PostMapping
     public ResponseEntity<TransactionResponse> create(
-            @RequestHeader("X-User-Id") Long usuarioId,
-            @Valid @RequestBody CreateTransactionRequest request
+            @AuthenticationPrincipal AppUser loggedUser, @Valid @RequestBody CreateTransactionRequest request) {
+        TransactionResponse response = transactionService.create(loggedUser.getId(), request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @Operation(
+            summary = "Classify transaction",
+            description = "Receives a list of financial transaction and returns a mocked expense classification"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Transactions classified seccessfully"
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid transaction data"
+    )
+
+    /**
+     * Cria várias transações de uma vez para o usuário informado.
+     *
+     * Útil para importação de extratos ou cadastro em lote.
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<List<TransactionResponse>> createBatch(
+            @AuthenticationPrincipal AppUser loggedUser,
+            @Valid @RequestBody List<CreateTransactionRequest> requests
     ) {
-        TransactionResponse response =
-                transactionService.create(usuarioId, request);
+        List<TransactionResponse> response = transactionService.createBatch(loggedUser.getId(), requests);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -60,7 +103,7 @@ public class TransactionController {
      */
     @GetMapping
     public ResponseEntity<List<TransactionResponse>> findAll(
-            @RequestHeader("X-User-Id") Long usuarioId,
+            @AuthenticationPrincipal AppUser loggedUser,
 
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -76,13 +119,13 @@ public class TransactionController {
 
         if (dataInicial != null) {
             response = transactionService.findAllByPeriod(
-                    usuarioId,
+                    loggedUser.getId(),
                     dataInicial,
                     dataFinal
             );
         }
         else {
-            response = transactionService.findAll(usuarioId);
+            response = transactionService.findAll(loggedUser.getId());
         }
 
         return ResponseEntity.ok(response);
@@ -94,11 +137,11 @@ public class TransactionController {
      */
     @GetMapping("/{transactionId}")
     public ResponseEntity<TransactionResponse> findById(
-            @RequestHeader("X-User-Id") Long usuarioId,
+            @AuthenticationPrincipal AppUser loggedUser,
             @PathVariable Long transactionId
     ) {
         TransactionResponse response =
-                transactionService.findById(usuarioId, transactionId);
+                transactionService.findById(loggedUser.getId(), transactionId);
 
         return ResponseEntity.ok(response);
     }
@@ -111,13 +154,13 @@ public class TransactionController {
      */
     @PutMapping("/{transactionId}")
     public ResponseEntity<TransactionResponse> update(
-            @RequestHeader("X-User-Id") Long usuarioId,
+            @AuthenticationPrincipal AppUser loggedUser,
             @PathVariable Long transactionId,
             @Valid @RequestBody UpdateTransactionRequest request
     ) {
         TransactionResponse response =
                 transactionService.update(
-                        usuarioId,
+                        loggedUser.getId(),
                         transactionId,
                         request
                 );
@@ -130,10 +173,10 @@ public class TransactionController {
      */
     @DeleteMapping("/{transactionId}")
     public ResponseEntity<Void> delete(
-            @RequestHeader("X-User-Id") Long usuarioId,
+            @AuthenticationPrincipal AppUser loggedUser,
             @PathVariable Long transactionId
     ) {
-        transactionService.delete(usuarioId, transactionId);
+        transactionService.delete(loggedUser.getId(), transactionId);
 
         return ResponseEntity.noContent().build();
     }

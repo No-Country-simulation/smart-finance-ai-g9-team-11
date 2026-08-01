@@ -1,5 +1,6 @@
 package br.com.financeai.repository;
 
+import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -24,7 +25,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
      * Lista todas as transações do usuário, ordenando primeiro
      * pelas movimentações mais recentes.
      */
-    List<Transaction> findAllByUsuarioIdOrderByDataTransacaoDescIdDesc(
+    List<Transaction> findAllByUsuarioIdOrderByDataDescIdDesc(
             Long usuarioId
     );
 
@@ -32,9 +33,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
      * Lista as transações do usuário dentro de um período.
      */
     List<Transaction>
-    findAllByUsuarioIdAndDataTransacaoBetweenOrderByDataTransacaoDescIdDesc(
+    findAllByUsuarioIdAndDataBetweenOrderByDataDescIdDesc(
             Long usuarioId,
             LocalDate dataInicial,
             LocalDate dataFinal
     );
+
+    List<Transaction> findByUsuarioAndDataBetween(AppUser user, LocalDate dataInical, LocalDate dataFinal);
 }
+

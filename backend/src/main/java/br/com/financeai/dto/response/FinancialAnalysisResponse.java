@@ -1,17 +1,29 @@
 package br.com.financeai.dto.response;
 
 import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 public record FinancialAnalysisResponse(
-        FinancialProfile financialProfile,
 
-        BigDecimal score,
+        @JsonProperty("perfil_financeiro")
+        FinancialProfile perfilFinanceiro,
 
-        Map<String, BigDecimal> categorySummary,
+        @JsonProperty("nivel_endividamento")
+        BigDecimal nivelEndividamento,
 
-        List<String> recommendation
+        @JsonProperty("frequencia_poupanca")
+        SavingFrequency frequenciaPoupanca,
+
+        @JsonProperty("probabilidade")
+        BigDecimal probabilidade,
+
+        @JsonProperty("resumo_gastos")
+        ExpenseSummaryResponse resumoGastos,
+
+        @JsonProperty("recomendacoes")
+        List<String> recomendacoes
 ) {}

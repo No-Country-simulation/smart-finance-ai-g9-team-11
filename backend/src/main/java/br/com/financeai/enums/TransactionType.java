@@ -1,5 +1,7 @@
 package br.com.financeai.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * Identifica a natureza da movimentação financeira.
  *
@@ -7,6 +9,16 @@ package br.com.financeai.enums;
  * DESPESA representa uma saída de dinheiro.
  */
 public enum TransactionType {
-    RECEITA,
-    DESPESA
+    RECEITA("Receita"),
+    DESPESA("Despesa");
+    private final String label;
+
+    TransactionType(String label) {
+        this.label = label;
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
 }

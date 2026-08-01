@@ -143,7 +143,7 @@ public class MlClient {
 //}
 
 
-        public MlTransactionResponse classifyTransaction(MlTransactionRequest request){
+    public MlTransactionResponse classifyTransaction(MlTransactionRequest request){
 
         //Mock da Classificao de transacoes
 
@@ -158,7 +158,7 @@ public class MlClient {
         );
     }
 
-        private TransactionCategory inferirCategoria(String descricao) {
+    private TransactionCategory inferirCategoria(String descricao) {
         String texto = descricao.toLowerCase();
 
         if (texto.contains("supermercado") || texto.contains("mercado") || texto.contains("restaurante")) {
@@ -208,6 +208,3 @@ public class MlClient {
     }
 
 }
-
-
-

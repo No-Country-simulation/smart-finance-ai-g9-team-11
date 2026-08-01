@@ -139,7 +139,7 @@ def analisar_financas(payload: FinancialAnalysisRequest):
         dados = extrair_features(df)
         resultado = executar_pipeline(
             dados["features_modelo"],
-            dados["indicadores_negocio"],
+            dados["indicadores_negocio"],   
             dados["resumo_gastos"],
         )
 

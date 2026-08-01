@@ -5,28 +5,9 @@ import {
   type FinancialCardProps,
 } from "../FinancialCard";
 
-function isScoreCard(
-  card: FinancialCardProps,
-): boolean {
-  const normalizedId = String(
-    card.id ?? "",
-  ).toLocaleLowerCase("pt-BR");
-
-  const normalizedTitle =
-    card.title.toLocaleLowerCase("pt-BR");
-
-  return (
-    normalizedId.includes("score") ||
-    normalizedTitle.includes("score")
-  );
-}
-
 export function FinancialCards() {
   const summaryCards: FinancialCardProps[] =
-    dashboardMock.summary.filter(
-      (card: FinancialCardProps) =>
-        !isScoreCard(card),
-    );
+    dashboardMock.summary;
 
   return (
     <>

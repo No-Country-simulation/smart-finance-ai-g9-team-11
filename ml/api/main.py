@@ -70,11 +70,16 @@ def classificar_transacao(payload: TransactionRequest):
 # 2. ANÁLISE FINANCEIRA
 # ==========================================
 
+class AnalysisTransactionRequest(BaseModel):
+    descricao: str
+    valor: float
+    tipo: Literal["Receita", "Despesa"]
+    categoria: str
+    data: date
+
 
 class FinancialAnalysisRequest(BaseModel):
-    data_inicial: date
-    data_final: date
-    transactions: List[dict]  # Envio obrigatório garantido pelo backend Java
+    transactions: List[AnalysisTransactionRequest]  # Envio obrigatório garantido pelo backend Java
 
 
 class ResumoGastosBackend(BaseModel):
@@ -115,8 +120,12 @@ def analisar_financas(payload: FinancialAnalysisRequest):
             )
 
         # 1. Carrega as transações categorizadas no DataFrame Pandas
-        raw_data = payload.transactions
+        raw_data = [
+            transaction.model_dump(mode="json") for transaction in payload.transactions
+        ]
+
         df = pd.DataFrame(raw_data)
+        
 
         # 2. Renomeia as colunas para a padronização do feature_engineering
         df = df.rename(

@@ -11,6 +11,7 @@ import br.com.financeai.integration.client.MlClient;
 import br.com.financeai.integration.dto.request.MlRequest;
 import br.com.financeai.integration.dto.request.MlTransactionRequest;
 import br.com.financeai.integration.dto.response.MlResponse;
+import br.com.financeai.integration.dto.response.MlTransactionResponse;
 import br.com.financeai.repository.FinancialAnalysisRepository;
 import br.com.financeai.repository.TransactionRepository;
 import br.com.financeai.repository.UserRepository;
@@ -75,8 +76,13 @@ public class FinancialAnalysisService {
 
         // Passo 3: converte as entidades do banco para o formato que a IA espera.
         // Monta a lista que a IA precisa, a partir do que já está no banco
-        List<MlTransactionRequest> mlTransactions = transactions.stream()
-                .map(t -> new MlTransactionRequest(t.getDescricao(), t.getValor(), t.getTipo(), t.getData()))
+        List<MlTransactionResponse> mlTransactions = transactions.stream()
+                .map(t -> new MlTransactionResponse(
+                        t.getDescricao(),
+                        t.getValor(),
+                        t.getTipo(),
+                        t.getCategoria(),
+                        t.getData()))
                 .toList();
 
         // Passo 4: chama a IA passando todas as transações do período de uma vez,

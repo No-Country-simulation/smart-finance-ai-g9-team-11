@@ -99,12 +99,12 @@ def gerar_recomendacoes(
             )
 
     # --- Regras específicas por perfil ---
-    if perfil_financeiro == "SAUDAVEL" and not recomendacoes:
+    if perfil_financeiro == "Saudável" and not recomendacoes:
         recomendacoes.append(
             "Perfil financeiro saudável: considere investir a sobra mensal para fazer o dinheiro trabalhar por você."
         )
 
-    if perfil_financeiro == "EM_RISCO" and endividamento < 30 and comprometimento_renda < 70:
+    if perfil_financeiro == "Em risco" and endividamento < 30 and comprometimento_renda < 70:
         # Caso raro: classificado em risco por outros fatores do modelo
         recomendacoes.append(
             "Reavaliar hábitos financeiros gerais: o perfil indica risco mesmo com endividamento controlado."

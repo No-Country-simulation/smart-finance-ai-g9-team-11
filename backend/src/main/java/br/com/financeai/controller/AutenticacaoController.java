@@ -43,11 +43,16 @@ public class AutenticacaoController {
     @Operation(
             summary = "Authenticate user",
             description = """
-                    Validates the user's email and password and returns a JWT access token.
-                    
-                    The returned token must be sent to protected endpoints through the
-                    Authorization header using the format: Bearer {token}.
-                    """
+                Authenticates a user and returns a JWT access token.
+
+                Authentication:
+                This endpoint is public and does not require a JWT token.
+
+                Behavior:
+                Validates the provided email and password. When the credentials are
+                valid, returns a token that must be sent to protected endpoints in
+                the Authorization header using the format: Bearer {token}.
+                """
     )
     @SecurityRequirements
     @ApiResponses({
@@ -92,8 +97,13 @@ public class AutenticacaoController {
             description = """
                 Creates a new user account.
 
-                The email address must be unique. The password is encrypted before
-                being stored and is never included in the API response.
+                Authentication:
+                This endpoint is public and does not require a JWT token.
+
+                Behavior:
+                Validates the registration data, requires a unique email address
+                and encrypts the password before storing it. The password is never
+                included in the API response.
                 """
     )
     @SecurityRequirements

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 @Tag(
         name = "Users",
-        description = "Endpoints for managing the authenticated user's profile."
+        description = "Protected endpoints for managing the authenticated user's profile."
 )
 public class UserController {
 
@@ -35,7 +35,13 @@ public class UserController {
             description = """
                 Returns the profile information of the currently authenticated user.
 
-                Authentication is required.
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Identifies the user from the token and returns their profile data
+                without exposing sensitive information such as the password.
                 """
     )
     @ApiResponses({
@@ -73,9 +79,16 @@ public class UserController {
     @Operation(
             summary = "Update authenticated user",
             description = """
-                Updates the profile information of the authenticated user.
+                Updates the profile information of the currently authenticated user.
 
-                Only the authenticated user can update their own account.
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Allows the authenticated user to update their own account information.
+                If the email is changed, the new address must not already belong to
+                another user. A new password is encrypted before being stored.
                 """
     )
     @ApiResponses({
@@ -104,6 +117,14 @@ public class UserController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "409",
                     description = "Email address already registered",
                     content = @Content(
@@ -123,9 +144,16 @@ public class UserController {
     @Operation(
             summary = "Deactivate authenticated user",
             description = """
-                Deactivates the authenticated user's account.
+                Deactivates the currently authenticated user's account.
 
-                The account is logically deleted by marking it as inactive.
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Performs a logical deletion by marking the account as inactive.
+                The user record remains stored in the database, but the account
+                must no longer be authorized to access protected endpoints.
                 """
     )
     @ApiResponses({

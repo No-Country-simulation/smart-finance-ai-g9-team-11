@@ -5,12 +5,14 @@ import br.com.financeai.dto.response.FinancialAnalysisResponse;
 import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.FinancialAnalysis;
 import br.com.financeai.entity.Transaction;
+import br.com.financeai.exception.BusinessException;
 import br.com.financeai.exception.InvalidRequestException;
 import br.com.financeai.exception.UserNotFoundException;
 import br.com.financeai.integration.client.MlClient;
 import br.com.financeai.integration.dto.request.MlRequest;
 import br.com.financeai.integration.dto.request.MlTransactionRequest;
 import br.com.financeai.integration.dto.response.MlResponse;
+import br.com.financeai.integration.dto.response.MlTransactionResponse;
 import br.com.financeai.repository.FinancialAnalysisRepository;
 import br.com.financeai.repository.TransactionRepository;
 import br.com.financeai.repository.UserRepository;
@@ -67,16 +69,32 @@ public class FinancialAnalysisService {
         List<Transaction> transactions = transactionRepository
                 .findByUsuarioAndDataBetween(user, request.dataInicial(), request.dataFinal());
 
+
+        if (request.dataInicial().isAfter(LocalDate.now())) {
+            throw new BusinessException(
+                    "Não é possível gerar análise para um período que ainda não começou."
+            );
+        }
         // Sem transações no período, não há o que analisar — melhor falhar
         // de forma clara do que mandar uma lista vazia para a IA.
         if (transactions.isEmpty()) {
             throw new InvalidRequestException("Não há transações no período informado.");
         }
+        if (transactions.size() < 3) {
+            throw new BusinessException(
+                    "É necessário ter pelo menos 3 transações no período para gerar uma análise confiável."
+            );
+        }
 
         // Passo 3: converte as entidades do banco para o formato que a IA espera.
         // Monta a lista que a IA precisa, a partir do que já está no banco
-        List<MlTransactionRequest> mlTransactions = transactions.stream()
-                .map(t -> new MlTransactionRequest(t.getDescricao(), t.getValor(), t.getTipo(), t.getData()))
+        List<MlTransactionResponse> mlTransactions = transactions.stream()
+                .map(t -> new MlTransactionResponse(
+                        t.getDescricao(),
+                        t.getValor(),
+                        t.getTipo(),
+                        t.getCategoria(),
+                        t.getData()))
                 .toList();
 
         // Passo 4: chama a IA passando todas as transações do período de uma vez,

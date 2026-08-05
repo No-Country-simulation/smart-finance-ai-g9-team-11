@@ -14,7 +14,8 @@ from ml.scripts.algorithm2.dataset_profile import (
     TARGET_COLUNA,
 )
 
-MODELS_DIR = Path(__file__).parent / "models"
+# Sobe 3 níveis a partir deste arquivo (algorithm2 -> scripts -> ml) para salvar diretamente em ml/models
+MODELS_DIR = Path(__file__).resolve().parents[2] / "models"
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 MODEL_PATH = MODELS_DIR / "gb_profile.pkl"

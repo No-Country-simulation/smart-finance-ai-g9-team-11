@@ -32,17 +32,17 @@ def _classificar_perfil_regra(renda, gastos, endividamento, poupanca_mensal,
     meses_reserva = reserva_financeira / gastos if gastos > 0 else 0
 
     if margem < 0 or endividamento >= 50 or meses_saldo_negativo >= 2:
-        perfil = "EM_RISCO"
+        perfil = "Em risco"
     elif comprometimento <= 70 and endividamento <= 20 and taxa_poupanca >= 15 and meses_reserva >= 3:
-        perfil = "SAUDAVEL"
+        perfil = "Saudável"
     else:
-        perfil = "EM_OBSERVACAO"
+        perfil = "Em observação"
 
     if rng.random() < 0.07:
         vizinhos = {
-            "EM_RISCO": ["EM_OBSERVACAO"],
-            "EM_OBSERVACAO": ["EM_RISCO", "SAUDAVEL"],
-            "SAUDAVEL": ["EM_OBSERVACAO"],
+            "Em risco": ["Em observação"],
+            "Em observação": ["Em risco", "Saudável"],
+            "Saudável": ["Em observação"],
         }
         perfil = rng.choice(vizinhos[perfil])
 

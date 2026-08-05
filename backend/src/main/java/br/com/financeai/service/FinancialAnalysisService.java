@@ -5,6 +5,7 @@ import br.com.financeai.dto.response.FinancialAnalysisResponse;
 import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.FinancialAnalysis;
 import br.com.financeai.entity.Transaction;
+import br.com.financeai.exception.BusinessException;
 import br.com.financeai.exception.InvalidRequestException;
 import br.com.financeai.exception.UserNotFoundException;
 import br.com.financeai.integration.client.MlClient;
@@ -68,10 +69,21 @@ public class FinancialAnalysisService {
         List<Transaction> transactions = transactionRepository
                 .findByUsuarioAndDataBetween(user, request.dataInicial(), request.dataFinal());
 
+
+        if (request.dataInicial().isAfter(LocalDate.now())) {
+            throw new BusinessException(
+                    "Não é possível gerar análise para um período que ainda não começou."
+            );
+        }
         // Sem transações no período, não há o que analisar — melhor falhar
         // de forma clara do que mandar uma lista vazia para a IA.
         if (transactions.isEmpty()) {
             throw new InvalidRequestException("Não há transações no período informado.");
+        }
+        if (transactions.size() < 3) {
+            throw new BusinessException(
+                    "É necessário ter pelo menos 3 transações no período para gerar uma análise confiável."
+            );
         }
 
         // Passo 3: converte as entidades do banco para o formato que a IA espera.

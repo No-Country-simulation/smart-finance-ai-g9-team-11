@@ -5,12 +5,14 @@ import br.com.financeai.dto.request.UserRegisterDto;
 import br.com.financeai.dto.response.DadosTokenJWT;
 import br.com.financeai.dto.response.UserResponseDto;
 import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.AuthenticationException;
 import br.com.financeai.security.TokenService;
 import br.com.financeai.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -84,59 +86,26 @@ public class AutenticacaoController {
     @PostMapping("/login")
     public ResponseEntity<DadosTokenJWT>  efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
-        var authentication = manager.authenticate(authenticationToken);
 
-        var usuario = (AppUser) authentication.getPrincipal();
-        var tokenJWT = tokenService.gerarToken(usuario.getEmail()); // ou usuario.getUsername()
+            try {
+                var authentication = manager.authenticate(authenticationToken);
 
-        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+                var usuario = (AppUser) authentication.getPrincipal();
+                var tokenJWT = tokenService.gerarToken(usuario.getEmail());
+
+            return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+
+        } catch (BadCredentialsException ex) {
+            // Traduz o erro do Spring Security para a exceção de domínio do projeto,
+            // que já é tratada de forma padronizada pelo GlobalExceptionHandler.
+            throw new AuthenticationException(ex.getMessage());
+        }
     }
 
-    @Operation(
-            summary = "Register a new user",
-            description = """
-                Creates a new user account.
-
-                Authentication:
-                This endpoint is public and does not require a JWT token.
-
-                Behavior:
-                Validates the registration data, requires a unique email address
-                and encrypts the password before storing it. The password is never
-                included in the API response.
-                """
-    )
-    @SecurityRequirements
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "User registered successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = UserResponseDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid registration data",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiErrorResponse.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "Email address already registered",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiErrorResponse.class)
-                    )
-            )
-    })
-    @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> cadastrar(@RequestBody @Valid UserRegisterDto dto, UriComponentsBuilder uriBuilder) {
-        UserResponseDto response = userService.cadastrar(dto);
-        var uri = uriBuilder.path("/users/{id}").buildAndExpand(response.id()).toUri();
-        return ResponseEntity.created(uri).body(response);
+    @PostMapping("/reactivate")
+    public ResponseEntity<Void> reativarConta(@RequestBody @Valid DadosAutenticacao dados) {
+        userService.reativarConta(dados);
+        return ResponseEntity.noContent().build();
     }
+
 }

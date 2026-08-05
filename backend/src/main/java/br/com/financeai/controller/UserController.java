@@ -1,5 +1,6 @@
 package br.com.financeai.controller;
 
+import br.com.financeai.dto.request.UserRegisterDto;
 import br.com.financeai.dto.request.UserUpdateDto;
 import br.com.financeai.dto.response.UserResponseDto;
 import br.com.financeai.entity.AppUser;
@@ -15,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/users")
@@ -28,6 +30,55 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+  
+   @Operation(
+            summary = "Register a new user",
+            description = """
+                Creates a new user account.
+
+                Authentication:
+                This endpoint is public and does not require a JWT token.
+
+                Behavior:
+                Validates the registration data, requires a unique email address
+                and encrypts the password before storing it. The password is never
+                included in the API response.
+                """
+    )
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "User registered successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid registration data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email address already registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+
+    @PostMapping
+    public ResponseEntity<UserResponseDto> cadastrar(@RequestBody @Valid UserRegisterDto dto, UriComponentsBuilder uriBuilder) {
+        UserResponseDto response = userService.cadastrar(dto);
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(response.id()).toUri();
+        return ResponseEntity.created(uri).body(response);
     }
 
     @Operation(

@@ -1,5 +1,6 @@
 package br.com.financeai.controller;
 
+import br.com.financeai.dto.request.UserRegisterDto;
 import br.com.financeai.dto.request.UserUpdateDto;
 import br.com.financeai.dto.response.UserResponseDto;
 import br.com.financeai.entity.AppUser;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/users")
@@ -17,6 +19,13 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponseDto> cadastrar(@RequestBody @Valid UserRegisterDto dto, UriComponentsBuilder uriBuilder) {
+        UserResponseDto response = userService.cadastrar(dto);
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(response.id()).toUri();
+        return ResponseEntity.created(uri).body(response);
     }
 
     @GetMapping("/me")

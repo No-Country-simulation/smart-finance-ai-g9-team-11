@@ -1,0 +1,541 @@
+﻿{
+    "openapi":  "3.1.0",
+    "info":  {
+                 "title":  "Finance AI API",
+                 "description":  "API do Finance AI",
+                 "version":  "v1"
+             },
+    "servers":  [
+                    {
+                        "url":  "http://127.0.0.1:8080",
+                        "description":  "Generated server url"
+                    }
+                ],
+    "security":  [
+                     {
+                         "bearerAuth":  [
+
+                                        ]
+                     }
+                 ],
+    "paths":  {
+                  "/classificar-transacoes/{transactionId}":  {
+                                                                  "get":  {
+                                                                              "tags":  [
+                                                                                           "transaction-controller"
+                                                                                       ],
+                                                                              "operationId":  "findById",
+                                                                              "parameters":  [
+                                                                                                 {
+                                                                                                     "name":  "transactionId",
+                                                                                                     "in":  "path",
+                                                                                                     "required":  true,
+                                                                                                     "schema":  {
+                                                                                                                    "type":  "integer",
+                                                                                                                    "format":  "int64"
+                                                                                                                }
+                                                                                                 }
+                                                                                             ],
+                                                                              "responses":  {
+                                                                                                "200":  {
+                                                                                                            "description":  "OK",
+                                                                                                            "content":  {
+                                                                                                                            "*/*":  {
+                                                                                                                                        "schema":  {
+                                                                                                                                                       "$ref":  "#/components/schemas/TransactionResponse"
+                                                                                                                                                   }
+                                                                                                                                    }
+                                                                                                                        }
+                                                                                                        }
+                                                                                            }
+                                                                          },
+                                                                  "put":  {
+                                                                              "tags":  [
+                                                                                           "transaction-controller"
+                                                                                       ],
+                                                                              "operationId":  "update",
+                                                                              "parameters":  [
+                                                                                                 {
+                                                                                                     "name":  "transactionId",
+                                                                                                     "in":  "path",
+                                                                                                     "required":  true,
+                                                                                                     "schema":  {
+                                                                                                                    "type":  "integer",
+                                                                                                                    "format":  "int64"
+                                                                                                                }
+                                                                                                 }
+                                                                                             ],
+                                                                              "requestBody":  {
+                                                                                                  "content":  {
+                                                                                                                  "application/json":  {
+                                                                                                                                           "schema":  {
+                                                                                                                                                          "$ref":  "#/components/schemas/UpdateTransactionRequest"
+                                                                                                                                                      }
+                                                                                                                                       }
+                                                                                                              },
+                                                                                                  "required":  true
+                                                                                              },
+                                                                              "responses":  {
+                                                                                                "200":  {
+                                                                                                            "description":  "OK",
+                                                                                                            "content":  {
+                                                                                                                            "*/*":  {
+                                                                                                                                        "schema":  {
+                                                                                                                                                       "$ref":  "#/components/schemas/TransactionResponse"
+                                                                                                                                                   }
+                                                                                                                                    }
+                                                                                                                        }
+                                                                                                        }
+                                                                                            }
+                                                                          },
+                                                                  "delete":  {
+                                                                                 "tags":  [
+                                                                                              "transaction-controller"
+                                                                                          ],
+                                                                                 "operationId":  "delete",
+                                                                                 "parameters":  [
+                                                                                                    {
+                                                                                                        "name":  "transactionId",
+                                                                                                        "in":  "path",
+                                                                                                        "required":  true,
+                                                                                                        "schema":  {
+                                                                                                                       "type":  "integer",
+                                                                                                                       "format":  "int64"
+                                                                                                                   }
+                                                                                                    }
+                                                                                                ],
+                                                                                 "responses":  {
+                                                                                                   "200":  {
+                                                                                                               "description":  "OK"
+                                                                                                           }
+                                                                                               }
+                                                                             }
+                                                              },
+                  "/classificar-transacoes":  {
+                                                  "get":  {
+                                                              "tags":  [
+                                                                           "transaction-controller"
+                                                                       ],
+                                                              "operationId":  "findAll",
+                                                              "parameters":  [
+                                                                                 {
+                                                                                     "name":  "dataInicial",
+                                                                                     "in":  "query",
+                                                                                     "required":  false,
+                                                                                     "schema":  {
+                                                                                                    "type":  "string",
+                                                                                                    "format":  "date"
+                                                                                                }
+                                                                                 },
+                                                                                 {
+                                                                                     "name":  "dataFinal",
+                                                                                     "in":  "query",
+                                                                                     "required":  false,
+                                                                                     "schema":  {
+                                                                                                    "type":  "string",
+                                                                                                    "format":  "date"
+                                                                                                }
+                                                                                 }
+                                                                             ],
+                                                              "responses":  {
+                                                                                "200":  {
+                                                                                            "description":  "OK",
+                                                                                            "content":  {
+                                                                                                            "*/*":  {
+                                                                                                                        "schema":  {
+                                                                                                                                       "type":  "array",
+                                                                                                                                       "items":  {
+                                                                                                                                                     "$ref":  "#/components/schemas/TransactionResponse"
+                                                                                                                                                 }
+                                                                                                                                   }
+                                                                                                                    }
+                                                                                                        }
+                                                                                        }
+                                                                            }
+                                                          },
+                                                  "post":  {
+                                                               "tags":  [
+                                                                            "transaction-controller"
+                                                                        ],
+                                                               "summary":  "Classify transaction",
+                                                               "description":  "Receives a financial transaction and returns a mocked expense classification",
+                                                               "operationId":  "create",
+                                                               "requestBody":  {
+                                                                                   "content":  {
+                                                                                                   "application/json":  {
+                                                                                                                            "schema":  {
+                                                                                                                                           "$ref":  "#/components/schemas/CreateTransactionRequest"
+                                                                                                                                       }
+                                                                                                                        }
+                                                                                               },
+                                                                                   "required":  true
+                                                                               },
+                                                               "responses":  {
+                                                                                 "200":  {
+                                                                                             "description":  "Transaction classified seccessfully",
+                                                                                             "content":  {
+                                                                                                             "*/*":  {
+                                                                                                                         "schema":  {
+                                                                                                                                        "$ref":  "#/components/schemas/TransactionResponse"
+                                                                                                                                    }
+                                                                                                                     }
+                                                                                                         }
+                                                                                         },
+                                                                                 "400":  {
+                                                                                             "description":  "Invalid transaction data",
+                                                                                             "content":  {
+                                                                                                             "*/*":  {
+                                                                                                                         "schema":  {
+                                                                                                                                        "$ref":  "#/components/schemas/TransactionResponse"
+                                                                                                                                    }
+                                                                                                                     }
+                                                                                                         }
+                                                                                         }
+                                                                             }
+                                                           }
+                                              },
+                  "/classificar-transacoes/batch":  {
+                                                        "post":  {
+                                                                     "tags":  [
+                                                                                  "transaction-controller"
+                                                                              ],
+                                                                     "summary":  "Classify transaction",
+                                                                     "description":  "Receives a list of financial transaction and returns a mocked expense classification",
+                                                                     "operationId":  "createBatch",
+                                                                     "requestBody":  {
+                                                                                         "content":  {
+                                                                                                         "application/json":  {
+                                                                                                                                  "schema":  {
+                                                                                                                                                 "type":  "array",
+                                                                                                                                                 "items":  {
+                                                                                                                                                               "$ref":  "#/components/schemas/CreateTransactionRequest"
+                                                                                                                                                           }
+                                                                                                                                             }
+                                                                                                                              }
+                                                                                                     },
+                                                                                         "required":  true
+                                                                                     },
+                                                                     "responses":  {
+                                                                                       "200":  {
+                                                                                                   "description":  "Transactions classified seccessfully",
+                                                                                                   "content":  {
+                                                                                                                   "*/*":  {
+                                                                                                                               "schema":  {
+                                                                                                                                              "type":  "array",
+                                                                                                                                              "items":  {
+                                                                                                                                                            "$ref":  "#/components/schemas/TransactionResponse"
+                                                                                                                                                        }
+                                                                                                                                          }
+                                                                                                                           }
+                                                                                                               }
+                                                                                               },
+                                                                                       "400":  {
+                                                                                                   "description":  "Invalid transaction data",
+                                                                                                   "content":  {
+                                                                                                                   "*/*":  {
+                                                                                                                               "schema":  {
+                                                                                                                                              "type":  "array",
+                                                                                                                                              "items":  {
+                                                                                                                                                            "$ref":  "#/components/schemas/TransactionResponse"
+                                                                                                                                                        }
+                                                                                                                                          }
+                                                                                                                           }
+                                                                                                               }
+                                                                                               }
+                                                                                   }
+                                                                 }
+                                                    },
+                  "/auth/login":  {
+                                      "post":  {
+                                                   "tags":  [
+                                                                "autenticacao-controller"
+                                                            ],
+                                                   "operationId":  "efetuarLogin",
+                                                   "requestBody":  {
+                                                                       "content":  {
+                                                                                       "application/json":  {
+                                                                                                                "schema":  {
+                                                                                                                               "$ref":  "#/components/schemas/DadosAutenticacao"
+                                                                                                                           }
+                                                                                                            }
+                                                                                   },
+                                                                       "required":  true
+                                                                   },
+                                                   "responses":  {
+                                                                     "200":  {
+                                                                                 "description":  "OK",
+                                                                                 "content":  {
+                                                                                                 "*/*":  {
+                                                                                                             "schema":  {
+                                                                                                                            "type":  "string"
+                                                                                                                        }
+                                                                                                         }
+                                                                                             }
+                                                                             }
+                                                                 }
+                                               }
+                                  },
+                  "/analise-financeira":  {
+                                              "post":  {
+                                                           "tags":  [
+                                                                        "financial-analysis-controller"
+                                                                    ],
+                                                           "summary":  "Analyze financial profile",
+                                                           "description":  "Receives the user\u0027s financial data and returns a mocked financial analysis.",
+                                                           "operationId":  "analyze",
+                                                           "requestBody":  {
+                                                                               "content":  {
+                                                                                               "application/json":  {
+                                                                                                                        "schema":  {
+                                                                                                                                       "$ref":  "#/components/schemas/FinancialAnalysisRequest"
+                                                                                                                                   }
+                                                                                                                    }
+                                                                                           },
+                                                                               "required":  true
+                                                                           },
+                                                           "responses":  {
+                                                                             "200":  {
+                                                                                         "description":  "Financial analysis completed seccessfully",
+                                                                                         "content":  {
+                                                                                                         "*/*":  {
+                                                                                                                     "schema":  {
+                                                                                                                                    "$ref":  "#/components/schemas/FinancialAnalysisResponse"
+                                                                                                                                }
+                                                                                                                 }
+                                                                                                     }
+                                                                                     },
+                                                                             "400":  {
+                                                                                         "description":  "Invalid request data",
+                                                                                         "content":  {
+                                                                                                         "*/*":  {
+                                                                                                                     "schema":  {
+                                                                                                                                    "$ref":  "#/components/schemas/FinancialAnalysisResponse"
+                                                                                                                                }
+                                                                                                                 }
+                                                                                                     }
+                                                                                     }
+                                                                         }
+                                                       }
+                                          }
+              },
+    "components":  {
+                       "schemas":  {
+                                       "UpdateTransactionRequest":  {
+                                                                        "type":  "object",
+                                                                        "properties":  {
+                                                                                           "descricao":  {
+                                                                                                             "type":  "string",
+                                                                                                             "maxLength":  255,
+                                                                                                             "minLength":  0
+                                                                                                         },
+                                                                                           "valor":  {
+                                                                                                         "type":  "number"
+                                                                                                     },
+                                                                                           "tipo":  {
+                                                                                                        "type":  "string",
+                                                                                                        "enum":  [
+                                                                                                                     "Receita",
+                                                                                                                     "Despesa"
+                                                                                                                 ]
+                                                                                                    },
+                                                                                           "data":  {
+                                                                                                        "type":  "string",
+                                                                                                        "format":  "date"
+                                                                                                    }
+                                                                                       },
+                                                                        "required":  [
+                                                                                         "data",
+                                                                                         "descricao",
+                                                                                         "tipo",
+                                                                                         "valor"
+                                                                                     ]
+                                                                    },
+                                       "TransactionResponse":  {
+                                                                   "type":  "object",
+                                                                   "properties":  {
+                                                                                      "id":  {
+                                                                                                 "type":  "integer",
+                                                                                                 "format":  "int64"
+                                                                                             },
+                                                                                      "descricao":  {
+                                                                                                        "type":  "string"
+                                                                                                    },
+                                                                                      "valor":  {
+                                                                                                    "type":  "number"
+                                                                                                },
+                                                                                      "tipo":  {
+                                                                                                   "type":  "string",
+                                                                                                   "enum":  [
+                                                                                                                "Receita",
+                                                                                                                "Despesa"
+                                                                                                            ]
+                                                                                               },
+                                                                                      "categoria":  {
+                                                                                                        "type":  "string",
+                                                                                                        "enum":  [
+                                                                                                                     "AlimentaÃ§Ã£o",
+                                                                                                                     "UtilitÃ¡rios",
+                                                                                                                     "Moradia",
+                                                                                                                     "Investimento",
+                                                                                                                     "Compras",
+                                                                                                                     "SaÃºde",
+                                                                                                                     "Entretenimento",
+                                                                                                                     "Trajeto",
+                                                                                                                     "SalÃ¡rio",
+                                                                                                                     "Outros"
+                                                                                                                 ]
+                                                                                                    },
+                                                                                      "data":  {
+                                                                                                   "type":  "string",
+                                                                                                   "format":  "date"
+                                                                                               },
+                                                                                      "usuarioId":  {
+                                                                                                        "type":  "integer",
+                                                                                                        "format":  "int64"
+                                                                                                    }
+                                                                                  }
+                                                               },
+                                       "CreateTransactionRequest":  {
+                                                                        "type":  "object",
+                                                                        "properties":  {
+                                                                                           "descricao":  {
+                                                                                                             "type":  "string",
+                                                                                                             "maxLength":  255,
+                                                                                                             "minLength":  0
+                                                                                                         },
+                                                                                           "valor":  {
+                                                                                                         "type":  "number"
+                                                                                                     },
+                                                                                           "tipo":  {
+                                                                                                        "type":  "string",
+                                                                                                        "enum":  [
+                                                                                                                     "Receita",
+                                                                                                                     "Despesa"
+                                                                                                                 ]
+                                                                                                    },
+                                                                                           "data":  {
+                                                                                                        "type":  "string",
+                                                                                                        "format":  "date"
+                                                                                                    }
+                                                                                       },
+                                                                        "required":  [
+                                                                                         "data",
+                                                                                         "descricao",
+                                                                                         "tipo",
+                                                                                         "valor"
+                                                                                     ]
+                                                                    },
+                                       "DadosAutenticacao":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "email":  {
+                                                                                                  "type":  "string"
+                                                                                              },
+                                                                                    "senha":  {
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                                },
+                                                                 "required":  [
+                                                                                  "email",
+                                                                                  "senha"
+                                                                              ]
+                                                             },
+                                       "FinancialAnalysisRequest":  {
+                                                                        "type":  "object",
+                                                                        "properties":  {
+                                                                                           "data_inicial":  {
+                                                                                                                "type":  "string",
+                                                                                                                "format":  "date"
+                                                                                                            },
+                                                                                           "data_final":  {
+                                                                                                              "type":  "string",
+                                                                                                              "format":  "date"
+                                                                                                          }
+                                                                                       },
+                                                                        "required":  [
+                                                                                         "data_final",
+                                                                                         "data_inicial"
+                                                                                     ]
+                                                                    },
+                                       "ExpenseSummaryResponse":  {
+                                                                      "type":  "object",
+                                                                      "properties":  {
+                                                                                         "AlimentaÃ§Ã£o":  {
+                                                                                                               "type":  "number"
+                                                                                                           },
+                                                                                         "Moradia":  {
+                                                                                                         "type":  "number"
+                                                                                                     },
+                                                                                         "Compras":  {
+                                                                                                         "type":  "number"
+                                                                                                     },
+                                                                                         "Entretenimento":  {
+                                                                                                                "type":  "number"
+                                                                                                            },
+                                                                                         "Investimento":  {
+                                                                                                              "type":  "number"
+                                                                                                          },
+                                                                                         "SalÃ¡rio":  {
+                                                                                                          "type":  "number"
+                                                                                                      },
+                                                                                         "SaÃºde":  {
+                                                                                                        "type":  "number"
+                                                                                                    },
+                                                                                         "Trajeto":  {
+                                                                                                         "type":  "number"
+                                                                                                     },
+                                                                                         "UtilitÃ¡rios":  {
+                                                                                                              "type":  "number"
+                                                                                                          },
+                                                                                         "Outros":  {
+                                                                                                        "type":  "number"
+                                                                                                    }
+                                                                                     }
+                                                                  },
+                                       "FinancialAnalysisResponse":  {
+                                                                         "type":  "object",
+                                                                         "properties":  {
+                                                                                            "perfil_financeiro":  {
+                                                                                                                      "type":  "string",
+                                                                                                                      "enum":  [
+                                                                                                                                   "SaudÃ¡vel",
+                                                                                                                                   "Em observaÃ§Ã£o",
+                                                                                                                                   "Em risco"
+                                                                                                                               ]
+                                                                                                                  },
+                                                                                            "nivel_endividamento":  {
+                                                                                                                        "type":  "number"
+                                                                                                                    },
+                                                                                            "frequencia_poupanca":  {
+                                                                                                                        "type":  "string",
+                                                                                                                        "enum":  [
+                                                                                                                                     "Baixa",
+                                                                                                                                     "MÃ©dia",
+                                                                                                                                     "Alta"
+                                                                                                                                 ]
+                                                                                                                    },
+                                                                                            "probabilidade":  {
+                                                                                                                  "type":  "number"
+                                                                                                              },
+                                                                                            "resumo_gastos":  {
+                                                                                                                  "$ref":  "#/components/schemas/ExpenseSummaryResponse"
+                                                                                                              },
+                                                                                            "recomendacoes":  {
+                                                                                                                  "type":  "array",
+                                                                                                                  "items":  {
+                                                                                                                                "type":  "string"
+                                                                                                                            }
+                                                                                                              }
+                                                                                        }
+                                                                     }
+                                   },
+                       "securitySchemes":  {
+                                               "bearerAuth":  {
+                                                                  "type":  "http",
+                                                                  "name":  "bearerAuth",
+                                                                  "scheme":  "bearer",
+                                                                  "bearerFormat":  "JWT"
+                                                              }
+                                           }
+                   }
+}

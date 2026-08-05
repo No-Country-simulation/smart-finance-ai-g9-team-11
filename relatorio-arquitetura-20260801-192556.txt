@@ -1,0 +1,740 @@
+﻿RELATÓRIO DE ESTRUTURA E ARQUITETURA DO PROJETO
+Gerado em: 01/08/2026 19:25:57
+Raiz do projeto: C:\Users\geanc\OneDrive\Desktop\Hackathon\smart-finance-ai-g9-team-11
+Quantidade de diretórios: 89
+Quantidade de arquivos analisados: 239
+
+Arquivos secretos, dependências, binários e diretórios de build foram excluídos.
+
+====================================================================================================
+1. INFORMAÇÕES DO GIT
+====================================================================================================
+Branch atual:
+feature/frontend-backend-integration
+
+Último commit:
+7bee477 merge: integrate validated backend CRUD
+
+Status resumido:
+?? gerar-relatorio-arquitetura-v2.ps1
+?? relatorio-arquitetura-20260801-190744.txt
+
+Branches locais:
+  develop
+  feature/backend-analysis
+  feature/backend-crud
+  feature/devops
+  feature/frontend
+* feature/frontend-backend-integration
+  main
+
+Repositórios remotos:
+origin	https://github.com/No-Country-simulation/smart-finance-ai-g9-team-11.git (fetch)
+origin	https://github.com/No-Country-simulation/smart-finance-ai-g9-team-11.git (push)
+
+====================================================================================================
+2. ESTRUTURA COMPLETA DO PROJETO
+====================================================================================================
+[F] .gitignore
+[D] backend
+  [F] .gitattributes
+  [F] .gitignore
+  [F] mvnw
+  [F] mvnw.cmd
+  [F] pom.xml
+  [F] relatorio-backend-crud.txt
+  [D] src
+    [D] main
+      [D] java
+        [D] br
+          [D] com
+            [D] financeai
+              [D] config
+                [F] DatabaseInitializer.java
+                [F] RestClientConfig.java
+              [D] controller
+                [F] FinancialAnalysisController.java
+                [F] TransactionController.java
+              [D] dto
+                [D] request
+                  [F] CreateTransactionRequest.java
+                  [F] FinancialAnalysisRequest.java
+                  [F] TransactionRequest.java
+                  [F] UpdateTransactionRequest.java
+                [D] response
+                  [F] ExpenseSummaryResponse.java
+                  [F] FinancialAnalysisResponse.java
+                  [F] TransactionClassificationResponse.java
+                  [F] TransactionResponse.java
+              [D] entity
+                [F] AppUser.java
+                [F] FinancialAnalysis.java
+                [F] Transaction.java
+              [D] enums
+                [F] FinancialProfile.java
+                [F] SavingFrequency.java
+                [F] TransactionCategory.java
+                [F] TransactionType.java
+              [D] exception
+                [F] ApiErrorResponse.java
+                [F] BusinessException.java
+                [F] DatabaseException.java
+                [F] ExternalServiceException.java
+                [F] GlobalExceptionHandler.java
+                [F] InvalidRequestException.java
+                [F] ResourceNotFoundException.java
+                [F] UserNotFoundException.java
+              [F] FinanceAiApiApplication.java
+              [D] integration
+                [D] client
+                  [F] MlClient.java
+                [D] dto
+                  [D] request
+                    [F] MlRequest.java
+                    [F] MlTransactionRequest.java
+                  [D] response
+                    [F] MlResponse.java
+                    [F] MlTransactionResponse.java
+              [D] repository
+                [F] FinancialAnalysisRepository.java
+                [F] TransactionRepository.java
+                [F] UserRepository.java
+              [D] service
+                [F] FinancialAnalysisService.java
+                [F] FinancialProfileService.java
+                [F] TransactionClassificationService.java
+                [F] TransactionService.java
+      [D] resources
+        [F] application.properties
+        [D] db
+          [D] migration
+            [F] V1__create_tables.sql
+            [F] V2__refactor_transacoes_for_crud.sql
+          [D] migration-oracle
+            [F] V1__create_analises_financeiras.sql
+            [F] V2__create_transacoes.sql
+            [F] V3__create_indexes.sql
+    [D] test
+      [D] java
+        [D] br
+          [D] com
+            [D] financeai
+              [F] FinanceAiApiApplicationTests.java
+[D] docker
+  [F] backend.Dockerfile
+  [F] frontend.Dockerfile
+  [F] ml-mock.Dockerfile
+[F] docker-compose.yml
+[D] docs
+  [F] API.md
+  [F] ARCHITECTURE.md
+  [F] BUSINESS_RULES.md
+  [F] DATABASE.md
+  [F] SETUP.md
+  [F] TEAM.md
+[F] finance-ai-status-atual.txt
+[D] frontend
+  [F] .gitignore
+  [F] components.json
+  [F] eslint.config.js
+  [F] finance-ai-avatar-sidebar.txt
+  [F] finance-ai-etapa-3-header.txt
+  [F] finance-ai-frontend-audit.txt
+  [F] finance-ai-status-atual.txt
+  [F] index.html
+  [F] package.json
+  [F] package-lock.json
+  [D] public
+  [F] README.md
+  [D] src
+    [F] App.css
+    [F] App.tsx
+    [D] assets
+      [D] icons
+        [F] .gitkeep
+      [D] images
+        [F] .gitkeep
+      [D] logos
+        [F] .gitkeep
+    [D] components
+      [D] common
+        [F] .gitkeep
+        [D] Card
+          [F] Card.tsx
+          [F] Card.types.ts
+          [F] CardContent.tsx
+          [F] CardFooter.tsx
+          [F] CardHeader.tsx
+          [F] CardTitle.tsx
+          [F] CardValue.tsx
+          [F] index.ts
+        [D] Chart
+          [F] Chart.types.ts
+          [F] ChartContainer.tsx
+          [F] ChartLegend.tsx
+          [F] ChartTheme.ts
+          [F] ChartTooltip.tsx
+          [F] index.ts
+      [D] dashboard
+        [F] .gitkeep
+        [D] AIInsights
+          [F] AIInsights.tsx
+          [F] AIInsights.types.ts
+          [F] index.ts
+          [F] InsightItem.tsx
+        [D] Alerts
+          [F] AlertItem.tsx
+          [F] Alerts.tsx
+          [F] Alerts.types.ts
+          [F] index.ts
+        [D] BalanceChart
+          [F] BalanceChart.tsx
+          [F] BalanceChart.types.ts
+          [F] BalanceChartTooltip.tsx
+          [F] index.ts
+        [D] DashobordGrid
+          [F] DashboardGrid.tsx
+          [F] index.ts
+        [D] ExpenseChart
+          [F] ExpenseChart.tsx
+          [F] ExpenseChart.types.ts
+          [F] index.ts
+        [D] FinancialCard
+          [F] FinancialCard.tsx
+          [F] FinancialCard.types.ts
+          [F] index.ts
+        [D] FinancialCards
+          [F] FinancialCards.tsx
+          [F] index.ts
+        [D] QuickActions
+          [F] index.ts
+          [F] QuickActionButton.tsx
+          [F] quickActions.data.ts
+          [F] QuickActions.tsx
+          [F] QuickActions.types.ts
+        [D] ScoreCard
+          [F] index.ts
+          [F] ScoreCard.tsx
+          [F] ScoreCard.types.ts
+          [F] ScoreGauge.tsx
+        [D] TransactionsTable
+          [F] index.ts
+          [F] TransactionsTable.tsx
+          [F] TransactionsTable.types.ts
+          [F] TransactionsTableHeader.tsx
+          [F] TransactionsTableRow.tsx
+          [F] TransactionsTableSearch.tsx
+      [D] forms
+        [F] .gitkeep
+      [D] layout
+        [D] Header
+          [F] .gitkeep
+          [F] DateRangePicker.tsx
+          [F] Header.tsx
+          [F] HeaderActions.tsx
+          [F] HeaderGreeting.tsx
+          [F] index.ts
+          [F] NotificationButton.tsx
+          [F] SyncButton.tsx
+          [F] ThemeToggle.tsx
+        [D] Navigation
+          [F] .gitkeep
+          [F] navigation.constants.ts
+          [F] navigations.types.ts
+        [D] SearchBar
+          [F] .gitkeep
+          [F] index.ts
+          [F] SearchBar.tsx
+        [D] Sidebar
+          [F] .gitkeep
+          [F] Sidebar.constants.ts
+          [F] Sidebar.tsx
+          [F] SidebarItem.tsx
+          [F] SidebarMain.tsx
+        [D] UserMenu
+          [F] .gitkeep
+          [F] index.ts
+          [F] UserMenu.tsx
+          [F] UserMenu.types.ts
+      [D] settings
+        [D] SettingsRow
+          [F] SettingsRow.tsx
+          [F] SettingsRow.types.ts
+        [D] SettingsSection
+          [F] index.ts
+          [F] SettingsSection.tsx
+          [F] SettingsSection.types.ts
+        [D] ThemeSelector
+          [F] index.ts
+          [F] ThemeSelector.tsx
+          [F] ThemeSelector.types.ts
+      [D] ui
+        [F] avatar.tsx
+        [F] dropdown-menu.tsx
+        [F] input.tsx
+        [F] tooltip.tsx
+    [D] constants
+      [F] .gitkeep
+      [F] navigation.constants.ts
+    [D] contexts
+      [F] .gitkeep
+      [D] UserContext
+        [F] index.ts
+        [F] UserContext.tsx
+        [F] UserContext.types.ts
+    [D] hooks
+      [F] .gitkeep
+    [F] index.css
+    [D] layouts
+      [F] .gitkeep
+      [F] AppLayout.tsx
+      [F] index.ts
+      [F] type.ts
+    [D] lib
+      [F] .gitkeep
+      [F] utils.ts
+    [F] main.tsx
+    [D] mocks
+      [F] dashboard.mock.tsx
+      [F] user.mock.ts
+    [D] pages
+      [D] Analysis
+        [F] .gitkeep
+        [F] AnalysisPage.tsx
+        [F] index.ts
+      [D] Dashboard
+        [F] .gitkeep
+        [F] DashboardPage.tsx
+        [F] index.ts
+      [D] Profile
+        [F] .gitkeep
+        [F] index.ts
+        [F] ProfilePage.tsx
+      [D] Settings
+        [F] .gitkeep
+        [F] index.ts
+        [F] SettingsPage.tsx
+      [D] Transactions
+        [F] .gitkeep
+        [F] index.ts
+        [F] TransactionsPage.tsx
+    [D] providers
+      [F] ThemeContext.ts
+      [F] ThemeProvider.tsx
+      [F] useTheme.ts
+    [D] routes
+      [F] .gitkeep
+      [F] AppRouter.tsx
+      [F] index.ts
+    [D] schemas
+      [F] .gitkeep
+    [D] services
+      [F] .gitkeep
+      [F] dashboard.service.ts
+      [F] userService.ts
+    [D] styles
+      [F] .gitkeep
+      [F] charts.ts
+      [F] colors.ts
+      [F] radius.ts
+      [F] shadows.ts
+      [F] spacing.ts
+      [F] theme.css
+      [F] tokens.ts
+      [F] typography.ts
+    [D] types
+      [F] .gitkeep
+      [F] dashboard.ts
+      [F] financial.ts
+      [F] navigation.types.ts
+      [F] user.ts
+    [D] utils
+      [F] .gitkeep
+    [F] vite-env.d.ts
+  [F] tailwind.config.js
+  [F] tsconfig.app.json
+  [F] tsconfig.json
+  [F] tsconfig.node.json
+  [F] vite.config.ts
+[F] gerar-relatorio-arquitetura-v2.ps1
+[F] LICENSE
+[D] ml
+  [D] api
+    [F] main.py
+  [F] requirements.txt
+[F] README.md
+
+====================================================================================================
+3. INVENTÁRIO DE TODOS OS ARQUIVOS
+====================================================================================================
+.gitignore                                                                                          326 bytes
+backend\.gitattributes                                                                               40 bytes
+backend\.gitignore                                                                                  427 bytes
+backend\mvnw                                                                                     11.790 bytes
+backend\mvnw.cmd                                                                                  8.484 bytes
+backend\pom.xml                                                                                   4.406 bytes
+backend\relatorio-backend-crud.txt                                                               18.725 bytes
+backend\src\main\java\br\com\financeai\config\DatabaseInitializer.java                            1.101 bytes
+backend\src\main\java\br\com\financeai\config\RestClientConfig.java                                 516 bytes
+backend\src\main\java\br\com\financeai\controller\FinancialAnalysisController.java                2.744 bytes
+backend\src\main\java\br\com\financeai\controller\TransactionController.java                      5.575 bytes
+backend\src\main\java\br\com\financeai\dto\request\CreateTransactionRequest.java                  1.401 bytes
+backend\src\main\java\br\com\financeai\dto\request\FinancialAnalysisRequest.java                  1.131 bytes
+backend\src\main\java\br\com\financeai\dto\request\TransactionRequest.java                          528 bytes
+backend\src\main\java\br\com\financeai\dto\request\UpdateTransactionRequest.java                  1.403 bytes
+backend\src\main\java\br\com\financeai\dto\response\ExpenseSummaryResponse.java                     219 bytes
+backend\src\main\java\br\com\financeai\dto\response\FinancialAnalysisResponse.java                  384 bytes
+backend\src\main\java\br\com\financeai\dto\response\TransactionClassificationResponse.java          281 bytes
+backend\src\main\java\br\com\financeai\dto\response\TransactionResponse.java                        652 bytes
+backend\src\main\java\br\com\financeai\entity\AppUser.java                                        1.695 bytes
+backend\src\main\java\br\com\financeai\entity\FinancialAnalysis.java                              1.691 bytes
+backend\src\main\java\br\com\financeai\entity\Transaction.java                                    2.213 bytes
+backend\src\main\java\br\com\financeai\enums\FinancialProfile.java                                  125 bytes
+backend\src\main\java\br\com\financeai\enums\SavingFrequency.java                                   109 bytes
+backend\src\main\java\br\com\financeai\enums\TransactionCategory.java                               214 bytes
+backend\src\main\java\br\com\financeai\enums\TransactionType.java                                   259 bytes
+backend\src\main\java\br\com\financeai\exception\ApiErrorResponse.java                              251 bytes
+backend\src\main\java\br\com\financeai\exception\BusinessException.java                             181 bytes
+backend\src\main\java\br\com\financeai\exception\DatabaseException.java                             181 bytes
+backend\src\main\java\br\com\financeai\exception\ExternalServiceException.java                      195 bytes
+backend\src\main\java\br\com\financeai\exception\GlobalExceptionHandler.java                      4.977 bytes
+backend\src\main\java\br\com\financeai\exception\InvalidRequestException.java                       193 bytes
+backend\src\main\java\br\com\financeai\exception\ResourceNotFoundException.java                     197 bytes
+backend\src\main\java\br\com\financeai\exception\UserNotFoundException.java                         191 bytes
+backend\src\main\java\br\com\financeai\FinanceAiApiApplication.java                                 547 bytes
+backend\src\main\java\br\com\financeai\integration\client\MlClient.java                           2.591 bytes
+backend\src\main\java\br\com\financeai\integration\dto\request\MlRequest.java                       299 bytes
+backend\src\main\java\br\com\financeai\integration\dto\request\MlTransactionRequest.java            349 bytes
+backend\src\main\java\br\com\financeai\integration\dto\response\MlResponse.java                     444 bytes
+backend\src\main\java\br\com\financeai\integration\dto\response\MlTransactionResponse.java          440 bytes
+backend\src\main\java\br\com\financeai\repository\FinancialAnalysisRepository.java                  254 bytes
+backend\src\main\java\br\com\financeai\repository\TransactionRepository.java                      1.218 bytes
+backend\src\main\java\br\com\financeai\repository\UserRepository.java                               347 bytes
+backend\src\main\java\br\com\financeai\service\FinancialAnalysisService.java                      3.882 bytes
+backend\src\main\java\br\com\financeai\service\FinancialProfileService.java                         140 bytes
+backend\src\main\java\br\com\financeai\service\TransactionClassificationService.java              1.247 bytes
+backend\src\main\java\br\com\financeai\service\TransactionService.java                            7.451 bytes
+backend\src\main\resources\application.properties                                                 1.304 bytes
+backend\src\main\resources\db\migration\V1__create_tables.sql                                     1.068 bytes
+backend\src\main\resources\db\migration\V2__refactor_transacoes_for_crud.sql                      1.747 bytes
+backend\src\main\resources\db\migration-oracle\V1__create_analises_financeiras.sql                  373 bytes
+backend\src\main\resources\db\migration-oracle\V2__create_transacoes.sql                            377 bytes
+backend\src\main\resources\db\migration-oracle\V3__create_indexes.sql                                74 bytes
+backend\src\test\java\br\com\financeai\FinanceAiApiApplicationTests.java                            227 bytes
+docker\backend.Dockerfile                                                                           378 bytes
+docker\frontend.Dockerfile                                                                          568 bytes
+docker\ml-mock.Dockerfile                                                                           208 bytes
+docker-compose.yml                                                                                  947 bytes
+docs\API.md                                                                                       5.123 bytes
+docs\ARCHITECTURE.md                                                                              8.032 bytes
+docs\BUSINESS_RULES.md                                                                            5.435 bytes
+docs\DATABASE.md                                                                                  6.540 bytes
+docs\SETUP.md                                                                                     6.691 bytes
+docs\TEAM.md                                                                                      3.723 bytes
+finance-ai-status-atual.txt                                                                       4.645 bytes
+frontend\.gitignore                                                                                 277 bytes
+frontend\components.json                                                                            558 bytes
+frontend\eslint.config.js                                                                           613 bytes
+frontend\finance-ai-avatar-sidebar.txt                                                           27.566 bytes
+frontend\finance-ai-etapa-3-header.txt                                                           12.252 bytes
+frontend\finance-ai-frontend-audit.txt                                                           43.178 bytes
+frontend\finance-ai-status-atual.txt                                                             54.668 bytes
+frontend\index.html                                                                                 463 bytes
+frontend\package.json                                                                             1.395 bytes
+frontend\package-lock.json                                                                      282.018 bytes
+frontend\README.md                                                                                2.502 bytes
+frontend\src\App.css                                                                              3.075 bytes
+frontend\src\App.tsx                                                                                998 bytes
+frontend\src\assets\icons\.gitkeep                                                                    0 bytes
+frontend\src\assets\images\.gitkeep                                                                   0 bytes
+frontend\src\assets\logos\.gitkeep                                                                    0 bytes
+frontend\src\components\common\.gitkeep                                                               0 bytes
+frontend\src\components\common\Card\Card.tsx                                                        657 bytes
+frontend\src\components\common\Card\Card.types.ts                                                   512 bytes
+frontend\src\components\common\Card\CardContent.tsx                                                 284 bytes
+frontend\src\components\common\Card\CardFooter.tsx                                                  336 bytes
+frontend\src\components\common\Card\CardHeader.tsx                                                  350 bytes
+frontend\src\components\common\Card\CardTitle.tsx                                                   338 bytes
+frontend\src\components\common\Card\CardValue.tsx                                                 1.749 bytes
+frontend\src\components\common\Card\index.ts                                                        326 bytes
+frontend\src\components\common\Chart\Chart.types.ts                                                 514 bytes
+frontend\src\components\common\Chart\ChartContainer.tsx                                             671 bytes
+frontend\src\components\common\Chart\ChartLegend.tsx                                                578 bytes
+frontend\src\components\common\Chart\ChartTheme.ts                                                  366 bytes
+frontend\src\components\common\Chart\ChartTooltip.tsx                                               945 bytes
+frontend\src\components\common\Chart\index.ts                                                       391 bytes
+frontend\src\components\dashboard\.gitkeep                                                            0 bytes
+frontend\src\components\dashboard\AIInsights\AIInsights.tsx                                       9.016 bytes
+frontend\src\components\dashboard\AIInsights\AIInsights.types.ts                                    453 bytes
+frontend\src\components\dashboard\AIInsights\index.ts                                                98 bytes
+frontend\src\components\dashboard\AIInsights\InsightItem.tsx                                      3.211 bytes
+frontend\src\components\dashboard\Alerts\AlertItem.tsx                                            4.619 bytes
+frontend\src\components\dashboard\Alerts\Alerts.tsx                                               8.156 bytes
+frontend\src\components\dashboard\Alerts\Alerts.types.ts                                            804 bytes
+frontend\src\components\dashboard\Alerts\index.ts                                                   218 bytes
+frontend\src\components\dashboard\BalanceChart\BalanceChart.tsx                                  13.008 bytes
+frontend\src\components\dashboard\BalanceChart\BalanceChart.types.ts                                394 bytes
+frontend\src\components\dashboard\BalanceChart\BalanceChartTooltip.tsx                            2.395 bytes
+frontend\src\components\dashboard\BalanceChart\index.ts                                              70 bytes
+frontend\src\components\dashboard\DashobordGrid\DashboardGrid.tsx                                 3.141 bytes
+frontend\src\components\dashboard\DashobordGrid\index.ts                                             32 bytes
+frontend\src\components\dashboard\ExpenseChart\ExpenseChart.tsx                                   1.947 bytes
+frontend\src\components\dashboard\ExpenseChart\ExpenseChart.types.ts                                 72 bytes
+frontend\src\components\dashboard\ExpenseChart\index.ts                                              70 bytes
+frontend\src\components\dashboard\FinancialCard\FinancialCard.tsx                                 7.209 bytes
+frontend\src\components\dashboard\FinancialCard\FinancialCard.types.ts                              268 bytes
+frontend\src\components\dashboard\FinancialCard\index.ts                                             72 bytes
+frontend\src\components\dashboard\FinancialCards\FinancialCards.tsx                               1.143 bytes
+frontend\src\components\dashboard\FinancialCards\index.ts                                            33 bytes
+frontend\src\components\dashboard\QuickActions\index.ts                                             321 bytes
+frontend\src\components\dashboard\QuickActions\QuickActionButton.tsx                              6.165 bytes
+frontend\src\components\dashboard\QuickActions\quickActions.data.ts                                 995 bytes
+frontend\src\components\dashboard\QuickActions\QuickActions.tsx                                   4.652 bytes
+frontend\src\components\dashboard\QuickActions\QuickActions.types.ts                                954 bytes
+frontend\src\components\dashboard\ScoreCard\index.ts                                                 28 bytes
+frontend\src\components\dashboard\ScoreCard\ScoreCard.tsx                                         4.588 bytes
+frontend\src\components\dashboard\ScoreCard\ScoreCard.types.ts                                      135 bytes
+frontend\src\components\dashboard\ScoreCard\ScoreGauge.tsx                                        2.853 bytes
+frontend\src\components\dashboard\TransactionsTable\index.ts                                         36 bytes
+frontend\src\components\dashboard\TransactionsTable\TransactionsTable.tsx                         7.075 bytes
+frontend\src\components\dashboard\TransactionsTable\TransactionsTable.types.ts                      429 bytes
+frontend\src\components\dashboard\TransactionsTable\TransactionsTableHeader.tsx                   1.254 bytes
+frontend\src\components\dashboard\TransactionsTable\TransactionsTableRow.tsx                      6.169 bytes
+frontend\src\components\dashboard\TransactionsTable\TransactionsTableSearch.tsx                   2.816 bytes
+frontend\src\components\forms\.gitkeep                                                                0 bytes
+frontend\src\components\layout\Header\.gitkeep                                                        0 bytes
+frontend\src\components\layout\Header\DateRangePicker.tsx                                         1.048 bytes
+frontend\src\components\layout\Header\Header.tsx                                                  2.047 bytes
+frontend\src\components\layout\Header\HeaderActions.tsx                                             935 bytes
+frontend\src\components\layout\Header\HeaderGreeting.tsx                                          1.126 bytes
+frontend\src\components\layout\Header\index.ts                                                      340 bytes
+frontend\src\components\layout\Header\NotificationButton.tsx                                      1.290 bytes
+frontend\src\components\layout\Header\SyncButton.tsx                                                544 bytes
+frontend\src\components\layout\Header\ThemeToggle.tsx                                             1.343 bytes
+frontend\src\components\layout\Navigation\.gitkeep                                                    0 bytes
+frontend\src\components\layout\Navigation\navigation.constants.ts                                   535 bytes
+frontend\src\components\layout\Navigation\navigations.types.ts                                      158 bytes
+frontend\src\components\layout\SearchBar\.gitkeep                                                     0 bytes
+frontend\src\components\layout\SearchBar\index.ts                                                    40 bytes
+frontend\src\components\layout\SearchBar\SearchBar.tsx                                            1.481 bytes
+frontend\src\components\layout\Sidebar\.gitkeep                                                       0 bytes
+frontend\src\components\layout\Sidebar\Sidebar.constants.ts                                         325 bytes
+frontend\src\components\layout\Sidebar\Sidebar.tsx                                               19.554 bytes
+frontend\src\components\layout\Sidebar\SidebarItem.tsx                                            3.231 bytes
+frontend\src\components\layout\Sidebar\SidebarMain.tsx                                            1.880 bytes
+frontend\src\components\layout\UserMenu\.gitkeep                                                      0 bytes
+frontend\src\components\layout\UserMenu\index.ts                                                     96 bytes
+frontend\src\components\layout\UserMenu\UserMenu.tsx                                              2.203 bytes
+frontend\src\components\layout\UserMenu\UserMenu.types.ts                                           148 bytes
+frontend\src\components\settings\SettingsRow\SettingsRow.tsx                                          0 bytes
+frontend\src\components\settings\SettingsRow\SettingsRow.types.ts                                     0 bytes
+frontend\src\components\settings\SettingsSection\index.ts                                             0 bytes
+frontend\src\components\settings\SettingsSection\SettingsSection.tsx                                  0 bytes
+frontend\src\components\settings\SettingsSection\SettingsSection.types.ts                             0 bytes
+frontend\src\components\settings\ThemeSelector\index.ts                                               0 bytes
+frontend\src\components\settings\ThemeSelector\ThemeSelector.tsx                                      0 bytes
+frontend\src\components\settings\ThemeSelector\ThemeSelector.types.ts                                 0 bytes
+frontend\src\components\ui\avatar.tsx                                                             3.131 bytes
+frontend\src\components\ui\dropdown-menu.tsx                                                      8.988 bytes
+frontend\src\components\ui\input.tsx                                                              1.060 bytes
+frontend\src\components\ui\tooltip.tsx                                                            2.912 bytes
+frontend\src\constants\.gitkeep                                                                       0 bytes
+frontend\src\constants\navigation.constants.ts                                                      535 bytes
+frontend\src\contexts\.gitkeep                                                                        0 bytes
+frontend\src\contexts\UserContext\index.ts                                                            0 bytes
+frontend\src\contexts\UserContext\UserContext.tsx                                                     0 bytes
+frontend\src\contexts\UserContext\UserContext.types.ts                                                0 bytes
+frontend\src\hooks\.gitkeep                                                                           0 bytes
+frontend\src\index.css                                                                            4.405 bytes
+frontend\src\layouts\.gitkeep                                                                         0 bytes
+frontend\src\layouts\AppLayout.tsx                                                                2.623 bytes
+frontend\src\layouts\index.ts                                                                        40 bytes
+frontend\src\layouts\type.ts                                                                        214 bytes
+frontend\src\lib\.gitkeep                                                                             0 bytes
+frontend\src\lib\utils.ts                                                                           172 bytes
+frontend\src\main.tsx                                                                               399 bytes
+frontend\src\mocks\dashboard.mock.tsx                                                             5.021 bytes
+frontend\src\mocks\user.mock.ts                                                                     486 bytes
+frontend\src\pages\Analysis\.gitkeep                                                                  0 bytes
+frontend\src\pages\Analysis\AnalysisPage.tsx                                                         93 bytes
+frontend\src\pages\Analysis\index.ts                                                                 57 bytes
+frontend\src\pages\Dashboard\.gitkeep                                                                 0 bytes
+frontend\src\pages\Dashboard\DashboardPage.tsx                                                      241 bytes
+frontend\src\pages\Dashboard\index.ts                                                                59 bytes
+frontend\src\pages\Profile\.gitkeep                                                                   0 bytes
+frontend\src\pages\Profile\index.ts                                                                  44 bytes
+frontend\src\pages\Profile\ProfilePage.tsx                                                        5.776 bytes
+frontend\src\pages\Settings\.gitkeep                                                                  0 bytes
+frontend\src\pages\Settings\index.ts                                                                 46 bytes
+frontend\src\pages\Settings\SettingsPage.tsx                                                      7.447 bytes
+frontend\src\pages\Transactions\.gitkeep                                                              0 bytes
+frontend\src\pages\Transactions\index.ts                                                             65 bytes
+frontend\src\pages\Transactions\TransactionsPage.tsx                                                105 bytes
+frontend\src\providers\ThemeContext.ts                                                              386 bytes
+frontend\src\providers\ThemeProvider.tsx                                                          2.892 bytes
+frontend\src\providers\useTheme.ts                                                                  361 bytes
+frontend\src\routes\.gitkeep                                                                          0 bytes
+frontend\src\routes\AppRouter.tsx                                                                   855 bytes
+frontend\src\routes\index.ts                                                                         51 bytes
+frontend\src\schemas\.gitkeep                                                                         0 bytes
+frontend\src\services\.gitkeep                                                                        0 bytes
+frontend\src\services\dashboard.service.ts                                                          760 bytes
+frontend\src\services\userService.ts                                                                640 bytes
+frontend\src\styles\.gitkeep                                                                          0 bytes
+frontend\src\styles\charts.ts                                                                     2.344 bytes
+frontend\src\styles\colors.ts                                                                     2.133 bytes
+frontend\src\styles\radius.ts                                                                       521 bytes
+frontend\src\styles\shadows.ts                                                                      430 bytes
+frontend\src\styles\spacing.ts                                                                      530 bytes
+frontend\src\styles\theme.css                                                                     5.374 bytes
+frontend\src\styles\tokens.ts                                                                       358 bytes
+frontend\src\styles\typography.ts                                                                   980 bytes
+frontend\src\types\.gitkeep                                                                           0 bytes
+frontend\src\types\dashboard.ts                                                                   1.036 bytes
+frontend\src\types\financial.ts                                                                   1.159 bytes
+frontend\src\types\navigation.types.ts                                                              158 bytes
+frontend\src\types\user.ts                                                                          640 bytes
+frontend\src\utils\.gitkeep                                                                           0 bytes
+frontend\src\vite-env.d.ts                                                                           39 bytes
+frontend\tailwind.config.js                                                                         192 bytes
+frontend\tsconfig.app.json                                                                          203 bytes
+frontend\tsconfig.json                                                                              791 bytes
+frontend\tsconfig.node.json                                                                         581 bytes
+frontend\vite.config.ts                                                                             268 bytes
+gerar-relatorio-arquitetura-v2.ps1                                                                    0 bytes
+LICENSE                                                                                           1.099 bytes
+ml\api\main.py                                                                                    1.572 bytes
+ml\requirements.txt                                                                                  50 bytes
+README.md                                                                                         2.096 bytes
+
+====================================================================================================
+4. QUANTIDADE DE ARQUIVOS POR EXTENSÃO
+====================================================================================================
+.ts                        66
+.tsx                       58
+.java                      41
+.gitkeep                   27
+.md                         8
+.txt                        7
+.json                       6
+.sql                        5
+.css                        3
+.dockerfile                 3
+.gitignore                  3
+.js                         2
+[sem extensão]              2
+.py                         1
+.ps1                        1
+.xml                        1
+.cmd                        1
+.gitattributes              1
+.html                       1
+.yml                        1
+.properties                 1
+
+====================================================================================================
+5. DEPENDÊNCIAS, BUILD E INFRAESTRUTURA
+====================================================================================================
+
+====================================================================================================
+6. ARQUITETURA PROVÁVEL DO BACKEND
+====================================================================================================
+
+====================================================================================================
+7. ENDPOINTS ENCONTRADOS NO SPRING BOOT
+====================================================================================================
+
+====================================================================================================
+8. ARQUITETURA PROVÁVEL DO FRONTEND
+====================================================================================================
+
+====================================================================================================
+9. CHAMADAS HTTP ENCONTRADAS NO FRONTEND
+====================================================================================================
+
+====================================================================================================
+10. CONFIGURAÇÕES DE CORS, JWT E SEGURANÇA
+====================================================================================================
+
+====================================================================================================
+11. DTOs E CONTRATOS DE API
+====================================================================================================
+
+====================================================================================================
+12. CONTROLLERS IDENTIFICADOS
+====================================================================================================
+
+====================================================================================================
+13. SERVICES IDENTIFICADOS
+====================================================================================================
+
+====================================================================================================
+14. REPOSITORIES IDENTIFICADOS
+====================================================================================================
+
+====================================================================================================
+15. TIPAGENS E CONTRATOS DO FRONTEND
+====================================================================================================
+
+====================================================================================================
+16. ROTAS DO FRONTEND
+====================================================================================================
+
+====================================================================================================
+17. NOMES DE VARIÁVEIS DE AMBIENTE REFERENCIADAS
+====================================================================================================
+
+====================================================================================================
+18. ARQUIVOS DE TESTE
+====================================================================================================
+
+====================================================================================================
+19. POSSÍVEIS PONTOS DE INTEGRAÇÃO
+====================================================================================================
+Backend:
+- Controllers REST e caminhos dos endpoints.
+- DTOs de entrada e saída.
+- Configuração de CORS.
+- Spring Security e autenticação JWT.
+- Tratamento global de exceções.
+- Serviços de autenticação, usuários, transações e análises.
+- Repositórios e entidades.
+- Configurações de banco de dados.
+
+Frontend:
+- Cliente HTTP centralizado.
+- URL base da API.
+- Serviços por domínio.
+- Interfaces e tipos TypeScript.
+- Contexto ou store de autenticação.
+- Formulários de login e cadastro.
+- Rotas públicas e protegidas.
+- Dashboard e dados simulados.
+- Importação de arquivos CSV.
+
+Infraestrutura:
+- Dockerfiles.
+- Docker Compose.
+- Portas do frontend, backend e banco.
+- Variáveis de ambiente.
+- Configuração futura do OCI Object Storage.
+
+====================================================================================================
+20. RESUMO FINAL
+====================================================================================================
+Diretórios analisados: 89
+Arquivos analisados: 239
+Arquivos pesquisáveis: 199
+Arquivos backend identificados: 40
+Arquivos frontend identificados: 126
+Controllers identificados: 2
+Services identificados: 4
+Repositories identificados: 3
+DTOs identificados: 13
+Tipagens frontend identificadas: 20
+Arquivos de teste identificados: 1
+Variáveis de ambiente identificadas: 25
+
+Relatório gerado em:
+C:\Users\geanc\OneDrive\Desktop\Hackathon\smart-finance-ai-g9-team-11\relatorio-arquitetura-20260801-192556.txt
+

@@ -1,0 +1,452 @@
+import {
+  useEffect,
+  useRef,
+} from "react";
+
+import { cn } from "@/lib/utils";
+
+interface Particle {
+  x: number;
+  y: number;
+  velocityX: number;
+  velocityY: number;
+  radius: number;
+  color: string;
+}
+
+interface CanvasSize {
+  width: number;
+  height: number;
+  devicePixelRatio: number;
+}
+
+interface HeroBackgroundProps {
+  className?: string;
+}
+
+const PARTICLE_COLORS = [
+  "rgba(139, 92, 246, 0.72)",
+  "rgba(96, 165, 250, 0.58)",
+  "rgba(45, 212, 191, 0.55)",
+  "rgba(255, 255, 255, 0.34)",
+] as const;
+
+const DARK_LINE_COLOR = "139, 92, 246";
+const LIGHT_LINE_COLOR = "99, 102, 241";
+
+const MAX_CONNECTION_DISTANCE_DESKTOP = 145;
+const MAX_CONNECTION_DISTANCE_MOBILE = 105;
+
+function getRandomNumber(
+  minimum: number,
+  maximum: number,
+): number {
+  return (
+    Math.random() *
+      (maximum - minimum) +
+    minimum
+  );
+}
+
+function getRandomColor(): string {
+  const randomIndex = Math.floor(
+    Math.random() *
+      PARTICLE_COLORS.length,
+  );
+
+  return (
+    PARTICLE_COLORS[randomIndex] ??
+    PARTICLE_COLORS[0]
+  );
+}
+
+function createParticle(
+  width: number,
+  height: number,
+): Particle {
+  return {
+    x: getRandomNumber(0, width),
+    y: getRandomNumber(0, height),
+    velocityX: getRandomNumber(
+      -0.22,
+      0.22,
+    ),
+    velocityY: getRandomNumber(
+      -0.18,
+      0.18,
+    ),
+    radius: getRandomNumber(0.8, 2),
+    color: getRandomColor(),
+  };
+}
+
+function getParticleCount(
+  width: number,
+): number {
+  if (width < 640) {
+    return 26;
+  }
+
+  if (width < 1024) {
+    return 42;
+  }
+
+  return 66;
+}
+
+function getCanvasSize(
+  canvas: HTMLCanvasElement,
+): CanvasSize {
+  const bounds =
+    canvas.getBoundingClientRect();
+
+  const devicePixelRatio = Math.min(
+    window.devicePixelRatio || 1,
+    2,
+  );
+
+  return {
+    width: Math.max(bounds.width, 1),
+    height: Math.max(bounds.height, 1),
+    devicePixelRatio,
+  };
+}
+
+function isLightTheme(): boolean {
+  return (
+    document.documentElement.classList.contains(
+      "light",
+    ) ||
+    document.documentElement.dataset.theme ===
+      "light"
+  );
+}
+
+export function HeroBackground({
+  className,
+}: Readonly<HeroBackgroundProps>) {
+  const canvasRef =
+    useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) {
+      return;
+    }
+
+    const context =
+      canvas.getContext("2d");
+
+    if (!context) {
+      return;
+    }
+
+    const reducedMotionQuery =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      );
+
+    let animationFrameId = 0;
+    let particles: Particle[] = [];
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+    let isDocumentVisible =
+      document.visibilityState ===
+      "visible";
+
+    const configureCanvas = (): void => {
+      const {
+        width,
+        height,
+        devicePixelRatio,
+      } = getCanvasSize(canvas);
+
+      canvasWidth = width;
+      canvasHeight = height;
+
+      canvas.width = Math.round(
+        width * devicePixelRatio,
+      );
+
+      canvas.height = Math.round(
+        height * devicePixelRatio,
+      );
+
+      context.setTransform(
+        devicePixelRatio,
+        0,
+        0,
+        devicePixelRatio,
+        0,
+        0,
+      );
+
+      const particleCount =
+        getParticleCount(width);
+
+      particles = Array.from(
+        {
+          length: particleCount,
+        },
+        () =>
+          createParticle(
+            canvasWidth,
+            canvasHeight,
+          ),
+      );
+    };
+
+    const updateParticle = (
+      particle: Particle,
+    ): void => {
+      particle.x += particle.velocityX;
+      particle.y += particle.velocityY;
+
+      if (
+        particle.x + particle.radius >
+          canvasWidth ||
+        particle.x - particle.radius < 0
+      ) {
+        particle.velocityX *= -1;
+
+        particle.x = Math.min(
+          Math.max(
+            particle.x,
+            particle.radius,
+          ),
+          canvasWidth - particle.radius,
+        );
+      }
+
+      if (
+        particle.y + particle.radius >
+          canvasHeight ||
+        particle.y - particle.radius < 0
+      ) {
+        particle.velocityY *= -1;
+
+        particle.y = Math.min(
+          Math.max(
+            particle.y,
+            particle.radius,
+          ),
+          canvasHeight - particle.radius,
+        );
+      }
+    };
+
+    const drawParticle = (
+      particle: Particle,
+    ): void => {
+      context.beginPath();
+
+      context.arc(
+        particle.x,
+        particle.y,
+        particle.radius,
+        0,
+        Math.PI * 2,
+      );
+
+      context.fillStyle = particle.color;
+      context.fill();
+    };
+
+    const connectParticles = (): void => {
+      const maximumDistance =
+        canvasWidth < 640
+          ? MAX_CONNECTION_DISTANCE_MOBILE
+          : MAX_CONNECTION_DISTANCE_DESKTOP;
+
+      const lineColor = isLightTheme()
+        ? LIGHT_LINE_COLOR
+        : DARK_LINE_COLOR;
+
+      for (
+        let firstIndex = 0;
+        firstIndex < particles.length;
+        firstIndex += 1
+      ) {
+        const firstParticle =
+          particles[firstIndex];
+
+        if (!firstParticle) {
+          continue;
+        }
+
+        for (
+          let secondIndex =
+            firstIndex + 1;
+          secondIndex < particles.length;
+          secondIndex += 1
+        ) {
+          const secondParticle =
+            particles[secondIndex];
+
+          if (!secondParticle) {
+            continue;
+          }
+
+          const distanceX =
+            firstParticle.x -
+            secondParticle.x;
+
+          const distanceY =
+            firstParticle.y -
+            secondParticle.y;
+
+          const distance = Math.sqrt(
+            distanceX * distanceX +
+              distanceY * distanceY,
+          );
+
+          if (distance > maximumDistance) {
+            continue;
+          }
+
+          const proximity =
+            1 -
+            distance / maximumDistance;
+
+          const opacity =
+            0.13 * proximity;
+
+          context.beginPath();
+
+          context.moveTo(
+            firstParticle.x,
+            firstParticle.y,
+          );
+
+          context.lineTo(
+            secondParticle.x,
+            secondParticle.y,
+          );
+
+          context.strokeStyle = `rgba(${lineColor}, ${opacity})`;
+          context.lineWidth = 0.8;
+          context.stroke();
+        }
+      }
+    };
+
+    const drawFrame = (): void => {
+      context.clearRect(
+        0,
+        0,
+        canvasWidth,
+        canvasHeight,
+      );
+
+      for (const particle of particles) {
+        updateParticle(particle);
+        drawParticle(particle);
+      }
+
+      connectParticles();
+    };
+
+    const animate = (): void => {
+      if (
+        reducedMotionQuery.matches ||
+        !isDocumentVisible
+      ) {
+        return;
+      }
+
+      drawFrame();
+
+      animationFrameId =
+        window.requestAnimationFrame(
+          animate,
+        );
+    };
+
+    const restartAnimation = (): void => {
+      window.cancelAnimationFrame(
+        animationFrameId,
+      );
+
+      drawFrame();
+
+      if (
+        !reducedMotionQuery.matches &&
+        isDocumentVisible
+      ) {
+        animationFrameId =
+          window.requestAnimationFrame(
+            animate,
+          );
+      }
+    };
+
+    const handleVisibilityChange =
+      (): void => {
+        isDocumentVisible =
+          document.visibilityState ===
+          "visible";
+
+        restartAnimation();
+      };
+
+    const handleReducedMotionChange =
+      (): void => {
+        restartAnimation();
+      };
+
+    configureCanvas();
+    restartAnimation();
+
+    const resizeObserver =
+      new ResizeObserver(() => {
+        configureCanvas();
+        restartAnimation();
+      });
+
+    resizeObserver.observe(canvas);
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange,
+    );
+
+    reducedMotionQuery.addEventListener(
+      "change",
+      handleReducedMotionChange,
+    );
+
+    return () => {
+      window.cancelAnimationFrame(
+        animationFrameId,
+      );
+
+      resizeObserver.disconnect();
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange,
+      );
+
+      reducedMotionQuery.removeEventListener(
+        "change",
+        handleReducedMotionChange,
+      );
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className={cn(
+        "pointer-events-none",
+        "absolute inset-0",
+        "h-full w-full",
+        "opacity-100",
+        "motion-reduce:opacity-45",
+        className,
+      )}
+      aria-hidden="true"
+    />
+  );
+}

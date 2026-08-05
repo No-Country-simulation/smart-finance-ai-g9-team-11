@@ -1,4 +1,9 @@
-import type { CardProps, CardTone } from "./Card.types";
+import { cn } from "@/lib/utils";
+
+import type {
+  CardProps,
+  CardTone,
+} from "./Card.types";
 
 const toneClass: Record<CardTone, string> = {
   default: "bg-surface",
@@ -6,22 +11,19 @@ const toneClass: Record<CardTone, string> = {
   "accent-2": "bg-surface-accent-2",
 };
 
-export function Card({ children, className = "", tone = "default" }: CardProps) {
+export function Card({
+  children,
+  className,
+  tone = "default",
+}: Readonly<CardProps>) {
   return (
     <section
-      className={`
-        rounded-card
-        border
-        border-border
-        ${toneClass[tone]}
-        shadow-card
-        transition-all
-        duration-200
-        ease-out
-        hover:-translate-y-0.5
-        hover:shadow-elevated
-        ${className}
-      `}
+      className={cn(
+        "rounded-card border border-border",
+        "shadow-card",
+        toneClass[tone],
+        className,
+      )}
     >
       {children}
     </section>

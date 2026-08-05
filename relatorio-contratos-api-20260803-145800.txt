@@ -1,0 +1,320 @@
+﻿RELATÓRIO DOS CONTRATOS ATUAIS DA API
+Gerado em: 03/08/2026 14:58:08
+Branch: feature/frontend-backend-integration
+
+====================================================================================================
+1. ENDPOINTS ENCONTRADOS
+====================================================================================================
+
+====================================================================================================
+2. ESQUEMAS DE SEGURANÇA
+====================================================================================================
+
+====================================================================================================
+3. SCHEMAS DE LOGIN, TOKEN E USUÁRIO
+====================================================================================================
+Nenhum schema de autenticação foi encontrado.
+
+====================================================================================================
+4. ARQUIVOS DE SEGURANÇA DO BACKEND
+====================================================================================================
+
+====================================================================================================
+5. CONTROLLERS ATUAIS
+====================================================================================================
+
+ARQUIVO: backend\src\main\java\br\com\financeai\controller\AutenticacaoController.java
+----------------------------------------------------------------------------------------------------
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.DadosAutenticacao;
+import br.com.financeai.dto.response.DadosTokenJWT;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.security.TokenService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/auth")
+public class AutenticacaoController {
+
+    @Autowired
+    private AuthenticationManager manager;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @PostMapping("/login")
+    public ResponseEntity efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
+        var authentication = manager.authenticate(authenticationToken);
+
+        var usuario = (AppUser) authentication.getPrincipal();
+        var tokenJWT = tokenService.gerarToken(usuario.getEmail()); // ou usuario.getUsername()
+
+        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+    }
+}
+
+
+ARQUIVO: backend\src\main\java\br\com\financeai\controller\FinancialAnalysisController.java
+----------------------------------------------------------------------------------------------------
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.FinancialAnalysisRequest;
+import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.service.FinancialAnalysisService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+
+@RestController
+@RequestMapping("/analise-financeira")
+public class FinancialAnalysisController {
+
+    private final FinancialAnalysisService financialAnalysisService;
+
+    public FinancialAnalysisController(FinancialAnalysisService financialAnalysisService) {
+        this.financialAnalysisService = financialAnalysisService;
+
+    }
+
+    @Operation(
+            summary = "Analyze financial profile",
+            description = "Receives the user's financial data and returns a mocked financial analysis."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Financial analysis completed seccessfully"
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request data"
+    )
+    @PostMapping
+    public ResponseEntity<FinancialAnalysisResponse> analyze(@Valid @RequestBody FinancialAnalysisRequest request) {
+
+        return ResponseEntity.ok(financialAnalysisService.analyze(request));
+
+    }
+}
+
+ARQUIVO: backend\src\main\java\br\com\financeai\controller\TransactionController.java
+----------------------------------------------------------------------------------------------------
+package br.com.financeai.controller;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.dto.request.CreateTransactionRequest;
+import br.com.financeai.dto.request.UpdateTransactionRequest;
+import br.com.financeai.dto.response.TransactionResponse;
+import br.com.financeai.exception.InvalidRequestException;
+import br.com.financeai.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping("/classificar-transacoes")
+public class TransactionController {
+
+    private final TransactionService transactionService;
+
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
+
+    @Operation(
+            summary = "Classify transaction",
+            description = "Receives a financial transaction and returns a mocked expense classification"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Transaction classified seccessfully"
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid transaction data"
+    )
+
+    /**
+     * Cria uma Ãºnica transaÃ§Ã£o para o usuÃ¡rio informado.
+     *
+     * O cabeÃ§alho X-User-Id Ã© provisÃ³rio e deverÃ¡ ser substituÃ­do
+     * pelo usuÃ¡rio autenticado quando o JWT for implementado.
+     */
+    @PostMapping
+    public ResponseEntity<TransactionResponse> create(
+            @AuthenticationPrincipal AppUser loggedUser, @Valid @RequestBody CreateTransactionRequest request) {
+        TransactionResponse response = transactionService.create(loggedUser.getId(), request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @Operation(
+            summary = "Classify transaction",
+            description = "Receives a list of financial transaction and returns a mocked expense classification"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Transactions classified seccessfully"
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid transaction data"
+    )
+
+    /**
+     * Cria vÃ¡rias transaÃ§Ãµes de uma vez para o usuÃ¡rio informado.
+     *
+     * Ãštil para importaÃ§Ã£o de extratos ou cadastro em lote.
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<List<TransactionResponse>> createBatch(
+            @AuthenticationPrincipal AppUser loggedUser,
+            @Valid @RequestBody List<CreateTransactionRequest> requests
+    ) {
+        List<TransactionResponse> response = transactionService.createBatch(loggedUser.getId(), requests);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    /**
+     * Lista todas as transaÃ§Ãµes do usuÃ¡rio.
+     *
+     * Quando dataInicial e dataFinal sÃ£o informadas, a consulta
+     * retorna apenas as transaÃ§Ãµes dentro do perÃ­odo.
+     */
+    @GetMapping
+    public ResponseEntity<List<TransactionResponse>> findAll(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dataInicial,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dataFinal
+    ) {
+        validateOptionalPeriod(dataInicial, dataFinal);
+
+        List<TransactionResponse> response;
+
+        if (dataInicial != null) {
+            response = transactionService.findAllByPeriod(
+                    loggedUser.getId(),
+                    dataInicial,
+                    dataFinal
+            );
+        }
+        else {
+            response = transactionService.findAll(loggedUser.getId());
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Busca uma transaÃ§Ã£o especÃ­fica, validando se ela pertence
+     * ao usuÃ¡rio informado no cabeÃ§alho.
+     */
+    @GetMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponse> findById(
+            @AuthenticationPrincipal AppUser loggedUser,
+            @PathVariable Long transactionId
+    ) {
+        TransactionResponse response =
+                transactionService.findById(loggedUser.getId(), transactionId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Atualiza completamente uma transaÃ§Ã£o existente.
+     *
+     * Como o endpoint utiliza PUT, todos os campos do request
+     * continuam obrigatÃ³rios.
+     */
+    @PutMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponse> update(
+            @AuthenticationPrincipal AppUser loggedUser,
+            @PathVariable Long transactionId,
+            @Valid @RequestBody UpdateTransactionRequest request
+    ) {
+        TransactionResponse response =
+                transactionService.update(
+                        loggedUser.getId(),
+                        transactionId,
+                        request
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Exclui uma transaÃ§Ã£o pertencente ao usuÃ¡rio.
+     */
+    @DeleteMapping("/{transactionId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal AppUser loggedUser,
+            @PathVariable Long transactionId
+    ) {
+        transactionService.delete(loggedUser.getId(), transactionId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Evita consultas incompletas, como informar somente
+     * a data inicial ou somente a data final.
+     */
+    private void validateOptionalPeriod(
+            LocalDate dataInicial,
+            LocalDate dataFinal
+    ) {
+        boolean onlyInitialDateWasProvided =
+                dataInicial != null && dataFinal == null;
+
+        boolean onlyFinalDateWasProvided =
+                dataInicial == null && dataFinal != null;
+
+        if (onlyInitialDateWasProvided || onlyFinalDateWasProvided) {
+            throw new InvalidRequestException(
+                    "Informe a data inicial e a data final para filtrar por perÃ­odo."
+            );
+        }
+    }
+}
+

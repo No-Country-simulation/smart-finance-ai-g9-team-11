@@ -10,7 +10,7 @@ export const NAVIGATION_ITEMS = [
   {
     id: "dashboard",
     label: "Dashboard",
-    path: "/",
+    path: "/dashboard",
     icon: LayoutDashboard,
   },
   {

@@ -7,6 +7,7 @@ import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.Transaction;
 import br.com.financeai.enums.TransactionCategory;
 import br.com.financeai.enums.TransactionType;
+import br.com.financeai.exception.BusinessException;
 import br.com.financeai.exception.InvalidRequestException;
 import br.com.financeai.exception.ResourceNotFoundException;
 import br.com.financeai.exception.UserNotFoundException;
@@ -77,6 +78,16 @@ public class TransactionService {
         // Garante que o usuário existe antes de processar qualquer transação
         AppUser usuario = findUserById(usuarioId);
 
+        for (CreateTransactionRequest request : requests) {
+            boolean exists = transactionRepository.existsByUsuarioAndDescricaoAndValorAndData(
+                    usuario, request.descricao(), request.valor(), request.data()
+            );
+            if (exists) {
+                throw new BusinessException(
+                        "Já existe uma transação idêntica cadastrada para esta data."
+                );
+            }
+        }
         // Para cada transação recebida: classifica (chama a IA) e monta a entidade
         // pronta para ser salva. O mapeamento acontece uma transação por vez.
         List<Transaction> transactions = requests.stream()
@@ -138,10 +149,7 @@ public class TransactionService {
     /**
      * Busca uma transação garantindo que ela pertença ao usuário.
      */
-    public TransactionResponse findById(
-            Long usuarioId,
-            Long transactionId
-    ) {
+    public TransactionResponse findById(Long usuarioId, Long transactionId) {
         // findTransactionByIdAndUserId já garante a posse do recurso:
         // se a transação existir mas for de outro usuário, é tratada
         // como "não encontrada" (não vaza a existência do dado de terceiros).
@@ -158,14 +166,11 @@ public class TransactionService {
      * ou no valor podem mudar o resultado da classificação.
      */
     @Transactional
-    public TransactionResponse update(
-            Long usuarioId,
-            Long transactionId,
-            UpdateTransactionRequest request
-    ) {
+    public TransactionResponse update(Long usuarioId, Long transactionId, UpdateTransactionRequest request) {
         // Só busca a transação se ela realmente pertencer a esse usuário
-        Transaction transaction =
-                findTransactionByIdAndUserId(transactionId, usuarioId);
+        Transaction transaction = findTransactionByIdAndUserId(transactionId, usuarioId);
+
+        validateEditableWindow(transaction);
 
         // Recalcula a categoria com os dados novos, já que descrição/valor
         // podem ter mudado o suficiente para mudar a classificação da IA.
@@ -193,14 +198,13 @@ public class TransactionService {
      * Exclui uma transação somente quando ela pertence ao usuário.
      */
     @Transactional
-    public void delete(
-            Long usuarioId,
-            Long transactionId
-    ) {
+    public void delete(Long usuarioId, Long transactionId) {
         // Reaproveita a mesma validação de posse usada em findById/update —
         // se a transação não for do usuário, lança ResourceNotFoundException.
-        Transaction transaction =
-                findTransactionByIdAndUserId(transactionId, usuarioId);
+
+        Transaction transaction = findTransactionByIdAndUserId(transactionId, usuarioId);
+
+        validateEditableWindow(transaction);
 
         transactionRepository.delete(transaction);
     }
@@ -244,11 +248,9 @@ public class TransactionService {
             TransactionType tipo,
             LocalDate dataTransacao
     ) {
-        MlTransactionRequest mlRequest =
-                new MlTransactionRequest(descricao, valor, tipo, dataTransacao);
+        MlTransactionRequest mlRequest = new MlTransactionRequest(descricao, valor, tipo, dataTransacao);
 
-        MlTransactionResponse mlResponse =
-                mlClient.classifyTransaction(mlRequest);
+        MlTransactionResponse mlResponse = mlClient.classifyTransaction(mlRequest);
 
         return mlResponse.categoria();
     }
@@ -270,10 +272,7 @@ public class TransactionService {
      * ao usuário informado — evita que alguém acesse/edite/exclua uma
      * transação de outro usuário só sabendo o ID dela.
      */
-    private Transaction findTransactionByIdAndUserId(
-            Long transactionId,
-            Long usuarioId
-    ) {
+    private Transaction findTransactionByIdAndUserId(Long transactionId, Long usuarioId) {
         return transactionRepository
                 .findByIdAndUsuarioId(transactionId, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -286,10 +285,7 @@ public class TransactionService {
      * as duas datas precisam estar presentes, e a inicial não pode
      * ser posterior à final.
      */
-    private void validatePeriod(
-            LocalDate dataInicial,
-            LocalDate dataFinal
-    ) {
+    private void validatePeriod(LocalDate dataInicial, LocalDate dataFinal) {
         if (dataInicial == null || dataFinal == null) {
             throw new InvalidRequestException(
                     "A data inicial e a data final são obrigatórias para o filtro."
@@ -317,5 +313,13 @@ public class TransactionService {
                 transaction.getData(),
                 transaction.getUsuario().getId()
         );
+    }
+    // Bloqueia edição de transações fora da janela permitida
+    private void validateEditableWindow(Transaction transaction) {
+        if (transaction.getData().isBefore(LocalDate.now().minusDays(30))) {
+            throw new BusinessException(
+                    "Não é possível editar ou excluir transações com mais de 30 dias."
+            );
+        }
     }
 }

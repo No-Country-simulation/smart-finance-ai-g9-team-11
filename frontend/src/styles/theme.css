@@ -1,24 +1,10 @@
 /* ==========================================================================
    Finance AI — Design Tokens
-
-   Fonte única de verdade para:
-   - cores;
-   - superfícies;
-   - bordas;
-   - sombras;
-   - glows;
-   - tipografia;
-   - radius;
-   - tokens dos gráficos.
-
-   Componentes devem utilizar tokens semânticos, evitando valores hexadecimais
-   ou sombras arbitrárias diretamente nas classes.
    ========================================================================== */
 
 :root {
   color-scheme: light;
 
-  /* Backgrounds and surfaces */
   --background: #f6f7fb;
   --surface: #ffffff;
   --surface-muted: #f0f2f7;
@@ -26,16 +12,13 @@
   --surface-accent: #edf1ff;
   --surface-accent-2: #f2efff;
 
-  /* Cards */
   --card: rgba(255, 255, 255, 0.92);
   --card-hover: rgba(255, 255, 255, 1);
 
-  /* Borders */
   --border: rgba(71, 85, 105, 0.14);
   --border-muted: rgba(100, 116, 139, 0.09);
   --border-highlight: rgba(124, 58, 237, 0.28);
 
-  /* Brand */
   --primary: #7c3aed;
   --primary-bright: #8b5cf6;
   --primary-foreground: #ffffff;
@@ -44,17 +27,15 @@
   --secondary-bright: #3b82f6;
   --secondary-foreground: #ffffff;
 
-  /* Feedback */
   --success: #16a34a;
+  --info: #0284c7;
   --warning: #d97706;
   --danger: #e11d48;
 
-  /* Text */
   --text: #111827;
   --text-muted: #64748b;
   --text-subtle: #94a3b8;
 
-  /* Visual effects */
   --glow-primary: rgba(124, 58, 237, 0.16);
   --glow-secondary: rgba(37, 99, 235, 0.14);
 
@@ -68,7 +49,6 @@
     0 6px 18px rgb(var(--shadow-color) / 0.08),
     0 22px 48px -22px rgb(var(--shadow-color) / 0.22);
 
-  /* Charts */
   --chart-line-1: #7c3aed;
   --chart-line-2: #2563eb;
   --chart-grid: rgba(100, 116, 139, 0.16);
@@ -79,7 +59,6 @@
 .dark {
   color-scheme: dark;
 
-  /* Backgrounds and surfaces */
   --background: #050814;
   --surface: #080d1a;
   --surface-muted: #0b1120;
@@ -87,16 +66,13 @@
   --surface-accent: rgba(124, 58, 237, 0.1);
   --surface-accent-2: rgba(37, 99, 235, 0.1);
 
-  /* Cards */
   --card: rgba(13, 20, 38, 0.82);
   --card-hover: rgba(20, 29, 52, 0.95);
 
-  /* Borders */
   --border: rgba(148, 163, 184, 0.12);
   --border-muted: rgba(148, 163, 184, 0.07);
   --border-highlight: rgba(124, 58, 237, 0.32);
 
-  /* Brand */
   --primary: #7c3aed;
   --primary-bright: #8b5cf6;
   --primary-foreground: #ffffff;
@@ -105,17 +81,15 @@
   --secondary-bright: #3b82f6;
   --secondary-foreground: #ffffff;
 
-  /* Feedback */
   --success: #22c55e;
+  --info: #38bdf8;
   --warning: #f59e0b;
   --danger: #f43f5e;
 
-  /* Text */
   --text: #f8fafc;
   --text-muted: #a7b0c3;
   --text-subtle: #6f7a91;
 
-  /* Visual effects */
   --glow-primary: rgba(124, 58, 237, 0.25);
   --glow-secondary: rgba(37, 99, 235, 0.22);
 
@@ -130,7 +104,6 @@
     0 22px 54px -26px rgb(var(--shadow-color) / 0.98),
     0 0 28px -18px var(--glow-primary);
 
-  /* Charts */
   --chart-line-1: #8b5cf6;
   --chart-line-2: #3b82f6;
   --chart-grid: rgba(148, 163, 184, 0.09);
@@ -139,7 +112,6 @@
 }
 
 @theme inline {
-  /* Backgrounds and surfaces */
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
@@ -147,16 +119,13 @@
   --color-surface-accent: var(--surface-accent);
   --color-surface-accent-2: var(--surface-accent-2);
 
-  /* Cards */
   --color-card: var(--card);
   --color-card-hover: var(--card-hover);
 
-  /* Borders */
   --color-border: var(--border);
   --color-border-muted: var(--border-muted);
   --color-border-highlight: var(--border-highlight);
 
-  /* Brand */
   --color-primary: var(--primary);
   --color-primary-bright: var(--primary-bright);
   --color-primary-foreground: var(--primary-foreground);
@@ -165,32 +134,27 @@
   --color-secondary-bright: var(--secondary-bright);
   --color-secondary-foreground: var(--secondary-foreground);
 
-  /* Feedback */
   --color-success: var(--success);
+  --color-info: var(--info);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
 
-  /* Text */
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
   --color-text-subtle: var(--text-subtle);
 
-  /* Visual effects */
   --color-glow-primary: var(--glow-primary);
   --color-glow-secondary: var(--glow-secondary);
 
-  /* Radius */
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-card: 18px;
-  --radius-lg: 20px;
+  --radius-card: 20px;
+  --radius-lg: 24px;
   --radius-pill: 999px;
 
-  /* Shadows */
   --shadow-card: var(--shadow-card-value);
   --shadow-elevated: var(--shadow-elevated-value);
 
-  /* Typography */
   --text-display: 2rem;
   --text-display--line-height: 1.08;
 

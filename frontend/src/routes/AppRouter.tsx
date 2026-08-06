@@ -6,32 +6,81 @@ import {
 } from "react-router-dom";
 
 import { AppLayout } from "@/layouts/AppLayout";
+
+import { LandingPage } from "@/pages/Landing";
+import { LoginPage } from "@/pages/Login";
+import { RegisterPage } from "@/pages/Register";
+
 import { DashboardPage } from "@/pages/Dashboard";
 import { ProfilePage } from "@/pages/Profile";
 import { SettingsPage } from "@/pages/Settings";
+
+import { PrivateRoute } from "./PrivateRoute";
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<AppLayout />}>
-          <Route index element={<DashboardPage />} />
+        {/* ========================= */}
+        {/* Rotas Públicas            */}
+        {/* ========================= */}
+
+        <Route
+          path="/"
+          element={<LandingPage />}
+        />
+
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+
+        {/* ========================= */}
+        {/* Rotas Privadas            */}
+        {/* ========================= */}
+
+        <Route
+          path="/app"
+          element={
+            <PrivateRoute>
+              <AppLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route
+            index
+            element={<DashboardPage />}
+          />
 
           <Route
-            path="/profile"
+            path="profile"
             element={<ProfilePage />}
           />
 
           <Route
-            path="/settings"
+            path="settings"
             element={<SettingsPage />}
           />
-
-          <Route
-            path="*"
-            element={<Navigate to="/" replace />}
-          />
         </Route>
+
+        {/* ========================= */}
+        {/* Fallback                  */}
+        {/* ========================= */}
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

@@ -1,0 +1,120 @@
+{
+  "generatedAt": "2026-08-05T00:00:00Z",
+  "summary": {
+    "scope": "frontend and backend",
+    "totalFiles": 18,
+    "notes": "Erros automáticos coletados de compilação e lint. Muitas ocorrências são imports não usados e avisos de null-safety no backend; no frontend há problemas de exportação/typagem do AuthContext."
+  },
+  "files": [
+    {
+      "path": "frontend/src/providers/AuthProvider.tsx",
+      "issues": [
+        {
+          "message": "Module '@/contexts/AuthContext' has no exported member 'AuthContextProvider'",
+          "suggestion": "Export 'AuthContextProvider' from frontend/src/contexts/AuthContext.tsx or adjust the import."
+        }
+      ]
+    },
+    {
+      "path": "frontend/src/hooks/useAuth.ts",
+      "issues": [
+        {
+          "message": "Module '@/contexts/AuthContext' has no exported member 'AuthContext'",
+          "suggestion": "Export 'AuthContext' from the context or update the hook to use the correct name."
+        }
+      ]
+    },
+    {
+      "path": "frontend/src/routes/PrivateRoute.tsx",
+      "issues": [
+        { "message": "Property 'isAuthenticated' does not exist on type '{}'", "suggestion": "Fix the hook/context types to include isAuthenticated." },
+        { "message": "Property 'isLoading' does not exist on type '{}'", "suggestion": "Fix the hook/context types to include isLoading." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/exception/GlobalExceptionHandler.java",
+      "issues": [
+        { "message": "Null type safety: FieldError::getDefaultMessage mapping needs unchecked conversion.", "suggestion": "Use lambda with null checks or Objects.requireNonNull on messages." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/controller/AutenticacaoController.java",
+      "issues": [
+        { "message": "Import 'UserRegisterDto' is never used", "suggestion": "Remove unused import or use the DTO." },
+        { "message": "Import 'UserResponseDto' is never used", "suggestion": "Remove unused import or use the DTO." },
+        { "message": "Import 'UriComponentsBuilder' is never used", "suggestion": "Remove unused import or use it where needed." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/integration/dto/response/MlTransactionResponse.java",
+      "issues": [
+        { "message": "Import 'JsonProperty' is never used", "suggestion": "Remove import or annotate fields with @JsonProperty." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/config/RestClientConfig.java",
+      "issues": [
+        { "message": "Null type safety: .baseUrl(url)", "suggestion": "Ensure 'url' is not null (validate or requireNonNull)." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/service/FinancialAnalysisService.java",
+      "issues": [
+        { "message": "Import 'MlTransactionRequest' is never used", "suggestion": "Remove unused import." },
+        { "message": "Local variable 'appUser' is not used", "suggestion": "Use or remove the variable." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/integration/dto/request/MlTransactionRequest.java",
+      "issues": [
+        { "message": "Import 'JsonProperty' is never used", "suggestion": "Remove unused import or annotate fields." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/enums/TransactionCategory.java",
+      "issues": [
+        { "message": "Import 'JsonCreator' is never used", "suggestion": "Remove unused import." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/security/SecurityFilter.java",
+      "issues": [
+        { "message": "Missing non-null annotation on parameters of doFilterInternal", "suggestion": "Annotate parameters with @NonNull or match the superclass signature." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/integration/client/MlClient.java",
+      "issues": [
+        { "message": "Multiple unused imports (ExpenseSummaryResponse, FinancialProfile, SavingFrequency, TransactionCategory, BigDecimal, List)", "suggestion": "Remove unused imports and imports that were auto-added." },
+        { "message": "Null type safety: contentType/body values may be null", "suggestion": "Ensure media type and body are non-null before calling WebClient methods." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/service/TransactionService.java",
+      "issues": [
+        { "message": "Null type safety: saveAll returns/arguments may be null", "suggestion": "Validate inputs and add @NonNull or use Optional." },
+        { "message": "Null type safety: delete transaction may be null", "suggestion": "Validate transaction prior to delete." },
+        { "message": "Null type safety: findById parameter may be null", "suggestion": "Validate usuarioId before calling repository." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/controller/FinancialAnalysisController.java",
+      "issues": [
+        { "message": "Import 'java.util.List' is never used", "suggestion": "Remove unused import." }
+      ]
+    },
+    {
+      "path": "backend/pom.xml",
+      "issues": [
+        { "message": "Project configuration is not up-to-date with pom.xml", "suggestion": "Run './mvnw -U' and reimport the project." }
+      ]
+    },
+    {
+      "path": "backend/src/main/java/br/com/financeai/service/UserService.java",
+      "issues": [
+        { "message": "Import 'jakarta.validation.Valid' is never used", "suggestion": "Remove unused import or apply @Valid where required." },
+        { "message": "Null type safety: usuarioLogado.getId() may be null", "suggestion": "Validate usuarioLogado and id before use." }
+      ]
+    }
+  ]
+}

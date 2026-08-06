@@ -29,6 +29,12 @@ api.interceptors.request.use((config) => {
     return config;
   }
 
+  api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiError>) =>
+    Promise.reject(error),
+  );
+
   const accessToken = window.localStorage.getItem(
     ACCESS_TOKEN_STORAGE_KEY,
   );

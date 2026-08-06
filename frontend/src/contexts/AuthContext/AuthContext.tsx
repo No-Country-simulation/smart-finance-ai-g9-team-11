@@ -8,7 +8,8 @@ import {
 } from "react";
 
 import {
-  getAuthenticatedUser,
+  getProfile,
+  hasStoredToken,
   login as loginService,
   logout as logoutService,
 } from "@/services/auth.service";
@@ -31,54 +32,80 @@ export function AuthContextProvider({
 }: Readonly<AuthProviderProps>) {
   const [state, setState] = useState<AuthState>({
     user: null,
-    token: null,
     isAuthenticated: false,
     isLoading: true,
   });
-
-  useEffect(() => {
-    const user = getAuthenticatedUser();
-
-    setState({
-      user,
-      token: null,
-      isAuthenticated: !!user,
-      isLoading: false,
-    });
-  }, []);
-
-  const login = useCallback(
-    async (credentials: LoginRequest): Promise<void> => {
-      const user = await loginService(credentials);
-
-      setState({
-        user,
-        token: null,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    },
-    [],
-  );
 
   const logout = useCallback(() => {
     logoutService();
 
     setState({
       user: null,
-      token: null,
       isAuthenticated: false,
       isLoading: false,
     });
   }, []);
+
+  const checkAuth = useCallback(async () => {
+    if (!hasStoredToken()) {
+      setState({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
+      return;
+    }
+
+    try {
+      const user = await getProfile();
+
+      setState({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+    } catch {
+      logout();
+    }
+  }, [logout]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  const login = useCallback(
+    async (credentials: LoginRequest): Promise<void> => {
+      setState((prev) => ({ ...prev, isLoading: true }));
+
+      try {
+        await loginService(credentials);
+        const user = await getProfile();
+
+        setState({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } catch (error) {
+        setState({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
+        throw error;
+      }
+    },
+    [],
+  );
 
   const value = useMemo<AuthContextData>(
     () => ({
       ...state,
       login,
       logout,
+      checkAuth,
     }),
-    [state, login, logout],
+    [state, login, logout, checkAuth],
   );
 
   return (

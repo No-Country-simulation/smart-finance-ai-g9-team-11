@@ -5,6 +5,7 @@ import br.com.financeai.dto.request.UpdateTransactionRequest;
 import br.com.financeai.dto.response.TransactionResponse;
 import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.Transaction;
+import br.com.financeai.enums.Source;
 import br.com.financeai.enums.TransactionCategory;
 import br.com.financeai.enums.TransactionType;
 import br.com.financeai.exception.*;
@@ -37,14 +38,14 @@ import java.util.List;
 @Service
 public class TransactionService {
 
-
     private final TransactionClassificationService transactionClassificationService;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final MlClient mlClient;
 
     public TransactionService(
-            TransactionClassificationService transactionClassificationService, TransactionRepository transactionRepository,
+            TransactionClassificationService transactionClassificationService,
+            TransactionRepository transactionRepository,
             UserRepository userRepository,
             MlClient mlClient
     ) {
@@ -65,7 +66,6 @@ public class TransactionService {
      */
     @Transactional
     public TransactionResponse create(Long usuarioId, CreateTransactionRequest request) {
-
         return createBatch(usuarioId, List.of(request)).get(0);
     }
 
@@ -96,6 +96,7 @@ public class TransactionService {
                 );
             }
         }
+
         // Para cada transação recebida: classifica (chama a IA) e monta a entidade
         // pronta para ser salva. O mapeamento acontece uma transação por vez.
         List<Transaction> transactions = requests.stream()
@@ -134,24 +135,22 @@ public class TransactionService {
 
         validateEditableWindow(transaction);
 
-        // Recalcula a categoria com os dados novos, já que descrição/valor
-        // podem ter mudado o suficiente para mudar a classificação da IA.
-        TransactionCategory categoria = classify(
+        // Atualiza os dados básicos
+        transaction.setDescricao(request.descricao().trim());
+        transaction.setValor(request.valor());
+        transaction.setTipo(request.tipo());
+        transaction.setData(request.data());
+
+        // Recalcula a categoria e seta a origem internamente na própria entidade
+        classifyAndSetOrigin(
+                transaction,
                 request.descricao(),
                 request.valor(),
                 request.tipo(),
                 request.data()
         );
 
-        // Aplica os novos valores na entidade já existente (não cria uma nova)
-        transaction.setDescricao(request.descricao().trim());
-        transaction.setValor(request.valor());
-        transaction.setTipo(request.tipo());
-        transaction.setCategoria(categoria);
-        transaction.setData(request.data());
-
-        Transaction updatedTransaction =
-                transactionRepository.save(transaction);
+        Transaction updatedTransaction = transactionRepository.save(transaction);
 
         return toResponse(updatedTransaction);
     }
@@ -168,7 +167,6 @@ public class TransactionService {
     public void delete(Long usuarioId, Long transactionId) {
         // Reaproveita a mesma validação de posse usada em findById/update —
         // se a transação não for do usuário, lança ResourceNotFoundException.
-
         Transaction transaction = findTransactionByIdAndUserId(transactionId, usuarioId);
 
         validateEditableWindow(transaction);
@@ -236,15 +234,14 @@ public class TransactionService {
         // findTransactionByIdAndUserId já garante a posse do recurso:
         // se a transação existir mas for de outro usuário, é tratada
         // como "não encontrada" (não vaza a existência do dado de terceiros).
-        Transaction transaction =
-                findTransactionByIdAndUserId(transactionId, usuarioId);
+        Transaction transaction = findTransactionByIdAndUserId(transactionId, usuarioId);
 
         return toResponse(transaction);
     }
 
     /**
      * Constrói a entidade de transação pronta para persistência, realizando a
-     * classificação automática da categoria via integração com a IA.
+     * classificação automática da categoria via integração com a IA ou fallback.
      *
      * @param descricao descrição detalhada da transação.
      * @param valor montante financeiro da transação.
@@ -260,16 +257,15 @@ public class TransactionService {
             LocalDate dataTransacao,
             AppUser usuario
     ) {
-        // A categoria nunca é informada pelo usuário — sempre vem da IA
-        TransactionCategory categoria = classify(descricao, valor, tipo, dataTransacao);
-
         Transaction transaction = new Transaction();
         transaction.setDescricao(descricao.trim());
         transaction.setValor(valor);
         transaction.setTipo(tipo);
-        transaction.setCategoria(categoria);
         transaction.setData(dataTransacao);
         transaction.setUsuario(usuario);
+
+        // Aplica a classificação e define a origem direto na entidade
+        classifyAndSetOrigin(transaction, descricao, valor, tipo, dataTransacao);
 
         return transaction;
     }
@@ -277,14 +273,16 @@ public class TransactionService {
     /**
      * Comunica-se com o serviço de Machine Learning para obter a categoria da transação.
      * Em caso de falha de comunicação, aciona automaticamente o mecanismo de fallback local.
+     * Altera a própria entidade Transaction, definindo a categoria e a origem.
      *
+     * @param transaction a entidade que será atualizada com a categoria e origem.
      * @param descricao descrição da transação.
      * @param valor montante financeiro da transação.
      * @param tipo indica se a transação é uma RECEITA ou DESPESA.
      * @param dataTransacao data em que a transação ocorreu.
-     * @return a categoria ({@link TransactionCategory}) inferida para os dados fornecidos.
      */
-    private TransactionCategory classify(
+    private void classifyAndSetOrigin(
+            Transaction transaction,
             String descricao,
             BigDecimal valor,
             TransactionType tipo,
@@ -292,21 +290,21 @@ public class TransactionService {
     ) {
         MlTransactionRequest mlRequest = new MlTransactionRequest(descricao, valor, tipo, dataTransacao);
 
-        MlTransactionResponse mlResponse;
-
         try {
-            mlResponse = mlClient.classifyTransaction(mlRequest);
+            MlTransactionResponse mlResponse = mlClient.classifyTransaction(mlRequest);
+
+            transaction.setCategoria(mlResponse.categoria());
+            transaction.setOrigem(Source.ML);
 
         } catch (ExternalServiceException ex) {
 
-            log.warn(
-                    "IA indisponível. Classificação realizada utilizando fallback."
-            );
+            log.warn("IA indisponível. Classificação realizada utilizando fallback.");
 
-            mlResponse = transactionClassificationService.classifyTransactionFallback(mlRequest);
+            MlTransactionResponse fallbackResponse = transactionClassificationService.classifyTransactionFallback(mlRequest);
+
+            transaction.setCategoria(fallbackResponse.categoria());
+            transaction.setOrigem(Source.FALLBACK);
         }
-
-        return mlResponse.categoria();
     }
 
     /**
@@ -364,7 +362,7 @@ public class TransactionService {
 
     /**
      * Converte uma entidade de transação do banco de dados para o objeto de transferência
-     * de dados (DTO) utilizado nas respostas da API.
+     * de dados (DTO) utilizado nas respostas da API. A origem é omitida para uso exclusivo interno.
      *
      * @param transaction a entidade {@link Transaction} que será convertida.
      * @return o DTO {@link TransactionResponse} formatado para o frontend.

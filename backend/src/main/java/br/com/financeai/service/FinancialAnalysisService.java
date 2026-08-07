@@ -6,6 +6,9 @@ import br.com.financeai.dto.response.FinancialAnalysisResponse;
 import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.FinancialAnalysis;
 import br.com.financeai.entity.Transaction;
+import br.com.financeai.enums.Source;
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
 import br.com.financeai.exception.BusinessException;
 import br.com.financeai.exception.ExternalServiceException;
 import br.com.financeai.exception.InvalidRequestException;
@@ -22,12 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 /**
  * Responsável por gerar e gerenciar as análises financeiras dos usuários.
- *
  * Fluxo de geração:
  * 1. Localiza o usuário autenticado.
  * 2. Busca as transações do usuário dentro do período informado.
@@ -61,12 +64,9 @@ public class FinancialAnalysisService {
 
     /**
      * Gera uma análise financeira baseada no histórico de transações do período informado.
-     *
-     * Quando o serviço de IA responde normalmente, o resultado é persistido no banco
-     * antes de ser devolvido. Se o serviço de IA estiver indisponível
-     * ({@link ExternalServiceException}), a análise é gerada localmente via
-     * {@link FinancialProfileService#gerarAnaliseFallback}, com base em regras
-     * determinísticas — nesse caso, o resultado NÃO é persistido.
+     Tanto o resultado vindo da IA quanto o resultado do fallback local são
+     * persistidos no banco, diferenciados pelo campo {@code origem}
+     * ({@link Source#ML} ou {@link Source#FALLBACK}).
      *
      * @param usuarioId identificador único do usuário autenticado.
      * @param request dados contendo o período (data inicial e data final) para o qual a análise será gerada.
@@ -78,11 +78,7 @@ public class FinancialAnalysisService {
      */
     public FinancialAnalysisResponse analyze(Long usuarioId, FinancialAnalysisRequest request) {
 
-        // Passo 1: identifica o usuário dono das transações a serem analisadas
-        AppUser user = userRepository.findById(usuarioId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "Usuário não encontrado com o ID: " + usuarioId
-                ));
+        AppUser user = findUserById(usuarioId);
 
         // Impede análise de um período que ainda não começou — valida antes
         // de consultar o banco, evitando uma query desnecessária.
@@ -92,39 +88,10 @@ public class FinancialAnalysisService {
             );
         }
 
-        // Passo 2: busca no banco as transações do usuário dentro do período pedido.
-        // Essas transações já foram cadastradas e classificadas anteriormente
-        // (via TransactionService) — aqui só lemos o que já existe.
-        List<Transaction> transactions = transactionRepository
-                .findByUsuarioAndDataBetween(user, request.dataInicial(), request.dataFinal());
+        List<Transaction> transactions = buscarTransacoes(user, request);
+        MlRequest mlRequest = new MlRequest(mapToMlTransactions(transactions));
 
-        if (transactions.isEmpty()) {
-            throw new InvalidRequestException(
-                    "Não há transações no período informado."
-            );
-        }
-
-        if (transactions.size() < 3) {
-            throw new BusinessException(
-                    "É necessário ter pelo menos 3 transações no período para gerar uma análise confiável."
-            );
-        }
-
-        // Converte as entidades Transaction para o formato esperado pela ML.
-        List<MlTransactionResponse> mlTransactions = transactions.stream()
-                .map(transaction -> new MlTransactionResponse(
-                        transaction.getDescricao(),
-                        transaction.getValor(),
-                        transaction.getTipo(),
-                        transaction.getCategoria(),
-                        transaction.getData()
-                ))
-                .toList();
-
-        // Envia as transações para o serviço de Machine Learning.
-        MlRequest mlRequest = new MlRequest(mlTransactions);
         MlResponse mlResponse;
-
         try {
             mlResponse = mlClient.analyze(mlRequest);
 
@@ -133,21 +100,34 @@ public class FinancialAnalysisService {
             log.warn("IA indisponível. Análise feita utilizando fallback local para o usuário {}",
                     user.getId(), ex);
 
-            return financialProfileService.gerarAnaliseFallback(transactions);
+            FinancialAnalysisResponse fallback = financialProfileService.gerarAnaliseFallback(transactions);
+            financialAnalysisRepository.save(
+                    criarAnalise(
+                            user,
+                            fallback.perfilFinanceiro(),
+                            fallback.nivelEndividamento(),
+                            fallback.frequenciaPoupanca(),
+                            fallback.probabilidade(),
+                            Source.FALLBACK
+                    )
+            );
+
+            return fallback;
         }
 
-        // Passo 5: monta a entidade FinancialAnalysis com o resultado devolvido pela IA
+        // Monta a entidade FinancialAnalysis com o resultado devolvido pela IA
         // e persiste no banco — isso cria um "retrato" daquela análise, sem guardar
         // vínculo direto com as transações que a originaram.
-        FinancialAnalysis analysis = new FinancialAnalysis();
-        analysis.setUsuario(user);
-        analysis.setPerfilFinanceiro(mlResponse.perfilFinanceiro());
-        analysis.setFrequenciaPoupanca(mlResponse.frequenciaPoupanca());
-        analysis.setNivelEndividamento(mlResponse.nivelEndividamento());
-        analysis.setProbabilidade(mlResponse.probabilidade());
-        analysis.setDataAnalise(LocalDate.now());
-
-        financialAnalysisRepository.save(analysis);
+        financialAnalysisRepository.save(
+                criarAnalise(
+                        user,
+                        mlResponse.perfilFinanceiro(),
+                        mlResponse.nivelEndividamento(),
+                        mlResponse.frequenciaPoupanca(),
+                        mlResponse.probabilidade(),
+                        Source.ML
+                )
+        );
 
         return new FinancialAnalysisResponse(
                 mlResponse.perfilFinanceiro(),
@@ -157,6 +137,31 @@ public class FinancialAnalysisService {
                 mlResponse.resumoGastos(),
                 mlResponse.recomendacoes()
         );
+    }
+
+    /**
+     * Busca o usuário pelo ID, lançando erro claro se ele não existir.
+     */
+    private AppUser findUserById(Long usuarioId) {
+        return userRepository.findById(usuarioId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Usuário não encontrado com o ID: " + usuarioId
+                ));
+    }
+
+    /**
+     * Converte as entidades Transaction para o formato esperado pela ML.
+     */
+    private List<MlTransactionResponse> mapToMlTransactions(List<Transaction> transactions) {
+        return transactions.stream()
+                .map(transaction -> new MlTransactionResponse(
+                        transaction.getDescricao(),
+                        transaction.getValor(),
+                        transaction.getTipo(),
+                        transaction.getCategoria(),
+                        transaction.getData()
+                ))
+                .toList();
     }
 
     /**
@@ -206,7 +211,6 @@ public class FinancialAnalysisService {
 
     /**
      * Busca uma análise validando que ela pertence ao usuário autenticado.
-     *
      * Se a análise existir, mas pertencer a outro usuário, também será
      * considerada não encontrada. Isso impede exposição de dados de terceiros.
      */
@@ -223,5 +227,54 @@ public class FinancialAnalysisService {
                         new ResourceNotFoundException(
                                 "Análise financeira não encontrada."
                         ));
+    }
+
+    private List<Transaction> buscarTransacoes(
+            AppUser usuario,
+            FinancialAnalysisRequest request
+    ) {
+
+        List<Transaction> transactions =
+                transactionRepository.findByUsuarioAndDataBetween(
+                        usuario,
+                        request.dataInicial(),
+                        request.dataFinal()
+                );
+
+        if (transactions.isEmpty()) {
+            throw new InvalidRequestException(
+                    "Não há transações no período informado."
+            );
+        }
+
+        if (transactions.size() < 3) {
+            throw new BusinessException(
+                    "É necessário ter pelo menos 3 transações no período para gerar uma análise confiável."
+            );
+        }
+
+        return transactions;
+    }
+
+    private FinancialAnalysis criarAnalise(
+            AppUser usuario,
+            FinancialProfile perfil,
+            BigDecimal nivelEndividamento,
+            SavingFrequency frequenciaPoupanca,
+            BigDecimal probabilidade,
+            Source origem
+    ) {
+
+        FinancialAnalysis analysis = new FinancialAnalysis();
+
+        analysis.setUsuario(usuario);
+        analysis.setPerfilFinanceiro(perfil);
+        analysis.setNivelEndividamento(nivelEndividamento);
+        analysis.setFrequenciaPoupanca(frequenciaPoupanca);
+        analysis.setProbabilidade(probabilidade);
+        analysis.setDataAnalise(LocalDate.now());
+        analysis.setOrigem(origem);
+
+        return analysis;
     }
 }

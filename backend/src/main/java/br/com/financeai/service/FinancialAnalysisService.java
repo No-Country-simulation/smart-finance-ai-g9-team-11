@@ -46,15 +46,13 @@ public class FinancialAnalysisService {
     private final UserRepository userRepository;
     private final MlClient mlClient;
 
-
-    public FinancialAnalysisService(FinancialProfileService financialProfileService, MlClient mlClient, FinancialAnalysisRepository financialAnalysisRepository, TransactionRepository transactionRepository, UserRepository userRepository) {
-        this.financialProfileService = financialProfileService;
     public FinancialAnalysisService(
-            MlClient mlClient,
+            FinancialProfileService financialProfileService, MlClient mlClient,
             FinancialAnalysisRepository financialAnalysisRepository,
             TransactionRepository transactionRepository,
             UserRepository userRepository
     ) {
+        this.financialProfileService = financialProfileService;
         this.mlClient = mlClient;
         this.financialAnalysisRepository = financialAnalysisRepository;
         this.transactionRepository = transactionRepository;
@@ -62,12 +60,18 @@ public class FinancialAnalysisService {
     }
 
     /**
-     * Gera e persiste uma análise financeira baseada no histórico de transações do período informado.
+     * Gera uma análise financeira baseada no histórico de transações do período informado.
+     *
+     * Quando o serviço de IA responde normalmente, o resultado é persistido no banco
+     * antes de ser devolvido. Se o serviço de IA estiver indisponível
+     * ({@link ExternalServiceException}), a análise é gerada localmente via
+     * {@link FinancialProfileService#gerarAnaliseFallback}, com base em regras
+     * determinísticas — nesse caso, o resultado NÃO é persistido.
      *
      * @param usuarioId identificador único do usuário autenticado.
      * @param request dados contendo o período (data inicial e data final) para o qual a análise será gerada.
      * @return resposta contendo o perfil financeiro, resumo dos gastos, frequência de poupança,
-     *         nível de endividamento e recomendações geradas.
+     *         nível de endividamento e recomendações geradas — via IA ou via fallback local.
      * @throws BusinessException caso o período informado seja no futuro ou não haja o mínimo de transações exigido (3).
      * @throws InvalidRequestException caso o usuário não possua nenhuma transação no período informado.
      * @throws UserNotFoundException caso o usuário não seja encontrado no banco de dados.
@@ -80,28 +84,19 @@ public class FinancialAnalysisService {
                         "Usuário não encontrado com o ID: " + usuarioId
                 ));
 
-        // Passo 2: busca no banco as transações do usuário dentro do período pedido.
-        // Essas transações já foram cadastradas e classificadas anteriormente
-        // (via TransactionService) — aqui só lemos o que já existe.
-        List<Transaction> transactions = transactionRepository
-                .findByUsuarioAndDataBetween(user, request.dataInicial(), request.dataFinal());
-
-
-        // Impede análise de um período que ainda não começou.
+        // Impede análise de um período que ainda não começou — valida antes
+        // de consultar o banco, evitando uma query desnecessária.
         if (request.dataInicial().isAfter(LocalDate.now())) {
             throw new BusinessException(
                     "Não é possível gerar análise para um período que ainda não começou."
             );
         }
 
-        // Busca somente as transações pertencentes ao usuário autenticado
-        // e que estejam dentro do período solicitado.
+        // Passo 2: busca no banco as transações do usuário dentro do período pedido.
+        // Essas transações já foram cadastradas e classificadas anteriormente
+        // (via TransactionService) — aqui só lemos o que já existe.
         List<Transaction> transactions = transactionRepository
-                .findByUsuarioAndDataBetween(
-                        user,
-                        request.dataInicial(),
-                        request.dataFinal()
-                );
+                .findByUsuarioAndDataBetween(user, request.dataInicial(), request.dataFinal());
 
         if (transactions.isEmpty()) {
             throw new InvalidRequestException(
@@ -130,14 +125,13 @@ public class FinancialAnalysisService {
         MlRequest mlRequest = new MlRequest(mlTransactions);
         MlResponse mlResponse;
 
-        try{
+        try {
             mlResponse = mlClient.analyze(mlRequest);
 
         } catch (ExternalServiceException ex) {
 
             log.warn("IA indisponível. Análise feita utilizando fallback local para o usuário {}",
-                    user.getId(),
-                    ex);
+                    user.getId(), ex);
 
             return financialProfileService.gerarAnaliseFallback(transactions);
         }

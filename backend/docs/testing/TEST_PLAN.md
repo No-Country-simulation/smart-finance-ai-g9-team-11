@@ -28,10 +28,11 @@ The goal is to verify:
 
 ## Login
 
-- [ ] Login with valid credentials.
-- [ ] Reject invalid password.
-- [ ] Reject nonexistent email.
-- [ ] Verify JWT generation.
+- [x] Login with valid credentials (200)
+- [x] Reject invalid password (401)
+- [x] Reject nonexistent email (401)
+- [x] Verify JWT generation.
+- [x] Verify protected endpoint using JWT
 
 ---
 

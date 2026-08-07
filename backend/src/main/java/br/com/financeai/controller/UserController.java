@@ -23,7 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping("/users")
 @Tag(
         name = "Users",
-        description = "Protected endpoints for managing the authenticated user's profile."
+        description = "Endpoints for user registration and authenticated profile management."
 )
 public class UserController {
 

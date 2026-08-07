@@ -1,51 +1,53 @@
 package br.com.financeai.service;
 
 import br.com.financeai.dto.request.FinancialAnalysisRequest;
+import br.com.financeai.dto.response.FinancialAnalysisHistoryResponse;
 import br.com.financeai.dto.response.FinancialAnalysisResponse;
 import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.FinancialAnalysis;
 import br.com.financeai.entity.Transaction;
 import br.com.financeai.exception.BusinessException;
 import br.com.financeai.exception.InvalidRequestException;
+import br.com.financeai.exception.ResourceNotFoundException;
 import br.com.financeai.exception.UserNotFoundException;
 import br.com.financeai.integration.client.MlClient;
 import br.com.financeai.integration.dto.request.MlRequest;
-import br.com.financeai.integration.dto.request.MlTransactionRequest;
 import br.com.financeai.integration.dto.response.MlResponse;
 import br.com.financeai.integration.dto.response.MlTransactionResponse;
 import br.com.financeai.repository.FinancialAnalysisRepository;
 import br.com.financeai.repository.TransactionRepository;
 import br.com.financeai.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Responsável por gerar a análise financeira de um usuário para um período informado.
-
- * Fluxo geral:
- *   1. Localiza o usuário
- *   2. Busca as transações do usuário dentro do período informado
- *   3. Monta a requisição para a IA (MlRequest) com essas transações
- *   4. Chama a IA e recebe o resultado (perfil financeiro, probabilidade, resumo de gastos, etc.)
- *   5. Persiste o resultado da análise no banco
- *   6. Devolve o resultado formatado para o frontend
+ * Responsável por gerar e gerenciar as análises financeiras dos usuários.
+ *
+ * Fluxo de geração:
+ * 1. Localiza o usuário autenticado.
+ * 2. Busca as transações do usuário dentro do período informado.
+ * 3. Monta a requisição para a API de Machine Learning.
+ * 4. Recebe o resultado da análise.
+ * 5. Persiste o resultado no banco.
+ * 6. Devolve o resultado ao frontend.
  */
 @Service
 public class FinancialAnalysisService {
-
-    // E-mail fixo do usuário de teste, usado enquanto não existe autenticação real.
-    // Quando o JWT for implementado, essa constante deixa de ser necessária.
-    private static final String TEST_USER_EMAIL = "teste@financeai.com";
 
     private final FinancialAnalysisRepository financialAnalysisRepository;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final MlClient mlClient;
 
-
-    public FinancialAnalysisService(MlClient mlClient, FinancialAnalysisRepository financialAnalysisRepository, TransactionRepository transactionRepository, UserRepository userRepository) {
+    public FinancialAnalysisService(
+            MlClient mlClient,
+            FinancialAnalysisRepository financialAnalysisRepository,
+            TransactionRepository transactionRepository,
+            UserRepository userRepository
+    ) {
         this.mlClient = mlClient;
         this.financialAnalysisRepository = financialAnalysisRepository;
         this.transactionRepository = transactionRepository;
@@ -53,68 +55,70 @@ public class FinancialAnalysisService {
     }
 
     /**
-     * Gera e persiste uma análise financeira para o período informado no request.
+     * Gera e persiste uma análise financeira para o usuário autenticado
+     * dentro do período informado.
      *
-     * @param request contém apenas o período (dataInicial/dataFinal) — não recebe transações
-     * @return o resultado da análise, no formato que o frontend espera
+     * @param usuarioId identificador do usuário autenticado
+     * @param request contém o período da análise
+     * @return resultado da análise financeira
      */
-    public FinancialAnalysisResponse analyze(FinancialAnalysisRequest request) {
+    @Transactional
+    public FinancialAnalysisResponse analyze(
+            Long usuarioId,
+            FinancialAnalysisRequest request
+    ) {
+        // Localiza o usuário autenticado no banco.
+        AppUser user = userRepository
+                .findById(usuarioId)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "Usuário autenticado não encontrado."
+                        ));
 
-        // Passo 1: identifica o usuário dono das transações a serem analisadas
-        AppUser user = getTestUser();
-
-        // Passo 2: busca no banco as transações do usuário dentro do período pedido.
-        // Essas transações já foram cadastradas e classificadas anteriormente
-        // (via TransactionService) — aqui só lemos o que já existe.
-        List<Transaction> transactions = transactionRepository
-                .findByUsuarioAndDataBetween(user, request.dataInicial(), request.dataFinal());
-
-
+        // Impede análise de um período que ainda não começou.
         if (request.dataInicial().isAfter(LocalDate.now())) {
             throw new BusinessException(
                     "Não é possível gerar análise para um período que ainda não começou."
             );
         }
-        // Sem transações no período, não há o que analisar — melhor falhar
-        // de forma clara do que mandar uma lista vazia para a IA.
+
+        // Busca somente as transações pertencentes ao usuário autenticado
+        // e que estejam dentro do período solicitado.
+        List<Transaction> transactions = transactionRepository
+                .findByUsuarioAndDataBetween(
+                        user,
+                        request.dataInicial(),
+                        request.dataFinal()
+                );
+
         if (transactions.isEmpty()) {
-            throw new InvalidRequestException("Não há transações no período informado.");
+            throw new InvalidRequestException(
+                    "Não há transações no período informado."
+            );
         }
+
         if (transactions.size() < 3) {
             throw new BusinessException(
                     "É necessário ter pelo menos 3 transações no período para gerar uma análise confiável."
             );
         }
 
-        // Passo 3: converte as entidades do banco para o formato que a IA espera.
-        // Monta a lista que a IA precisa, a partir do que já está no banco
+        // Converte as entidades Transaction para o formato esperado pela ML.
         List<MlTransactionResponse> mlTransactions = transactions.stream()
-                .map(t -> new MlTransactionResponse(
-                        t.getDescricao(),
-                        t.getValor(),
-                        t.getTipo(),
-                        t.getCategoria(),
-                        t.getData()))
+                .map(transaction -> new MlTransactionResponse(
+                        transaction.getDescricao(),
+                        transaction.getValor(),
+                        transaction.getTipo(),
+                        transaction.getCategoria(),
+                        transaction.getData()
+                ))
                 .toList();
 
-        // Passo 4: chama a IA passando todas as transações do período de uma vez,
-        // e recebe de volta o resultado da análise (perfil, probabilidade, etc.)
+        // Envia as transações para o serviço de Machine Learning.
         MlRequest mlRequest = new MlRequest(mlTransactions);
         MlResponse mlResponse = mlClient.analyze(mlRequest);
 
-        // Busca o usuário novamente só para validar que ele ainda existe
-        // antes de vincular a análise a ele.
-        AppUser appUser = userRepository
-                .findByEmail(TEST_USER_EMAIL)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "Usuário de teste não encontrado."
-                        )
-                );
-
-        // Passo 5: monta a entidade FinancialAnalysis com o resultado devolvido pela IA
-        // e persiste no banco — isso cria um "retrato" daquela análise, sem guardar
-        // vínculo direto com as transações que a originaram.
+        // Monta a entidade que será armazenada no banco.
         FinancialAnalysis analysis = new FinancialAnalysis();
         analysis.setUsuario(user);
         analysis.setPerfilFinanceiro(mlResponse.perfilFinanceiro());
@@ -125,8 +129,6 @@ public class FinancialAnalysisService {
 
         financialAnalysisRepository.save(analysis);
 
-        // Passo 6: devolve o resultado da análise já no formato de resposta da API,
-        // usando os mesmos dados que acabamos de persistir.
         return new FinancialAnalysisResponse(
                 mlResponse.perfilFinanceiro(),
                 mlResponse.nivelEndividamento(),
@@ -138,16 +140,68 @@ public class FinancialAnalysisService {
     }
 
     /**
-     * Busca o usuário de teste fixo no banco.
-     *
-     * Substituído futuramente pela identificação do usuário autenticado (JWT).
+     * Lista todas as análises financeiras do usuário,
+     * ordenadas da mais recente para a mais antiga.
      */
-    private AppUser getTestUser() {
+    public List<FinancialAnalysisHistoryResponse> findAll(Long usuarioId) {
+        return financialAnalysisRepository
+                .findAllByUsuarioIdOrderByDataAnaliseDescIdDesc(usuarioId)
+                .stream()
+                .map(FinancialAnalysisHistoryResponse::new)
+                .toList();
+    }
 
-        return userRepository.findByEmail(TEST_USER_EMAIL)
+    /**
+     * Busca uma análise pelo ID, desde que pertença ao usuário.
+     */
+    public FinancialAnalysisHistoryResponse findById(
+            Long usuarioId,
+            Long analysisId
+    ) {
+        FinancialAnalysis analysis =
+                findAnalysisByIdAndUserId(
+                        analysisId,
+                        usuarioId
+                );
+
+        return new FinancialAnalysisHistoryResponse(analysis);
+    }
+
+    /**
+     * Exclui uma análise somente quando ela pertence ao usuário.
+     */
+    @Transactional
+    public void delete(
+            Long usuarioId,
+            Long analysisId
+    ) {
+        FinancialAnalysis analysis =
+                findAnalysisByIdAndUserId(
+                        analysisId,
+                        usuarioId
+                );
+
+        financialAnalysisRepository.delete(analysis);
+    }
+
+    /**
+     * Busca uma análise validando que ela pertence ao usuário autenticado.
+     *
+     * Se a análise existir, mas pertencer a outro usuário, também será
+     * considerada não encontrada. Isso impede exposição de dados de terceiros.
+     */
+    private FinancialAnalysis findAnalysisByIdAndUserId(
+            Long analysisId,
+            Long usuarioId
+    ) {
+        return financialAnalysisRepository
+                .findByIdAndUsuarioId(
+                        analysisId,
+                        usuarioId
+                )
                 .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "Usuário de teste não encontrado."
+                        new ResourceNotFoundException(
+                                "Análise financeira não encontrada."
                         ));
     }
 }

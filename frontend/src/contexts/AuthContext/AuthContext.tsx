@@ -21,11 +21,19 @@ import type {
 } from "@/types/auth";
 
 export const AuthContext =
-  createContext<AuthContextData | undefined>(undefined);
+  createContext<AuthContextData | undefined>(
+    undefined,
+  );
 
 interface AuthProviderProps {
   children: ReactNode;
 }
+
+const ANONYMOUS_STATE: AuthState = {
+  user: null,
+  isAuthenticated: false,
+  isLoading: false,
+};
 
 export function AuthContextProvider({
   children,
@@ -36,49 +44,55 @@ export function AuthContextProvider({
     isLoading: true,
   });
 
-  const logout = useCallback(() => {
+  const logout = useCallback((): void => {
     logoutService();
 
-    setState({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-    });
+    setState(ANONYMOUS_STATE);
   }, []);
 
-  const checkAuth = useCallback(async () => {
-    if (!hasStoredToken()) {
-      setState({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-      });
-      return;
-    }
+  const checkAuth =
+    useCallback(async (): Promise<void> => {
+      if (!hasStoredToken()) {
+        setState(ANONYMOUS_STATE);
+        return;
+      }
 
-    try {
-      const user = await getProfile();
+      setState((currentState) => ({
+        ...currentState,
+        isLoading: true,
+      }));
 
-      setState({
-        user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    } catch {
-      logout();
-    }
-  }, [logout]);
+      try {
+        const user = await getProfile();
+
+        setState({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } catch {
+        logoutService();
+
+        setState(ANONYMOUS_STATE);
+      }
+    }, []);
 
   useEffect(() => {
-    checkAuth();
+    void checkAuth();
   }, [checkAuth]);
 
   const login = useCallback(
-    async (credentials: LoginRequest): Promise<void> => {
-      setState((prev) => ({ ...prev, isLoading: true }));
+    async (
+      credentials: LoginRequest,
+    ): Promise<void> => {
+      setState((currentState) => ({
+        ...currentState,
+        isLoading: true,
+      }));
 
       try {
         await loginService(credentials);
+
         const user = await getProfile();
 
         setState({
@@ -87,11 +101,10 @@ export function AuthContextProvider({
           isLoading: false,
         });
       } catch (error) {
-        setState({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-        });
+        logoutService();
+
+        setState(ANONYMOUS_STATE);
+
         throw error;
       }
     },
@@ -105,7 +118,12 @@ export function AuthContextProvider({
       logout,
       checkAuth,
     }),
-    [state, login, logout, checkAuth],
+    [
+      state,
+      login,
+      logout,
+      checkAuth,
+    ],
   );
 
   return (

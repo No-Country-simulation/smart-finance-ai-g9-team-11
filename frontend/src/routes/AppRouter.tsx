@@ -5,26 +5,23 @@ import {
   Routes,
 } from "react-router-dom";
 
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+
 import { AppLayout } from "@/layouts/AppLayout";
 
+import { AnalysisPage } from "@/pages/Analysis";
+import { DashboardPage } from "@/pages/Dashboard";
 import { LandingPage } from "@/pages/Landing";
 import { LoginPage } from "@/pages/Login";
-import { RegisterPage } from "@/pages/Register";
-
-import { DashboardPage } from "@/pages/Dashboard";
 import { ProfilePage } from "@/pages/Profile";
+import { RegisterPage } from "@/pages/Register";
 import { SettingsPage } from "@/pages/Settings";
-
-import { PrivateRoute } from "./PrivateRoute";
+import { TransactionsPage } from "@/pages/Transactions";
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ========================= */}
-        {/* Rotas Públicas            */}
-        {/* ========================= */}
-
         <Route
           path="/"
           element={<LandingPage />}
@@ -40,21 +37,27 @@ export default function AppRouter() {
           element={<RegisterPage />}
         />
 
-        {/* ========================= */}
-        {/* Rotas Privadas            */}
-        {/* ========================= */}
-
         <Route
           path="/app"
           element={
-            <PrivateRoute>
+            <ProtectedRoute>
               <AppLayout />
-            </PrivateRoute>
+            </ProtectedRoute>
           }
         >
           <Route
             index
             element={<DashboardPage />}
+          />
+
+          <Route
+            path="transactions"
+            element={<TransactionsPage />}
+          />
+
+          <Route
+            path="analysis"
+            element={<AnalysisPage />}
           />
 
           <Route
@@ -67,10 +70,6 @@ export default function AppRouter() {
             element={<SettingsPage />}
           />
         </Route>
-
-        {/* ========================= */}
-        {/* Fallback                  */}
-        {/* ========================= */}
 
         <Route
           path="*"

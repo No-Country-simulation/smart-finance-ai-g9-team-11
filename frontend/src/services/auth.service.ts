@@ -1,30 +1,54 @@
 import {
   api,
-  saveAccessToken,
-  removeAccessToken,
   getAccessToken,
+  removeAccessToken,
+  saveAccessToken,
 } from "@/services/api";
+
 import type {
+  AuthUser,
   LoginRequest,
   LoginResponse,
-  AuthUser,
+  RegisterRequest,
 } from "@/types/auth";
 
-const AUTH_ENDPOINT = "/auth/login";
+const LOGIN_ENDPOINT = "/auth/login";
+const USERS_ENDPOINT = "/users";
+const PROFILE_ENDPOINT = "/users/me";
 
 export async function login(
   credentials: LoginRequest,
 ): Promise<void> {
   const { data } = await api.post<LoginResponse>(
-    AUTH_ENDPOINT,
+    LOGIN_ENDPOINT,
     credentials,
   );
+
+  if (!data.token) {
+    throw new Error(
+      "O backend não retornou um token de autenticação.",
+    );
+  }
 
   saveAccessToken(data.token);
 }
 
+export async function registerUser(
+  payload: RegisterRequest,
+): Promise<AuthUser> {
+  const { data } = await api.post<AuthUser>(
+    USERS_ENDPOINT,
+    payload,
+  );
+
+  return data;
+}
+
 export async function getProfile(): Promise<AuthUser> {
-  const { data } = await api.get<AuthUser>("/users/me");
+  const { data } = await api.get<AuthUser>(
+    PROFILE_ENDPOINT,
+  );
+
   return data;
 }
 
@@ -33,5 +57,5 @@ export function logout(): void {
 }
 
 export function hasStoredToken(): boolean {
-  return !!getAccessToken();
+  return Boolean(getAccessToken());
 }

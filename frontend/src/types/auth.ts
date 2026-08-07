@@ -7,12 +7,17 @@ export interface LoginResponse {
   token: string;
 }
 
-export interface AuthUser {
-  id?: string | number;
-  nome?: string;
+export interface RegisterRequest {
+  nome: string;
   email: string;
-  ativo?: boolean;
-  roles?: string[];
+  senha: string;
+}
+
+export interface AuthUser {
+  id: number;
+  nome: string;
+  email: string;
+  ativo: boolean;
 }
 
 export interface AuthState {
@@ -22,7 +27,11 @@ export interface AuthState {
 }
 
 export interface AuthContextData extends AuthState {
-  login: (credentials: LoginRequest) => Promise<void>;
+  login: (
+    credentials: LoginRequest,
+  ) => Promise<void>;
+
   logout: () => void;
+
   checkAuth: () => Promise<void>;
 }

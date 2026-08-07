@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -85,20 +86,22 @@ public class AutenticacaoController {
     })
     @PostMapping("/login")
     public ResponseEntity<DadosTokenJWT>  efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
+
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
 
-            try {
-                var authentication = manager.authenticate(authenticationToken);
+        try {
+            var authentication = manager.authenticate(authenticationToken);
 
-                var usuario = (AppUser) authentication.getPrincipal();
-                var tokenJWT = tokenService.gerarToken(usuario.getEmail());
+            var usuario = (AppUser) authentication.getPrincipal();
+            var tokenJWT = tokenService.gerarToken(usuario.getEmail());
 
             return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
 
+        } catch (DisabledException ex) {
+            throw new AuthenticationException("Esta conta está desativada. Reative sua conta para continuar.");
+
         } catch (BadCredentialsException ex) {
-            // Traduz o erro do Spring Security para a exceção de domínio do projeto,
-            // que já é tratada de forma padronizada pelo GlobalExceptionHandler.
-            throw new AuthenticationException(ex.getMessage());
+            throw new AuthenticationException("E-mail ou senha inválidos.");
         }
     }
 

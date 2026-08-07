@@ -105,8 +105,71 @@ public class AutenticacaoController {
         }
     }
 
+    @Operation(
+            summary = "Reactivate user account",
+            description = """
+            Reactivates a previously deactivated user account.
+
+            Authentication:
+            This endpoint is public and does not require a JWT token.
+
+            Behavior:
+            Validates the provided email and password. If the credentials
+            are correct and the account is currently inactive, the account
+            is reactivated and can authenticate normally again.
+            """
+    )
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "User account reactivated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid email or password",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "User account is already active",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
     @PostMapping("/reactivate")
-    public ResponseEntity<Void> reativarConta(@RequestBody @Valid DadosAutenticacao dados) {
+    public ResponseEntity<Void> reativarConta(
+            @RequestBody @Valid DadosAutenticacao dados
+    ) {
         userService.reativarConta(dados);
         return ResponseEntity.noContent().build();
     }

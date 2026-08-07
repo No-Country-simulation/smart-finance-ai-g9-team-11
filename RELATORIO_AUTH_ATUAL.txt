@@ -1,0 +1,1096 @@
+﻿RELATORIO - AUTENTICACAO SMART FINANCE AI
+Gerado em: 07/08/2026 10:45:58
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/auth.service.ts
+========================================================================================================================
+
+import {
+  api,
+  saveAccessToken,
+  removeAccessToken,
+  getAccessToken,
+} from "@/services/api";
+import type {
+  LoginRequest,
+  LoginResponse,
+  AuthUser,
+} from "@/types/auth";
+
+const AUTH_ENDPOINT = "/auth/login";
+
+export async function login(
+  credentials: LoginRequest,
+): Promise<void> {
+  const { data } = await api.post<LoginResponse>(
+    AUTH_ENDPOINT,
+    credentials,
+  );
+
+  saveAccessToken(data.token);
+}
+
+export async function getProfile(): Promise<AuthUser> {
+  const { data } = await api.get<AuthUser>("/users/me");
+  return data;
+}
+
+export function logout(): void {
+  removeAccessToken();
+}
+
+export function hasStoredToken(): boolean {
+  return !!getAccessToken();
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/api.ts
+========================================================================================================================
+
+import axios from "axios";
+import type { AxiosError } from "axios";
+
+import type { ApiError } from "@/types/api";
+
+const DEFAULT_API_BASE_URL =
+  "http://localhost:8080";
+
+const ACCESS_TOKEN_STORAGE_KEY =
+  "finance-ai:access-token";
+
+const configuredApiBaseUrl =
+  import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const API_BASE_URL = (
+  configuredApiBaseUrl || DEFAULT_API_BASE_URL
+).replace(/\/+$/, "");
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15_000,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+api.interceptors.request.use((config) => {
+  if (typeof window === "undefined") {
+    return config;
+  }
+
+  api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiError>) =>
+    Promise.reject(error),
+  );
+
+  const accessToken = window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+
+  if (accessToken) {
+    config.headers.Authorization =
+      `Bearer ${accessToken}`;
+  }
+
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiError>) =>
+    Promise.reject(error),
+);
+
+export function saveAccessToken(
+  accessToken: string,
+): void {
+  window.localStorage.setItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+    accessToken,
+  );
+}
+
+export function getAccessToken(): string | null {
+  return window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function removeAccessToken(): void {
+  window.localStorage.removeItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function getApiErrorMessage(
+  error: unknown,
+  fallbackMessage =
+    "Não foi possível concluir a solicitação.",
+): string {
+  if (!axios.isAxiosError<ApiError>(error)) {
+    return fallbackMessage;
+  }
+
+  return (
+    error.response?.data?.message ||
+    error.message ||
+    fallbackMessage
+  );
+}
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/auth.ts
+========================================================================================================================
+
+export interface LoginRequest {
+  email: string;
+  senha: string;
+}
+
+export interface LoginResponse {
+  token: string;
+}
+
+export interface AuthUser {
+  id?: string | number;
+  nome?: string;
+  email: string;
+  ativo?: boolean;
+  roles?: string[];
+}
+
+export interface AuthState {
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
+
+export interface AuthContextData extends AuthState {
+  login: (credentials: LoginRequest) => Promise<void>;
+  logout: () => void;
+  checkAuth: () => Promise<void>;
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/contexts/AuthContext/AuthContext.tsx
+========================================================================================================================
+
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+
+import {
+  getProfile,
+  hasStoredToken,
+  login as loginService,
+  logout as logoutService,
+} from "@/services/auth.service";
+
+import type {
+  AuthContextData,
+  AuthState,
+  LoginRequest,
+} from "@/types/auth";
+
+export const AuthContext =
+  createContext<AuthContextData | undefined>(undefined);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthContextProvider({
+  children,
+}: Readonly<AuthProviderProps>) {
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    isAuthenticated: false,
+    isLoading: true,
+  });
+
+  const logout = useCallback(() => {
+    logoutService();
+
+    setState({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+    });
+  }, []);
+
+  const checkAuth = useCallback(async () => {
+    if (!hasStoredToken()) {
+      setState({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
+      return;
+    }
+
+    try {
+      const user = await getProfile();
+
+      setState({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+    } catch {
+      logout();
+    }
+  }, [logout]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  const login = useCallback(
+    async (credentials: LoginRequest): Promise<void> => {
+      setState((prev) => ({ ...prev, isLoading: true }));
+
+      try {
+        await loginService(credentials);
+        const user = await getProfile();
+
+        setState({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } catch (error) {
+        setState({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
+        throw error;
+      }
+    },
+    [],
+  );
+
+  const value = useMemo<AuthContextData>(
+    () => ({
+      ...state,
+      login,
+      logout,
+      checkAuth,
+    }),
+    [state, login, logout, checkAuth],
+  );
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/contexts/AuthContext/index.ts
+========================================================================================================================
+
+export {
+  AuthContext,
+  AuthContextProvider,
+} from "./AuthContext";
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/hooks/useAuth.ts
+========================================================================================================================
+
+import { useContext } from "react";
+
+import { AuthContext } from "@/contexts/AuthContext/AuthContext";
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error(
+      "useAuth deve ser utilizado dentro de um AuthProvider.",
+    );
+  }
+
+  return context;
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/providers/AuthProvider.tsx
+========================================================================================================================
+
+import type { ReactNode } from "react";
+
+import { AuthContextProvider } from "@/contexts/AuthContext";
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({
+  children,
+}: Readonly<AuthProviderProps>) {
+  return (
+    <AuthContextProvider>
+      {children}
+    </AuthContextProvider>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/ProtectedRoute/ProtectedRoute.tsx
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/ProtectedRoute/index.ts
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/routes/AppRouter.tsx
+========================================================================================================================
+
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
+import { AppLayout } from "@/layouts/AppLayout";
+
+import { LandingPage } from "@/pages/Landing";
+import { LoginPage } from "@/pages/Login";
+import { RegisterPage } from "@/pages/Register";
+
+import { DashboardPage } from "@/pages/Dashboard";
+import { ProfilePage } from "@/pages/Profile";
+import { SettingsPage } from "@/pages/Settings";
+
+import { PrivateRoute } from "./PrivateRoute";
+
+export default function AppRouter() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* ========================= */}
+        {/* Rotas PÃºblicas            */}
+        {/* ========================= */}
+
+        <Route
+          path="/"
+          element={<LandingPage />}
+        />
+
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+
+        {/* ========================= */}
+        {/* Rotas Privadas            */}
+        {/* ========================= */}
+
+        <Route
+          path="/app"
+          element={
+            <PrivateRoute>
+              <AppLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route
+            index
+            element={<DashboardPage />}
+          />
+
+          <Route
+            path="profile"
+            element={<ProfilePage />}
+          />
+
+          <Route
+            path="settings"
+            element={<SettingsPage />}
+          />
+        </Route>
+
+        {/* ========================= */}
+        {/* Fallback                  */}
+        {/* ========================= */}
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/routes/index.ts
+========================================================================================================================
+
+export { default as AppRouter } from "./AppRouter";
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Login/LoginPage.tsx
+========================================================================================================================
+
+import {
+  ArrowLeft,
+  BrainCircuit,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+import { BrandLogo } from "@/components/landing/BrandLogo";
+import { cn } from "@/lib/utils";
+
+export function LoginPage() {
+  return (
+    <main
+      className={cn(
+        "relative flex min-h-dvh",
+        "items-center justify-center",
+        "overflow-hidden",
+        "bg-background px-4 py-10",
+        "text-text",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none",
+          "absolute inset-0",
+          "bg-[radial-gradient(circle_at_top,var(--glow-primary),transparent_65%)]",
+          "opacity-45",
+        )}
+        aria-hidden="true"
+      />
+
+      <Link
+        to="/"
+        className={cn(
+          "absolute left-4 top-4",
+          "inline-flex items-center gap-2",
+          "rounded-xl px-3 py-2",
+          "text-sm font-medium",
+          "text-text-muted",
+          "hover:bg-surface-elevated",
+          "hover:text-text",
+          "sm:left-6 sm:top-6",
+        )}
+      >
+        <ArrowLeft
+          size={16}
+          aria-hidden="true"
+        />
+
+        Voltar
+      </Link>
+
+      <section
+        className={cn(
+          "relative w-full max-w-md",
+          "rounded-[24px] border",
+          "border-border-highlight/60",
+          "bg-surface/85 p-6",
+          "shadow-elevated",
+          "backdrop-blur-xl",
+          "sm:p-8",
+        )}
+      >
+        <BrandLogo />
+
+        <div className="mt-8">
+          <div
+            className={cn(
+              "flex size-11 items-center",
+              "justify-center rounded-2xl",
+              "bg-primary/10",
+              "text-primary-bright",
+            )}
+          >
+            <BrainCircuit
+              size={22}
+              aria-hidden="true"
+            />
+          </div>
+
+          <h1 className="mt-5 text-2xl font-bold tracking-tight text-text">
+            Bem-vindo de volta
+          </h1>
+
+          <p className="mt-2 text-sm leading-6 text-text-muted">
+            Entre para acessar seu painel
+            financeiro.
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "mt-8 rounded-2xl",
+            "border border-border-muted",
+            "bg-background/40 p-4",
+            "text-sm leading-6",
+            "text-text-muted",
+          )}
+        >
+          O formulÃ¡rio de autenticaÃ§Ã£o serÃ¡
+          conectado na prÃ³xima etapa.
+        </div>
+
+        <p className="mt-6 text-center text-sm text-text-muted">
+          Ainda nÃ£o possui uma conta?{" "}
+          <Link
+            to="/register"
+            className="font-semibold text-primary-bright hover:underline"
+          >
+            Cadastre-se
+          </Link>
+        </p>
+      </section>
+    </main>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Login/index.ts
+========================================================================================================================
+
+export * from "./LoginPage";
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Register/RegisterPage.tsx
+========================================================================================================================
+
+import {
+  ArrowLeft,
+  Sparkles,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+import { BrandLogo } from "@/components/landing/BrandLogo";
+import { cn } from "@/lib/utils";
+
+export function RegisterPage() {
+  return (
+    <main
+      className={cn(
+        "relative flex min-h-dvh",
+        "items-center justify-center",
+        "overflow-hidden",
+        "bg-background px-4 py-10",
+        "text-text",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none",
+          "absolute inset-0",
+          "bg-[radial-gradient(circle_at_top,var(--glow-primary),transparent_65%)]",
+          "opacity-45",
+        )}
+        aria-hidden="true"
+      />
+
+      <Link
+        to="/"
+        className={cn(
+          "absolute left-4 top-4",
+          "inline-flex items-center gap-2",
+          "rounded-xl px-3 py-2",
+          "text-sm font-medium",
+          "text-text-muted",
+          "hover:bg-surface-elevated",
+          "hover:text-text",
+          "sm:left-6 sm:top-6",
+        )}
+      >
+        <ArrowLeft
+          size={16}
+          aria-hidden="true"
+        />
+
+        Voltar
+      </Link>
+
+      <section
+        className={cn(
+          "relative w-full max-w-md",
+          "rounded-[24px] border",
+          "border-border-highlight/60",
+          "bg-surface/85 p-6",
+          "shadow-elevated",
+          "backdrop-blur-xl",
+          "sm:p-8",
+        )}
+      >
+        <BrandLogo />
+
+        <div className="mt-8">
+          <div
+            className={cn(
+              "flex size-11 items-center",
+              "justify-center rounded-2xl",
+              "bg-secondary/10",
+              "text-secondary-bright",
+            )}
+          >
+            <Sparkles
+              size={22}
+              aria-hidden="true"
+            />
+          </div>
+
+          <h1 className="mt-5 text-2xl font-bold tracking-tight text-text">
+            Crie sua conta
+          </h1>
+
+          <p className="mt-2 text-sm leading-6 text-text-muted">
+            Comece a acompanhar sua vida
+            financeira com inteligÃªncia.
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "mt-8 rounded-2xl",
+            "border border-border-muted",
+            "bg-background/40 p-4",
+            "text-sm leading-6",
+            "text-text-muted",
+          )}
+        >
+          O formulÃ¡rio de cadastro e o acesso
+          com Google serÃ£o conectados na prÃ³xima
+          etapa.
+        </div>
+
+        <p className="mt-6 text-center text-sm text-text-muted">
+          JÃ¡ possui uma conta?{" "}
+          <Link
+            to="/login"
+            className="font-semibold text-primary-bright hover:underline"
+          >
+            Entrar
+          </Link>
+        </p>
+      </section>
+    </main>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Register/index.ts
+========================================================================================================================
+
+export * from "./RegisterPage";
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/AuthCard/AuthCard.tsx
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/AuthField/AuthField.tsx
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/PasswordField/PasswordField.tsx
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/AuthLayout/AuthLayout.tsx
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/AuthDivider/AuthDivider.tsx
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/GoogleAuthButton/GoogleAuthButton.tsx
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/controller/UserController.java
+========================================================================================================================
+
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.UserRegisterDto;
+import br.com.financeai.dto.request.UserUpdateDto;
+import br.com.financeai.dto.response.UserResponseDto;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.ApiErrorResponse;
+import br.com.financeai.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+@RestController
+@RequestMapping("/users")
+@Tag(
+        name = "Users",
+        description = "Protected endpoints for managing the authenticated user's profile."
+)
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+  
+   @Operation(
+            summary = "Register a new user",
+            description = """
+                Creates a new user account.
+
+                Authentication:
+                This endpoint is public and does not require a JWT token.
+
+                Behavior:
+                Validates the registration data, requires a unique email address
+                and encrypts the password before storing it. The password is never
+                included in the API response.
+                """
+    )
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "User registered successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid registration data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email address already registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+
+    @PostMapping
+    public ResponseEntity<UserResponseDto> cadastrar(@RequestBody @Valid UserRegisterDto dto, UriComponentsBuilder uriBuilder) {
+        UserResponseDto response = userService.cadastrar(dto);
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(response.id()).toUri();
+        return ResponseEntity.created(uri).body(response);
+    }
+
+    @Operation(
+            summary = "Get authenticated user",
+            description = """
+                Returns the profile information of the currently authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Identifies the user from the token and returns their profile data
+                without exposing sensitive information such as the password.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDto> obterPerfil(@AuthenticationPrincipal AppUser usuarioLogado) {
+        UserResponseDto response = userService.buscarPerfil(usuarioLogado);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Update authenticated user",
+            description = """
+                Updates the profile information of the currently authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Allows the authenticated user to update their own account information.
+                If the email is changed, the new address must not already belong to
+                another user. A new password is encrypted before being stored.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User updated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email address already registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PutMapping("/me")
+    public ResponseEntity<UserResponseDto> atualizarPerfil(
+            @AuthenticationPrincipal AppUser usuarioLogado,
+            @RequestBody @Valid UserUpdateDto dto) {
+        UserResponseDto response = userService.atualizarPerfil(usuarioLogado, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Deactivate authenticated user",
+            description = """
+                Deactivates the currently authenticated user's account.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Performs a logical deletion by marking the account as inactive.
+                The user record remains stored in the database, but the account
+                must no longer be authorized to access protected endpoints.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "User deactivated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> desativarConta(@AuthenticationPrincipal AppUser usuarioLogado) {
+        userService.desativarConta(usuarioLogado);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/response/UserResponseDto.java
+========================================================================================================================
+
+package br.com.financeai.dto.response;
+
+import br.com.financeai.entity.AppUser;
+
+public record UserResponseDto(
+        Long id,
+        String nome,
+        String email,
+        boolean ativo
+) {
+    public UserResponseDto(AppUser usuario) {
+        this(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.isAtivo());
+    }
+}
+
+
+
+========================================================================================================================
+DTOs DE USUARIO ENCONTRADOS NO BACKEND
+========================================================================================================================
+
+
+------------------------------------------------------------------------------------------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\request\UserRegisterDto.java
+------------------------------------------------------------------------------------------------------------------------
+
+package br.com.financeai.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record UserRegisterDto(
+        @NotBlank(message = "O nome Ã© obrigatÃ³rio")
+        @Size(max = 100, message = "O nome nÃ£o pode ter mais de 100 caracteres")
+        String nome,
+
+        @NotBlank(message = "O e-mail Ã© obrigatÃ³rio")
+        @Email(message = "Formato de e-mail invÃ¡lido")
+        @Size(max = 150, message = "O e-mail nÃ£o pode ter mais de 150 caracteres")
+        String email,
+
+        @NotBlank(message = "A senha Ã© obrigatÃ³ria")
+        @Size(min = 6, max = 20, message = "A senha deve conter entre 6 e 20 caracteres")
+        String senha
+) {}
+
+
+------------------------------------------------------------------------------------------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\request\UserUpdateDto.java
+------------------------------------------------------------------------------------------------------------------------
+
+package br.com.financeai.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
+
+public record UserUpdateDto(
+        @Size(max = 100, message = "O nome nÃ£o pode ter mais de 100 caracteres")
+        String nome,
+
+        @Email(message = "Formato de e-mail invÃ¡lido")
+        @Size(max = 150, message = "O e-mail nÃ£o pode ter mais de 150 caracteres")
+        String email,
+
+        @Size(min = 6, max = 20, message = "A senha deve conter entre 6 e 20 caracteres")
+        String senha
+) {}
+
+
+------------------------------------------------------------------------------------------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\response\UserResponseDto.java
+------------------------------------------------------------------------------------------------------------------------
+
+package br.com.financeai.dto.response;
+
+import br.com.financeai.entity.AppUser;
+
+public record UserResponseDto(
+        Long id,
+        String nome,
+        String email,
+        boolean ativo
+) {
+    public UserResponseDto(AppUser usuario) {
+        this(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.isAtivo());
+    }
+}
+

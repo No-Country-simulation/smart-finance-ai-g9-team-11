@@ -77,7 +77,7 @@ public class AutenticacaoController {
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Invalid email or password",
+                    description = "Authentication failed due to invalid credentials or inactive account",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiErrorResponse.class)
@@ -156,7 +156,7 @@ public class AutenticacaoController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "409",
+                    responseCode = "422",
                     description = "User account is already active",
                     content = @Content(
                             mediaType = "application/json",

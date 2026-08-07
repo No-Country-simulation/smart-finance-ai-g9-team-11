@@ -32,16 +32,18 @@ The goal is to verify:
 - [x] Reject invalid password (401)
 - [x] Reject nonexistent email (401)
 - [x] Verify JWT generation.
-- [x] Verify protected endpoint using JWT
+- [x] Verify protected endpoint using JWT.
+- [x] Reject requests without JWT (401)
+- [x] Reject invalid JWT (401)
 
 ---
 
 ## Account Reactivation
 
-- [ ] Reactivate inactive account.
-- [ ] Reject invalid password.
-- [ ] Reject already active account.
-- [ ] Reject nonexistent account.
+- [x] Reactivate inactive account (204)
+- [x] Reject invalid password (401)
+- [x] Reject already active account (422)
+- [x] Reject nonexistent account (404)
 
 ---
 
@@ -59,8 +61,8 @@ The goal is to verify:
 
 ## Account
 
-- [ ] Deactivate account.
-- [ ] Verify inactive user cannot login.
+- [x] Deactivate account (204)
+- [x] Verify inactive user cannot login (401)
 
 ---
 
@@ -123,8 +125,8 @@ The goal is to verify:
 
 ## Authentication
 
-- [ ] Access protected endpoint without JWT.
-- [ ] Access protected endpoint with invalid JWT.
+- [x] Access protected endpoint without JWT.
+- [x] Access protected endpoint with invalid JWT.
 - [ ] Access protected endpoint with expired JWT (if applicable).
 
 ---
@@ -176,6 +178,15 @@ The goal is to verify:
 
 ---
 
+# 9. Improvements
+
+## Authentication
+
+- [x] Implemented `CustomAuthenticationEntryPoint`.
+- [x] Standardized authentication errors for protected endpoints.
+- [x] Missing JWT now returns `401 Unauthorized` using `ApiErrorResponse`.
+- [x] Invalid JWT now returns `401 Unauthorized` using `ApiErrorResponse`.
+
 # Test Result
 
 Status:
@@ -186,3 +197,7 @@ Status:
 Comments:
 
 ```
+```
+
+
+

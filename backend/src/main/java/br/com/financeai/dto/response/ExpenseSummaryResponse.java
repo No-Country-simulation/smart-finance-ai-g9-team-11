@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 
-/** Total de gastos do período, agrupado por categoria de transação. */
 public record ExpenseSummaryResponse(
         @JsonProperty("Alimentação")
         BigDecimal alimentacao,

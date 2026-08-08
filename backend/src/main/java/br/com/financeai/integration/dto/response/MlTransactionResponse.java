@@ -8,10 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/**
- * Resposta do endpoint de classificação: os dados originais da
- * transação acrescidos da categoria determinada.
- */
 public record MlTransactionResponse(
 
         String descricao,

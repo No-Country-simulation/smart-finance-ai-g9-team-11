@@ -7,13 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-/**
- * Implementação de {@link UserDetailsService} exigida pelo Spring Security
- * para carregar um usuário durante a autenticação, a partir do e-mail
- * informado no login.
- */
 @Service
-public class AuthenticationService implements UserDetailsService {
+public class AutenticacaoService implements UserDetailsService {
 
     @Autowired
     private UserRepository repository;

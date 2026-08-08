@@ -12,12 +12,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-/**
- * Responsável por gerar e validar tokens JWT usando o algoritmo HMAC256.
- * <p>
- * O token expira em 2 horas a partir da geração e carrega o e-mail do
- * usuário como {@code subject}.
- */
 @Service
 public class TokenService {
 

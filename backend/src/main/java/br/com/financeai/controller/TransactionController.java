@@ -33,18 +33,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import java.time.LocalDate;
 import java.util.List;
 
-
-/**
- * Endpoints de CRUD de transações do usuário autenticado: criação
- * (única ou em lote), listagem (com filtro opcional de período),
- * busca por id, atualização e exclusão.
- */
+@RestController
+@RequestMapping("/classificar-transacoes")
 @Tag(
         name = "Transactions",
         description = "Protected endpoints for creating, classifying and managing the authenticated user's financial transactions."
 )
-@RestController
-@RequestMapping("/classificar-transacoes")
 public class TransactionController {
 
     private final TransactionService transactionService;

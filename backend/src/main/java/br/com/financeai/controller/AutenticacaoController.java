@@ -1,7 +1,9 @@
 package br.com.financeai.controller;
 
 import br.com.financeai.dto.request.DadosAutenticacao;
+import br.com.financeai.dto.request.UserRegisterDto;
 import br.com.financeai.dto.response.DadosTokenJWT;
+import br.com.financeai.dto.response.UserResponseDto;
 import br.com.financeai.entity.AppUser;
 import br.com.financeai.exception.AuthenticationException;
 import br.com.financeai.security.TokenService;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 import br.com.financeai.exception.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,17 +26,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * Endpoints de autenticação: login, cadastro e reativação de conta.
- * Únicos endpoints públicos da API, junto com a documentação Swagger.
- */
+@RestController
+@RequestMapping("/auth")
 @Tag(
         name="Authentication",
         description = "Public endpoints for user registration and authentication"
 )
-@RestController
-@RequestMapping("/auth")
-public class AuthenticationController {
+public class AutenticacaoController {
 
     @Autowired
     private AuthenticationManager manager;

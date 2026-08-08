@@ -23,14 +23,6 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-
-/**
- * Representa uma transação financeira (receita ou despesa) de um usuário.
- *
- * A categoria e a origem ({@link Source#ML} ou {@link Source#FALLBACK})
- * são preenchidas automaticamente no momento da classificação — nunca
- * informadas diretamente pelo usuário.
- */
 @Entity
 @Table(name = "transacoes")
 @Getter

@@ -6,6 +6,7 @@ import br.com.financeai.dto.response.TransactionResponse;
 import br.com.financeai.entity.AppUser;
 import br.com.financeai.entity.Transaction;
 import br.com.financeai.enums.Source;
+import br.com.financeai.enums.TransactionCategory;
 import br.com.financeai.enums.TransactionType;
 import br.com.financeai.exception.*;
 import br.com.financeai.integration.client.MlClient;
@@ -24,16 +25,14 @@ import java.util.List;
 /**
  * Responsável pelo CRUD completo de transações: criar (uma ou em lote),
  * listar, buscar por id, atualizar e excluir.
- * <p>
+ *
  * Toda transação criada ou editada passa pela IA (MlClient) para receber
- * uma categoria — o usuário nunca informa a categoria manualmente. Em caso
- * de falha na comunicação com a IA, a classificação recorre a um fallback
- * local baseado em palavras-chave ({@link TransactionClassificationService}).
- * <p>
- * O usuário é identificado via {@code @AuthenticationPrincipal}, extraído
- * do token JWT — e toda operação valida que a transação pertence de fato
- * ao usuário autenticado, evitando que alguém acesse/edite/exclua dados
- * de outra pessoa só adivinhando um ID.
+ * uma categoria — o usuário nunca informa a categoria manualmente.
+ *
+ * O usuário é identificado pelo header X-User-Id (placeholder provisório,
+ * até existir autenticação real via JWT), e toda operação valida que a
+ * transação pertence de fato ao usuário informado, evitando que alguém
+ * acesse/edite/exclua dados de outra pessoa só adivinhando um ID.
  */
 @Slf4j
 @Service

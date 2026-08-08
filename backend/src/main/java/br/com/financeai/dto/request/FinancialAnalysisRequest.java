@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-/** Período (data inicial e final) para o qual uma análise financeira será gerada. */
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record FinancialAnalysisRequest(
         @NotNull(message = "A data inicial é obrigatória.")

@@ -25,10 +25,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+/**
+ * Endpoints de gestão de análises financeiras do usuário autenticado:
+ * geração, listagem, busca por id e exclusão.
+ */
 @Tag(
         name = "Financial Analysis",
         description = "Protected endpoints for generating and managing the authenticated user's financial analyses."
 )
+
+
 @RestController
 @RequestMapping("/analise-financeira")
 public class FinancialAnalysisController {

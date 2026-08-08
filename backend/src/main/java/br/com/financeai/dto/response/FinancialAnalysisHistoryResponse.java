@@ -7,6 +7,7 @@ import br.com.financeai.enums.SavingFrequency;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/** Representação de uma análise financeira já persistida, para exibição no histórico. */
 public record FinancialAnalysisHistoryResponse(
 
         Long id,

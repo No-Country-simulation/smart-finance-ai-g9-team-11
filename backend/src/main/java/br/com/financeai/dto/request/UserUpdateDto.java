@@ -3,6 +3,7 @@ package br.com.financeai.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
+/** Campos opcionais para atualização parcial do perfil do usuário. */
 public record UserUpdateDto(
         @Size(max = 100, message = "O nome não pode ter mais de 100 caracteres")
         String nome,

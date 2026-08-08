@@ -8,7 +8,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record MlResponse(
+/**
+ * Resposta do endpoint de análise financeira: perfil, nível de
+ * endividamento, frequência de poupança, probabilidade, resumo de
+ * gastos por categoria e recomendações.
+ */
+public record MlAnalysisResponse(
 
 
         @JsonProperty("perfil_financeiro")

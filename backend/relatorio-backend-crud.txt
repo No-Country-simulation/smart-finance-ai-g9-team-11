@@ -100,19 +100,19 @@ public class TransactionClassificationService {
 
         public TransactionClassificationResponse classify(TransactionRequest request){
 
-            MlTransactionRequest mlRequest =
+            MlTransactionRequest mlAnalysisRequest =
                     new MlTransactionRequest(
                             request.descricao(),
                             request.valor()
                     );
 
 
-            MlTransactionResponse mlResponse = mlClient.classifyTransaction(mlRequest);
+            MlTransactionResponse mlAnalysisResponse = mlClient.classifyTransaction(mlAnalysisRequest);
 
             return new TransactionClassificationResponse(
-                    mlResponse.descricao(),
-                    mlResponse.valor(),
-                    mlResponse.categoria()
+                    mlAnalysisResponse.descricao(),
+                    mlAnalysisResponse.valor(),
+                    mlAnalysisResponse.categoria()
             );
     }
 }

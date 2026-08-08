@@ -22,7 +22,9 @@ The goal is to verify:
 - [x] Reject duplicated email (409)
 - [x] Reject invalid email (400)
 - [x] Reject weak password (400)
-- [x] Reject missing required fields (400)
+- [x] Reject missing name (400)
+- [x] Reject missing email (400)
+- [x] Reject missing password (400)
 
 ---
 
@@ -31,10 +33,13 @@ The goal is to verify:
 - [x] Login with valid credentials (200)
 - [x] Reject invalid password (401)
 - [x] Reject nonexistent email (401)
-- [x] Verify JWT generation.
-- [x] Verify protected endpoint using JWT.
-- [x] Reject requests without JWT (401)
-- [x] Reject invalid JWT (401)
+
+---
+
+## JWT Authentication
+
+- [x] Verify JWT generation (200)
+- [x] Verify protected endpoint using JWT (200)
 
 ---
 
@@ -51,11 +56,13 @@ The goal is to verify:
 
 ## Profile
 
-- [ ] Get authenticated user.
-- [ ] Update profile.
-- [ ] Update password.
-- [ ] Update email.
-- [ ] Reject duplicated email.
+- [x] Get authenticated user (200)
+- [x] Update profile (200)
+- [x] Update email (200)
+- [x] Update password (200)
+- [x] Reject duplicated email (409)
+- [x] Reject invalid email (400)
+- [x] Reject weak password (400)
 
 ---
 

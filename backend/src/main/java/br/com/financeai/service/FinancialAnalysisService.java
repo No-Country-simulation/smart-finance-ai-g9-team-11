@@ -31,12 +31,21 @@ import java.util.List;
 
 /**
  * Responsável por gerar e gerenciar as análises financeiras dos usuários.
+ * <p>
  * Fluxo de geração:
+ * <p>
  * 1. Localiza o usuário autenticado.
+ * <p>
  * 2. Busca as transações do usuário dentro do período informado.
+ * <p>
  * 3. Monta a requisição para a API de Machine Learning.
- * 4. Recebe o resultado da análise.
- * 5. Persiste o resultado no banco.
+ * <p>
+ * 4. Recebe o resultado da análise — ou, se a IA estiver indisponível,
+ *    gera o resultado localmente via {@link FinancialProfileService}.
+ * <p>
+ * 5. Persiste o resultado no banco, diferenciado pelo campo {@code origem}
+ *    ({@link br.com.financeai.enums.Source#ML} ou {@link br.com.financeai.enums.Source#FALLBACK}).
+ * <p>
  * 6. Devolve o resultado ao frontend.
  */
 @Slf4j

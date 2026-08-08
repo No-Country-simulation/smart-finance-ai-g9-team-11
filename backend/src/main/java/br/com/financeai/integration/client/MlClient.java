@@ -16,12 +16,13 @@ import org.springframework.web.client.RestClientResponseException;
 
 /**
  * Cliente responsável pela comunicação com o serviço de Machine Learning.
- *
- * <p>Esta classe realiza as chamadas HTTP para a API de IA, responsável
+ * <p>
+ * Esta classe realiza as chamadas HTTP para a API de IA, responsável
  * pela classificação de transações e pela análise do perfil financeiro.
+ * <p>
  * Em caso de indisponibilidade do serviço, lança
  * {@link ExternalServiceException} para que a camada de serviço possa
- * executar o mecanismo de fallback.</p>
+ * executar o mecanismo de fallback.
  */
 @Slf4j
 @Service

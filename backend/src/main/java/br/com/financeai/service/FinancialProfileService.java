@@ -18,6 +18,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Responsável pela geração local (fallback) de análises financeiras,
+ * usada quando o serviço de Machine Learning está indisponível.
+ * <p>
+ * Calcula o perfil financeiro, nível de endividamento e frequência de
+ * poupança através de regras determinísticas simples sobre o total de
+ * receitas e despesas do período — não substitui a precisão do modelo
+ * de IA, mas evita que a funcionalidade fique completamente indisponível.
+ */
 @Service
 public class FinancialProfileService {
 

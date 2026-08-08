@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -85,25 +86,90 @@ public class AutenticacaoController {
     })
     @PostMapping("/login")
     public ResponseEntity<DadosTokenJWT>  efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
+
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
 
-            try {
-                var authentication = manager.authenticate(authenticationToken);
+        try {
+            var authentication = manager.authenticate(authenticationToken);
 
-                var usuario = (AppUser) authentication.getPrincipal();
-                var tokenJWT = tokenService.gerarToken(usuario.getEmail());
+            var usuario = (AppUser) authentication.getPrincipal();
+            var tokenJWT = tokenService.gerarToken(usuario.getEmail());
 
             return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
 
+        } catch (DisabledException ex) {
+            throw new AuthenticationException("Esta conta está desativada. Reative sua conta para continuar.");
+
         } catch (BadCredentialsException ex) {
-            // Traduz o erro do Spring Security para a exceção de domínio do projeto,
-            // que já é tratada de forma padronizada pelo GlobalExceptionHandler.
-            throw new AuthenticationException(ex.getMessage());
+            throw new AuthenticationException("E-mail ou senha inválidos.");
         }
     }
 
+    @Operation(
+            summary = "Reactivate user account",
+            description = """
+            Reactivates a previously deactivated user account.
+
+            Authentication:
+            This endpoint is public and does not require a JWT token.
+
+            Behavior:
+            Validates the provided email and password. If the credentials
+            are correct and the account is currently inactive, the account
+            is reactivated and can authenticate normally again.
+            """
+    )
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "User account reactivated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid email or password",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "User account is already active",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
     @PostMapping("/reactivate")
-    public ResponseEntity<Void> reativarConta(@RequestBody @Valid DadosAutenticacao dados) {
+    public ResponseEntity<Void> reativarConta(
+            @RequestBody @Valid DadosAutenticacao dados
+    ) {
         userService.reativarConta(dados);
         return ResponseEntity.noContent().build();
     }

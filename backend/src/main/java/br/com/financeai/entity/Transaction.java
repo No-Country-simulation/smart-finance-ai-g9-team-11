@@ -1,5 +1,6 @@
 package br.com.financeai.entity;
 
+import br.com.financeai.enums.Source;
 import br.com.financeai.enums.TransactionCategory;
 import br.com.financeai.enums.TransactionType;
 import jakarta.persistence.Column;
@@ -52,12 +53,11 @@ public class Transaction {
     @Column(name = "data_transacao", nullable = false)
     private LocalDate data;
 
-    /*
-     * A transação pertence diretamente ao usuário.
-     * Dessa forma, ela pode existir antes de uma análise financeira
-     * e pode ser utilizada em análises de diferentes períodos.
-     */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
     private AppUser usuario;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Source origem;
 }

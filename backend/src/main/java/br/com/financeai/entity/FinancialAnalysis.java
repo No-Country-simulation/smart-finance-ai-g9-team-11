@@ -1,5 +1,6 @@
 package br.com.financeai.entity;
 
+import br.com.financeai.enums.Source;
 import br.com.financeai.enums.FinancialProfile;
 import br.com.financeai.enums.SavingFrequency;
 import jakarta.persistence.*;
@@ -41,5 +42,9 @@ public class FinancialAnalysis {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private AppUser usuario;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Source origem;
 
 }

@@ -1,0 +1,2 @@
+ALTER TABLE transacoes
+    ADD COLUMN origem VARCHAR(20) NOT NULL DEFAULT 'ML';

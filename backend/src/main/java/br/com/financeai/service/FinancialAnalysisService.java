@@ -15,8 +15,8 @@ import br.com.financeai.exception.InvalidRequestException;
 import br.com.financeai.exception.ResourceNotFoundException;
 import br.com.financeai.exception.UserNotFoundException;
 import br.com.financeai.integration.client.MlClient;
-import br.com.financeai.integration.dto.request.MlRequest;
-import br.com.financeai.integration.dto.response.MlResponse;
+import br.com.financeai.integration.dto.request.MlAnalysisRequest;
+import br.com.financeai.integration.dto.response.MlAnalysisResponse;
 import br.com.financeai.integration.dto.response.MlTransactionResponse;
 import br.com.financeai.repository.FinancialAnalysisRepository;
 import br.com.financeai.repository.TransactionRepository;
@@ -31,12 +31,21 @@ import java.util.List;
 
 /**
  * Responsável por gerar e gerenciar as análises financeiras dos usuários.
+ * <p>
  * Fluxo de geração:
+ * <p>
  * 1. Localiza o usuário autenticado.
+ * <p>
  * 2. Busca as transações do usuário dentro do período informado.
+ * <p>
  * 3. Monta a requisição para a API de Machine Learning.
- * 4. Recebe o resultado da análise.
- * 5. Persiste o resultado no banco.
+ * <p>
+ * 4. Recebe o resultado da análise — ou, se a IA estiver indisponível,
+ *    gera o resultado localmente via {@link FinancialProfileService}.
+ * <p>
+ * 5. Persiste o resultado no banco, diferenciado pelo campo {@code origem}
+ *    ({@link br.com.financeai.enums.Source#ML} ou {@link br.com.financeai.enums.Source#FALLBACK}).
+ * <p>
  * 6. Devolve o resultado ao frontend.
  */
 @Slf4j
@@ -89,11 +98,11 @@ public class FinancialAnalysisService {
         }
 
         List<Transaction> transactions = buscarTransacoes(user, request);
-        MlRequest mlRequest = new MlRequest(mapToMlTransactions(transactions));
+        MlAnalysisRequest mlAnalysisRequest = new MlAnalysisRequest(mapToMlTransactions(transactions));
 
-        MlResponse mlResponse;
+        MlAnalysisResponse mlAnalysisResponse;
         try {
-            mlResponse = mlClient.analyze(mlRequest);
+            mlAnalysisResponse = mlClient.analyze(mlAnalysisRequest);
 
         } catch (ExternalServiceException ex) {
 
@@ -121,21 +130,21 @@ public class FinancialAnalysisService {
         financialAnalysisRepository.save(
                 criarAnalise(
                         user,
-                        mlResponse.perfilFinanceiro(),
-                        mlResponse.nivelEndividamento(),
-                        mlResponse.frequenciaPoupanca(),
-                        mlResponse.probabilidade(),
+                        mlAnalysisResponse.perfilFinanceiro(),
+                        mlAnalysisResponse.nivelEndividamento(),
+                        mlAnalysisResponse.frequenciaPoupanca(),
+                        mlAnalysisResponse.probabilidade(),
                         Source.ML
                 )
         );
 
         return new FinancialAnalysisResponse(
-                mlResponse.perfilFinanceiro(),
-                mlResponse.nivelEndividamento(),
-                mlResponse.frequenciaPoupanca(),
-                mlResponse.probabilidade(),
-                mlResponse.resumoGastos(),
-                mlResponse.recomendacoes()
+                mlAnalysisResponse.perfilFinanceiro(),
+                mlAnalysisResponse.nivelEndividamento(),
+                mlAnalysisResponse.frequenciaPoupanca(),
+                mlAnalysisResponse.probabilidade(),
+                mlAnalysisResponse.resumoGastos(),
+                mlAnalysisResponse.recomendacoes()
         );
     }
 

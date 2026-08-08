@@ -19,12 +19,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@RestController
-@RequestMapping("/users")
+/**
+ * Endpoints de gestão do próprio perfil do usuário autenticado:
+ * consulta, atualização parcial e desativação de conta.
+ */
 @Tag(
         name = "Users",
         description = "Endpoints for user registration and authenticated profile management."
 )
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;

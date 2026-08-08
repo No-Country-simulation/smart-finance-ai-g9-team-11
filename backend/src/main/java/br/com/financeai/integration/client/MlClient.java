@@ -1,9 +1,9 @@
 package br.com.financeai.integration.client;
 
 import br.com.financeai.exception.ExternalServiceException;
-import br.com.financeai.integration.dto.request.MlRequest;
+import br.com.financeai.integration.dto.request.MlAnalysisRequest;
 import br.com.financeai.integration.dto.request.MlTransactionRequest;
-import br.com.financeai.integration.dto.response.MlResponse;
+import br.com.financeai.integration.dto.response.MlAnalysisResponse;
 import br.com.financeai.integration.dto.response.MlTransactionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,12 +16,13 @@ import org.springframework.web.client.RestClientResponseException;
 
 /**
  * Cliente responsável pela comunicação com o serviço de Machine Learning.
- *
- * <p>Esta classe realiza as chamadas HTTP para a API de IA, responsável
+ * <p>
+ * Esta classe realiza as chamadas HTTP para a API de IA, responsável
  * pela classificação de transações e pela análise do perfil financeiro.
+ * <p>
  * Em caso de indisponibilidade do serviço, lança
  * {@link ExternalServiceException} para que a camada de serviço possa
- * executar o mecanismo de fallback.</p>
+ * executar o mecanismo de fallback.
  */
 @Slf4j
 @Service
@@ -47,19 +48,19 @@ public class MlClient {
      * @throws ExternalServiceException caso o serviço de Machine Learning
      *         esteja indisponível ou retorne uma resposta inválida.
      */
-    public MlResponse analyze(MlRequest request) {
+    public MlAnalysisResponse analyze(MlAnalysisRequest request) {
 
         try {
 
             logRequest("JSON da análise enviado ao ML:", request);
 
-            MlResponse response = restClient.post()
+            MlAnalysisResponse response = restClient.post()
                     .uri("/analise-financeira")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
-                    .body(MlResponse.class);
+                    .body(MlAnalysisResponse.class);
 
             if (response == null) {
                 throw new ExternalServiceException(

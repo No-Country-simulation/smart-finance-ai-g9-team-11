@@ -2,6 +2,10 @@ package br.com.financeai.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Perfil financeiro resultante de uma análise, indicando o nível geral
+ * de saúde financeira do usuário no período analisado.
+ */
 public enum FinancialProfile {
 
     SAUDAVEL("Saudável"),

@@ -23,6 +23,14 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 
 import java.util.List;
 
+/**
+ * Configuração central de segurança da aplicação.
+ * <p>
+ * Define a política de sessão (stateless, já que a autenticação é via JWT,
+ * sem estado de sessão no servidor), as rotas públicas (login, cadastro,
+ * reativação de conta e documentação Swagger) e registra o
+ * {@link SecurityFilter} antes do filtro padrão de autenticação do Spring.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {

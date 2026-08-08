@@ -1,9 +1,7 @@
 package br.com.financeai.controller;
 
-import br.com.financeai.dto.request.DadosAutenticacao;
-import br.com.financeai.dto.request.UserRegisterDto;
-import br.com.financeai.dto.response.DadosTokenJWT;
-import br.com.financeai.dto.response.UserResponseDto;
+import br.com.financeai.dto.request.AuthenticationRequest;
+import br.com.financeai.dto.response.AuthenticationResponse;
 import br.com.financeai.entity.AppUser;
 import br.com.financeai.exception.AuthenticationException;
 import br.com.financeai.security.TokenService;
@@ -16,7 +14,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 import br.com.financeai.exception.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,13 +23,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@RestController
-@RequestMapping("/auth")
+/**
+ * Endpoints de autenticação: login, cadastro e reativação de conta.
+ * Únicos endpoints públicos da API, junto com a documentação Swagger.
+ */
 @Tag(
         name = "Authentication",
         description = "Public endpoints for user authentication and account reactivation."
 )
-public class AutenticacaoController {
+@RestController
+@RequestMapping("/auth")
+public class AuthenticationController {
 
     @Autowired
     private AuthenticationManager manager;
@@ -64,7 +65,7 @@ public class AutenticacaoController {
                     description = "User authenticated successfully",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = DadosTokenJWT.class)
+                            schema = @Schema(implementation = AuthenticationResponse.class)
                     )
             ),
             @ApiResponse(
@@ -85,7 +86,7 @@ public class AutenticacaoController {
             )
     })
     @PostMapping("/login")
-    public ResponseEntity<DadosTokenJWT>  efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
+    public ResponseEntity<AuthenticationResponse>  efetuarLogin(@RequestBody @Valid AuthenticationRequest dados) {
 
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
 
@@ -95,7 +96,7 @@ public class AutenticacaoController {
             var usuario = (AppUser) authentication.getPrincipal();
             var tokenJWT = tokenService.gerarToken(usuario.getEmail());
 
-            return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+            return ResponseEntity.ok(new AuthenticationResponse(tokenJWT));
 
         } catch (DisabledException ex) {
             throw new AuthenticationException("Esta conta está desativada. Reative sua conta para continuar.");
@@ -168,7 +169,7 @@ public class AutenticacaoController {
     })
     @PostMapping("/reactivate")
     public ResponseEntity<Void> reativarConta(
-            @RequestBody @Valid DadosAutenticacao dados
+            @RequestBody @Valid AuthenticationRequest dados
     ) {
         userService.reativarConta(dados);
         return ResponseEntity.noContent().build();

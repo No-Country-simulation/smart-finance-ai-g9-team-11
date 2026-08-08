@@ -8,6 +8,15 @@ import org.springframework.stereotype.Service;
 import java.text.Normalizer;
 import java.util.Locale;
 
+/**
+ * Responsável pela classificação local de transações (fallback), usada
+ * quando o serviço de Machine Learning está indisponível.
+ * <p>
+ * A categoria é inferida por correspondência de palavras-chave na
+ * descrição da transação — uma aproximação simples, não tão precisa
+ * quanto o modelo de IA, mas suficiente para manter o cadastro de
+ * transações funcionando durante uma indisponibilidade externa.
+ */
 @Service
 public class TransactionClassificationService {
 

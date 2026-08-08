@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/** Dados de cadastro de um novo usuário. */
 public record UserRegisterDto(
         @NotBlank(message = "O nome é obrigatório")
         @Size(max = 100, message = "O nome não pode ter mais de 100 caracteres")

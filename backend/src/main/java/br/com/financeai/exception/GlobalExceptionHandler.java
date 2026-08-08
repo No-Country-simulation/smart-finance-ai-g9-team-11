@@ -13,6 +13,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+/**
+ * Centraliza o tratamento de todas as exceções da aplicação, convertendo
+ * cada uma em uma resposta HTTP padronizada ({@link ApiErrorResponse}) e
+ * registrando o evento no log — em nível WARN para erros de domínio
+ * esperados, e ERROR (com stack trace) para falhas não previstas.
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {

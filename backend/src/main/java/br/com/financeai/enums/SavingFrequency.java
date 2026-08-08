@@ -2,6 +2,10 @@ package br.com.financeai.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Frequência de poupança estimada do usuário no período analisado,
+ * calculada a partir da proporção entre receitas e despesas.
+ */
 public enum SavingFrequency {
 
     BAIXA("Baixa"),

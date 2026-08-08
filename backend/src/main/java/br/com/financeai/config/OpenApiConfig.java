@@ -8,6 +8,11 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configura o esquema de segurança Bearer/JWT no Swagger UI, habilitando
+ * o botão "Authorize" para testar rotas protegidas diretamente pela
+ * documentação interativa.
+ */
 @Configuration
 public class OpenApiConfig {
 

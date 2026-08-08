@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { PublicRoute } from "@/components/auth/PublicRoute";
 
 import { AppLayout } from "@/layouts/AppLayout";
 
@@ -29,12 +30,20 @@ export default function AppRouter() {
 
         <Route
           path="/login"
-          element={<LoginPage />}
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
         />
 
         <Route
           path="/register"
-          element={<RegisterPage />}
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
         />
 
         <Route

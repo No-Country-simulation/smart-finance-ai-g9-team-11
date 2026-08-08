@@ -1,72 +1,106 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ArrowLeft,
+  LoaderCircle,
+  Mail,
   Sparkles,
+  User,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
+import { useForm } from "react-hook-form";
 
+import { AuthCard } from "@/components/auth/AuthCard";
+import { AuthField } from "@/components/auth/AuthField";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { PasswordField } from "@/components/auth/PasswordField";
 import { BrandLogo } from "@/components/landing/BrandLogo";
+
+import { useAuth } from "@/hooks/useAuth";
+
 import { cn } from "@/lib/utils";
 
+import {
+  registerSchema,
+  type RegisterFormData,
+} from "@/schemas/auth.schema";
+
+import { getApiErrorMessage } from "@/services/api";
+import { registerUser } from "@/services/auth.service";
+
 export function RegisterPage() {
-  return (
-    <main
-      className={cn(
-        "relative flex min-h-dvh",
-        "items-center justify-center",
-        "overflow-hidden",
-        "bg-background px-4 py-10",
-        "text-text",
-      )}
-    >
-      <div
-        className={cn(
-          "pointer-events-none",
-          "absolute inset-0",
-          "bg-[radial-gradient(circle_at_top,var(--glow-primary),transparent_65%)]",
-          "opacity-45",
-        )}
-        aria-hidden="true"
+  const {
+    isAuthenticated,
+  } = useAuth();
+
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: {
+      errors,
+      isSubmitting,
+    },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(
+      registerSchema,
+    ),
+    defaultValues: {
+      nome: "",
+      email: "",
+      senha: "",
+      confirmarSenha: "",
+    },
+  });
+
+  if (isAuthenticated) {
+    return (
+      <Navigate
+        to="/app"
+        replace
       />
+    );
+  }
 
-      <Link
-        to="/"
-        className={cn(
-          "absolute left-4 top-4",
-          "inline-flex items-center gap-2",
-          "rounded-xl px-3 py-2",
-          "text-sm font-medium",
-          "text-text-muted",
-          "hover:bg-surface-elevated",
-          "hover:text-text",
-          "sm:left-6 sm:top-6",
-        )}
-      >
-        <ArrowLeft
-          size={16}
-          aria-hidden="true"
-        />
+  const handleRegister = async (
+    formData: RegisterFormData,
+  ): Promise<void> => {
+    try {
+      await registerUser({
+        nome: formData.nome,
+        email: formData.email,
+        senha: formData.senha,
+      });
 
-        Voltar
-      </Link>
+      navigate("/login", {
+        replace: true,
+      });
+    } catch (error) {
+      setError("root", {
+        type: "server",
+        message: getApiErrorMessage(
+          error,
+          "Não foi possível criar sua conta.",
+        ),
+      });
+    }
+  };
 
-      <section
-        className={cn(
-          "relative w-full max-w-md",
-          "rounded-[24px] border",
-          "border-border-highlight/60",
-          "bg-surface/85 p-6",
-          "shadow-elevated",
-          "backdrop-blur-xl",
-          "sm:p-8",
-        )}
-      >
+  return (
+    <AuthLayout>
+      <AuthCard>
         <BrandLogo />
 
         <div className="mt-8">
           <div
             className={cn(
-              "flex size-11 items-center",
-              "justify-center rounded-2xl",
+              "flex size-11",
+              "items-center justify-center",
+              "rounded-2xl",
               "bg-secondary/10",
               "text-secondary-bright",
             )}
@@ -87,19 +121,118 @@ export function RegisterPage() {
           </p>
         </div>
 
-        <div
-          className={cn(
-            "mt-8 rounded-2xl",
-            "border border-border-muted",
-            "bg-background/40 p-4",
-            "text-sm leading-6",
-            "text-text-muted",
+        <form
+          className="mt-8 space-y-5"
+          onSubmit={handleSubmit(
+            handleRegister,
           )}
+          noValidate
         >
-          O formulário de cadastro e o acesso
-          com Google serão conectados na próxima
-          etapa.
-        </div>
+          <AuthField
+            label="Nome"
+            type="text"
+            placeholder="Seu nome"
+            autoComplete="name"
+            startIcon={
+              <User
+                size={17}
+                aria-hidden="true"
+              />
+            }
+            disabled={isSubmitting}
+            error={errors.nome?.message}
+            {...register("nome")}
+          />
+
+          <AuthField
+            label="E-mail"
+            type="email"
+            placeholder="voce@email.com"
+            autoComplete="email"
+            startIcon={
+              <Mail
+                size={17}
+                aria-hidden="true"
+              />
+            }
+            disabled={isSubmitting}
+            error={errors.email?.message}
+            {...register("email")}
+          />
+
+          <PasswordField
+            label="Senha"
+            placeholder="Crie uma senha"
+            autoComplete="new-password"
+            disabled={isSubmitting}
+            error={errors.senha?.message}
+            {...register("senha")}
+          />
+
+          <PasswordField
+            label="Confirmar senha"
+            placeholder="Repita sua senha"
+            autoComplete="new-password"
+            disabled={isSubmitting}
+            error={
+              errors.confirmarSenha
+                ?.message
+            }
+            {...register(
+              "confirmarSenha",
+            )}
+          />
+
+          {errors.root?.message ? (
+            <div
+              role="alert"
+              className={cn(
+                "rounded-xl border",
+                "border-red-500/30",
+                "bg-red-500/10",
+                "px-4 py-3",
+                "text-sm text-red-300",
+              )}
+            >
+              {errors.root.message}
+            </div>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={cn(
+              "flex h-12 w-full",
+              "items-center justify-center",
+              "gap-2 rounded-xl",
+              "bg-primary",
+              "px-4",
+              "text-sm font-semibold",
+              "text-white",
+              "transition",
+              "hover:bg-primary-bright",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary-bright",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-60",
+            )}
+          >
+            {isSubmitting ? (
+              <>
+                <LoaderCircle
+                  size={18}
+                  className="animate-spin"
+                  aria-hidden="true"
+                />
+
+                Criando conta...
+              </>
+            ) : (
+              "Criar conta"
+            )}
+          </button>
+        </form>
 
         <p className="mt-6 text-center text-sm text-text-muted">
           Já possui uma conta?{" "}
@@ -110,7 +243,7 @@ export function RegisterPage() {
             Entrar
           </Link>
         </p>
-      </section>
-    </main>
+      </AuthCard>
+    </AuthLayout>
   );
 }

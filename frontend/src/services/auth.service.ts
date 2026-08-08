@@ -19,14 +19,15 @@ const PROFILE_ENDPOINT = "/users/me";
 export async function login(
   credentials: LoginRequest,
 ): Promise<void> {
-  const { data } = await api.post<LoginResponse>(
-    LOGIN_ENDPOINT,
-    credentials,
-  );
+  const { data } =
+    await api.post<LoginResponse>(
+      LOGIN_ENDPOINT,
+      credentials,
+    );
 
   if (!data.token) {
     throw new Error(
-      "O backend não retornou um token de autenticação.",
+      "Token de autenticação não retornado pelo servidor.",
     );
   }
 
@@ -36,18 +37,20 @@ export async function login(
 export async function registerUser(
   payload: RegisterRequest,
 ): Promise<AuthUser> {
-  const { data } = await api.post<AuthUser>(
-    USERS_ENDPOINT,
-    payload,
-  );
+  const { data } =
+    await api.post<AuthUser>(
+      USERS_ENDPOINT,
+      payload,
+    );
 
   return data;
 }
 
 export async function getProfile(): Promise<AuthUser> {
-  const { data } = await api.get<AuthUser>(
-    PROFILE_ENDPOINT,
-  );
+  const { data } =
+    await api.get<AuthUser>(
+      PROFILE_ENDPOINT,
+    );
 
   return data;
 }
@@ -57,5 +60,7 @@ export function logout(): void {
 }
 
 export function hasStoredToken(): boolean {
-  return Boolean(getAccessToken());
+  return Boolean(
+    getAccessToken(),
+  );
 }

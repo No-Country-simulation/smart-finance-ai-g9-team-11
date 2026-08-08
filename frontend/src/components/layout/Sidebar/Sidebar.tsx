@@ -15,15 +15,15 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage,
 } from "@/components/ui/avatar";
 import { NAVIGATION_ITEMS } from "@/constants/navigation.constants";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import { userMock } from "@/mocks/user.mock";
 
 import {
   clampSidebarWidth,
@@ -50,7 +50,9 @@ function getUserInitials(name: string): string {
     .trim()
     .split(/\s+/)
     .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
+    .map((part) =>
+      part.charAt(0).toUpperCase(),
+    )
     .join("");
 }
 
@@ -84,34 +86,64 @@ export function Sidebar({
   width,
   onWidthChange,
 }: Readonly<SidebarProps>) {
-  const [isResizing, setIsResizing] = useState(false);
+  const navigate = useNavigate();
 
-  const sidebarRef = useRef<HTMLElement>(null);
+  const {
+    user,
+    logout,
+  } = useAuth();
+
+  const [isResizing, setIsResizing] =
+    useState(false);
+
+  const sidebarRef =
+    useRef<HTMLElement>(null);
+
   const closeButtonRef =
     useRef<HTMLButtonElement>(null);
-  const resizeStartXRef = useRef(0);
+
+  const resizeStartXRef =
+    useRef(0);
+
   const resizeStartWidthRef = useRef(
     SIDEBAR_MIN_WIDTH,
   );
-  const didResizeRef = useRef(false);
 
-  const initials = getUserInitials(userMock.name);
+  const didResizeRef =
+    useRef(false);
 
-  const sidebarWidth = clampSidebarWidth(width);
+  const userName =
+    user?.nome?.trim() ||
+    user?.email ||
+    "Usuário";
+
+  const userEmail =
+    user?.email ?? "";
+
+  const initials =
+    getUserInitials(userName);
+
+  const sidebarWidth =
+    clampSidebarWidth(width);
 
   const isCollapsed =
-    sidebarWidth < SIDEBAR_COLLAPSED_LIMIT;
+    sidebarWidth <
+    SIDEBAR_COLLAPSED_LIMIT;
 
   const sidebarStyle: SidebarStyle = {
     "--sidebar-width": `${sidebarWidth}px`,
   };
 
   const expandSidebar = (): void => {
-    onWidthChange(SIDEBAR_MAX_WIDTH);
+    onWidthChange(
+      SIDEBAR_MAX_WIDTH,
+    );
   };
 
   const collapseSidebar = (): void => {
-    onWidthChange(SIDEBAR_MIN_WIDTH);
+    onWidthChange(
+      SIDEBAR_MIN_WIDTH,
+    );
   };
 
   const toggleCollapsed = (): void => {
@@ -123,6 +155,19 @@ export function Sidebar({
     collapseSidebar();
   };
 
+  const handleLogout = (): void => {
+    logout();
+
+    onCloseMobile();
+
+    navigate(
+      "/login",
+      {
+        replace: true,
+      },
+    );
+  };
+
   useEffect(() => {
     if (!isMobileOpen) {
       return;
@@ -131,7 +176,9 @@ export function Sidebar({
     const previousOverflow =
       document.body.style.overflow;
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow =
+      "hidden";
+
     closeButtonRef.current?.focus();
 
     const handleEscape = (
@@ -156,7 +203,10 @@ export function Sidebar({
         handleEscape,
       );
     };
-  }, [isMobileOpen, onCloseMobile]);
+  }, [
+    isMobileOpen,
+    onCloseMobile,
+  ]);
 
   useEffect(() => {
     if (!isResizing) {
@@ -169,33 +219,43 @@ export function Sidebar({
     const previousUserSelect =
       document.body.style.userSelect;
 
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
+    document.body.style.cursor =
+      "col-resize";
+
+    document.body.style.userSelect =
+      "none";
 
     const handlePointerMove = (
       event: globalThis.PointerEvent,
     ): void => {
       const deltaX =
-        event.clientX - resizeStartXRef.current;
+        event.clientX -
+        resizeStartXRef.current;
 
-      if (Math.abs(deltaX) > 2) {
+      if (
+        Math.abs(deltaX) > 2
+      ) {
         didResizeRef.current = true;
       }
 
-      const nextWidth = clampSidebarWidth(
-        resizeStartWidthRef.current + deltaX,
-      );
+      const nextWidth =
+        clampSidebarWidth(
+          resizeStartWidthRef.current +
+            deltaX,
+        );
 
       onWidthChange(nextWidth);
     };
 
-    const finishResizing = (): void => {
-      setIsResizing(false);
+    const finishResizing =
+      (): void => {
+        setIsResizing(false);
 
-      window.setTimeout(() => {
-        didResizeRef.current = false;
-      }, 0);
-    };
+        window.setTimeout(() => {
+          didResizeRef.current =
+            false;
+        }, 0);
+      };
 
     window.addEventListener(
       "pointermove",
@@ -213,7 +273,9 @@ export function Sidebar({
     );
 
     return () => {
-      document.body.style.cursor = previousCursor;
+      document.body.style.cursor =
+        previousCursor;
+
       document.body.style.userSelect =
         previousUserSelect;
 
@@ -232,27 +294,39 @@ export function Sidebar({
         finishResizing,
       );
     };
-  }, [isResizing, onWidthChange]);
+  }, [
+    isResizing,
+    onWidthChange,
+  ]);
 
   const handleResizePointerDown = (
-    event: ReactPointerEvent<HTMLButtonElement>,
+    event:
+      ReactPointerEvent<HTMLButtonElement>,
   ): void => {
-    if (event.pointerType === "touch") {
+    if (
+      event.pointerType === "touch"
+    ) {
       return;
     }
 
     event.preventDefault();
     event.stopPropagation();
 
-    resizeStartXRef.current = event.clientX;
-    resizeStartWidthRef.current = sidebarWidth;
-    didResizeRef.current = false;
+    resizeStartXRef.current =
+      event.clientX;
+
+    resizeStartWidthRef.current =
+      sidebarWidth;
+
+    didResizeRef.current =
+      false;
 
     setIsResizing(true);
   };
 
   const handleResizeKeyDown = (
-    event: ReactKeyboardEvent<HTMLButtonElement>,
+    event:
+      ReactKeyboardEvent<HTMLButtonElement>,
   ): void => {
     switch (event.key) {
       case "ArrowLeft":
@@ -260,7 +334,8 @@ export function Sidebar({
 
         onWidthChange(
           clampSidebarWidth(
-            sidebarWidth - SIDEBAR_KEYBOARD_STEP,
+            sidebarWidth -
+              SIDEBAR_KEYBOARD_STEP,
           ),
         );
         break;
@@ -270,7 +345,8 @@ export function Sidebar({
 
         onWidthChange(
           clampSidebarWidth(
-            sidebarWidth + SIDEBAR_KEYBOARD_STEP,
+            sidebarWidth +
+              SIDEBAR_KEYBOARD_STEP,
           ),
         );
         break;
@@ -297,13 +373,16 @@ export function Sidebar({
   };
 
   const handleSidebarClick = (
-    event: ReactMouseEvent<HTMLElement>,
+    event:
+      ReactMouseEvent<HTMLElement>,
   ): void => {
     if (
       window.innerWidth < 768 ||
       isResizing ||
       didResizeRef.current ||
-      isInteractiveElement(event.target)
+      isInteractiveElement(
+        event.target,
+      )
     ) {
       return;
     }
@@ -312,41 +391,54 @@ export function Sidebar({
   };
 
   const handleSidebarKeyDown = (
-    event: ReactKeyboardEvent<HTMLElement>,
+    event:
+      ReactKeyboardEvent<HTMLElement>,
   ): void => {
-    if (event.key !== "Tab" || !isMobileOpen) {
+    if (
+      event.key !== "Tab" ||
+      !isMobileOpen
+    ) {
       return;
     }
 
-    const sidebar = sidebarRef.current;
+    const sidebar =
+      sidebarRef.current;
 
     if (!sidebar) {
       return;
     }
 
-    const focusableElements = Array.from(
-      sidebar.querySelectorAll<HTMLElement>(
-        [
-          "a[href]",
-          "button:not([disabled])",
-          "input:not([disabled])",
-          "select:not([disabled])",
-          "textarea:not([disabled])",
-          '[tabindex]:not([tabindex="-1"])',
-        ].join(","),
-      ),
-    ).filter(
-      (element) =>
-        !element.hasAttribute("disabled") &&
-        element.getAttribute("aria-hidden") !==
-          "true",
-    );
+    const focusableElements =
+      Array.from(
+        sidebar.querySelectorAll<HTMLElement>(
+          [
+            "a[href]",
+            "button:not([disabled])",
+            "input:not([disabled])",
+            "select:not([disabled])",
+            "textarea:not([disabled])",
+            '[tabindex]:not([tabindex="-1"])',
+          ].join(","),
+        ),
+      ).filter(
+        (element) =>
+          !element.hasAttribute(
+            "disabled",
+          ) &&
+          element.getAttribute(
+            "aria-hidden",
+          ) !== "true",
+      );
 
-    if (focusableElements.length === 0) {
+    if (
+      focusableElements.length === 0
+    ) {
       return;
     }
 
-    const firstElement = focusableElements[0];
+    const firstElement =
+      focusableElements[0];
+
     const lastElement =
       focusableElements[
         focusableElements.length - 1
@@ -354,7 +446,8 @@ export function Sidebar({
 
     if (
       event.shiftKey &&
-      document.activeElement === firstElement
+      document.activeElement ===
+        firstElement
     ) {
       event.preventDefault();
       lastElement?.focus();
@@ -363,7 +456,8 @@ export function Sidebar({
 
     if (
       !event.shiftKey &&
-      document.activeElement === lastElement
+      document.activeElement ===
+        lastElement
     ) {
       event.preventDefault();
       firstElement?.focus();
@@ -384,14 +478,20 @@ export function Sidebar({
         onClick={onCloseMobile}
         aria-label="Fechar menu principal"
         aria-hidden={!isMobileOpen}
-        tabIndex={isMobileOpen ? 0 : -1}
+        tabIndex={
+          isMobileOpen ? 0 : -1
+        }
       />
 
       <aside
         ref={sidebarRef}
         style={sidebarStyle}
-        onClick={handleSidebarClick}
-        onKeyDown={handleSidebarKeyDown}
+        onClick={
+          handleSidebarClick
+        }
+        onKeyDown={
+          handleSidebarKeyDown
+        }
         className={cn(
           "fixed inset-y-0 left-0 z-50",
           "flex min-h-dvh flex-col overflow-hidden",
@@ -407,7 +507,8 @@ export function Sidebar({
           "md:w-[var(--sidebar-width)]",
           "md:rounded-[20px] md:border",
           "md:border-border-highlight/60",
-          isResizing && "md:transition-none",
+          isResizing &&
+            "md:transition-none",
         )}
         aria-label="Menu principal"
       >
@@ -423,8 +524,12 @@ export function Sidebar({
         <button
           type="button"
           data-sidebar-resize-handle
-          onPointerDown={handleResizePointerDown}
-          onKeyDown={handleResizeKeyDown}
+          onPointerDown={
+            handleResizePointerDown
+          }
+          onKeyDown={
+            handleResizeKeyDown
+          }
           className={cn(
             "absolute inset-y-5 -right-1 z-20 hidden w-2",
             "cursor-col-resize rounded-full md:block",
@@ -443,9 +548,15 @@ export function Sidebar({
           role="separator"
           aria-orientation="vertical"
           aria-label="Redimensionar menu lateral"
-          aria-valuemin={SIDEBAR_MIN_WIDTH}
-          aria-valuemax={SIDEBAR_MAX_WIDTH}
-          aria-valuenow={Math.round(sidebarWidth)}
+          aria-valuemin={
+            SIDEBAR_MIN_WIDTH
+          }
+          aria-valuemax={
+            SIDEBAR_MAX_WIDTH
+          }
+          aria-valuenow={Math.round(
+            sidebarWidth,
+          )}
           title="Arraste para redimensionar. Use as setas do teclado para ajustar."
         />
 
@@ -514,7 +625,9 @@ export function Sidebar({
           <button
             ref={closeButtonRef}
             type="button"
-            onClick={onCloseMobile}
+            onClick={
+              onCloseMobile
+            }
             className={cn(
               "flex size-10 shrink-0 items-center justify-center",
               "rounded-xl border border-border",
@@ -528,7 +641,10 @@ export function Sidebar({
             )}
             aria-label="Fechar menu principal"
           >
-            <X size={19} aria-hidden="true" />
+            <X
+              size={19}
+              aria-hidden="true"
+            />
           </button>
         </div>
 
@@ -540,14 +656,20 @@ export function Sidebar({
           )}
           aria-label="Navegação da aplicação"
         >
-          {NAVIGATION_ITEMS.map((item) => (
-            <SidebarItem
-              key={item.id}
-              item={item}
-              isCollapsed={isCollapsed}
-              onNavigate={onCloseMobile}
-            />
-          ))}
+          {NAVIGATION_ITEMS.map(
+            (item) => (
+              <SidebarItem
+                key={item.id}
+                item={item}
+                isCollapsed={
+                  isCollapsed
+                }
+                onNavigate={
+                  onCloseMobile
+                }
+              />
+            ),
+          )}
         </nav>
 
         <div className="relative shrink-0 space-y-2 px-3 pb-3">
@@ -581,7 +703,8 @@ export function Sidebar({
             <span
               className={cn(
                 "min-w-0 truncate text-sm font-medium",
-                isCollapsed && "md:hidden",
+                isCollapsed &&
+                  "md:hidden",
               )}
             >
               Ajuda
@@ -611,11 +734,6 @@ export function Sidebar({
           >
             <div className="relative shrink-0">
               <Avatar className="size-9 border border-border-highlight">
-                <AvatarImage
-                  src={userMock.avatar}
-                  alt={`Foto de ${userMock.name}`}
-                />
-
                 <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary-bright">
                   {initials}
                 </AvatarFallback>
@@ -638,11 +756,11 @@ export function Sidebar({
             {!isCollapsed && (
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-semibold text-text">
-                  {userMock.name}
+                  {userName}
                 </p>
 
                 <p className="mt-0.5 truncate text-[10px] font-medium text-primary-bright">
-                  Premium
+                  {userEmail}
                 </p>
               </div>
             )}
@@ -650,14 +768,17 @@ export function Sidebar({
 
           <button
             type="button"
-            disabled
-            aria-disabled="true"
-            title="Sair — autenticação ainda não integrada"
+            onClick={handleLogout}
+            title="Encerrar sessão"
             className={cn(
               "flex min-h-10 w-full items-center rounded-xl",
-              "text-text-muted transition-colors",
-              "disabled:cursor-not-allowed",
-              "disabled:opacity-65",
+              "text-text-muted",
+              "transition-colors duration-200",
+              "hover:bg-red-500/10",
+              "hover:text-red-400",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-red-400/70",
               isCollapsed
                 ? [
                     "justify-start gap-3 px-3",
@@ -676,7 +797,8 @@ export function Sidebar({
             <span
               className={cn(
                 "truncate text-sm font-medium",
-                isCollapsed && "md:hidden",
+                isCollapsed &&
+                  "md:hidden",
               )}
             >
               Sair
@@ -685,7 +807,9 @@ export function Sidebar({
 
           <button
             type="button"
-            onClick={toggleCollapsed}
+            onClick={
+              toggleCollapsed
+            }
             className={cn(
               "hidden min-h-10 w-full items-center rounded-xl",
               "border border-transparent text-sm font-medium",
@@ -705,20 +829,25 @@ export function Sidebar({
                 ? "Expandir menu lateral"
                 : "Recolher menu lateral"
             }
-            aria-expanded={!isCollapsed}
+            aria-expanded={
+              !isCollapsed
+            }
           >
             <ChevronLeft
               size={18}
               className={cn(
                 "shrink-0 transition-transform duration-300",
                 "motion-reduce:transition-none",
-                isCollapsed && "rotate-180",
+                isCollapsed &&
+                  "rotate-180",
               )}
               aria-hidden="true"
             />
 
             {!isCollapsed && (
-              <span>Recolher menu</span>
+              <span>
+                Recolher menu
+              </span>
             )}
           </button>
         </div>

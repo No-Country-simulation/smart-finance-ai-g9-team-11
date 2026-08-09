@@ -24,25 +24,23 @@ modelo = joblib.load(
     MODELS_DIR / "transaction_classifier.pkl"
 )
 
-def predizer_categoria(descricao: str, limite_confianca: float = 0.65) -> str:
+def predizer_categoria(descricao: str, limite_confianca: float = 0.40) -> str:
     descricao = limpar_texto(descricao)
 
-    # 1. Se o texto ficou vazio após a limpeza
     if not descricao.strip():
         return "Outros"
 
-    # 2. Pega o vetorizador do primeiro passo do Pipeline (sem depender do nome da chave)
     vectorizer = modelo.steps[0][1]
     vetor = vectorizer.transform([descricao])
 
-    # Se a quantidade de elementos não-zeros (nnz) for 0, nenhuma palavra é conhecida pelo vocabulário
+    # Se a palavra não existe no vocabulário de treino, CAI EM "OUTROS"
     if vetor.nnz == 0:
         return "Outros"
 
-    # 3. Predição normal com o modelo
     probabilidades = modelo.predict_proba([descricao])[0]
     maior_probabilidade = np.max(probabilidades)
 
+    # Se o modelo não tiver certeza suficiente, CAI EM "OUTROS"
     if maior_probabilidade <= limite_confianca:
         return "Outros"
 

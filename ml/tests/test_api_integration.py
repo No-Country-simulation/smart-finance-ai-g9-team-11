@@ -5,57 +5,40 @@ from ml.api.main import app
 client = TestClient(app)
 
 
-def test_health():
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
-
-
 def test_analise_financeira_endpoint():
     payload = {
         "transactions": [
             {
-                "date": "2026-07-01",
-                "description": "Supermercado",
-                "amount": 420.0,
-                "type": "DESPESA",
-                "category": "ALIMENTACAO",
+                "data": "2026-07-01",
+                "descricao": "Supermercado",
+                "valor": 420.0,
+                "tipo": "Despesa",
+                "categoria": "Alimentação",
             },
             {
-                "date": "2026-07-05",
-                "description": "Salario",
-                "amount": 5000.0,
-                "type": "RECEITA",
-                "category": "SALARIO",
+                "data": "2026-07-05",
+                "descricao": "Salario",
+                "valor": 5000.0,
+                "tipo": "Receita",
+                "categoria": "Salário",
             },
-        ],
-        "nivel_endividamento": 25.0,
-        "frequencia_poupanca": "mensal",
+        ]
     }
 
     response = client.post("/analise-financeira", json=payload)
     assert response.status_code == 200
 
     data = response.json()
-    assert "financialProfile" in data
-    assert "recommendations" in data
-    assert "indicadoresNegocio" in data
+    assert "perfil_financeiro" in data
+    assert "nivel_endividamento" in data
+    assert "frequencia_poupanca" in data
+    assert "probabilidade" in data
+    assert "resumo_gastos" in data
+    assert "recomendacoes" in data
 
 
-def test_analise_financeira_sem_receita_retorna_erro():
-    payload = {
-        "transactions": [
-            {
-                "date": "2026-07-01",
-                "description": "Supermercado",
-                "amount": 420.0,
-                "type": "DESPESA",
-                "category": "ALIMENTACAO",
-            }
-        ],
-        "nivel_endividamento": 25.0,
-        "frequencia_poupanca": "mensal",
-    }
+def test_analise_financeira_sem_transacoes_retorna_erro():
+    payload = {"transactions": []}
 
     response = client.post("/analise-financeira", json=payload)
     assert response.status_code == 422

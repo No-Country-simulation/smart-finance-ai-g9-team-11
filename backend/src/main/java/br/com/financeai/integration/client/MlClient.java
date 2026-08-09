@@ -1,53 +1,66 @@
 package br.com.financeai.integration.client;
 
-import br.com.financeai.dto.response.ExpenseSummaryResponse;
-import br.com.financeai.enums.FinancialProfile;
-import br.com.financeai.enums.SavingFrequency;
-import br.com.financeai.enums.TransactionCategory;
 import br.com.financeai.exception.ExternalServiceException;
-import br.com.financeai.integration.dto.request.MlRequest;
+import br.com.financeai.integration.dto.request.MlAnalysisRequest;
 import br.com.financeai.integration.dto.request.MlTransactionRequest;
-import br.com.financeai.integration.dto.response.MlResponse;
+import br.com.financeai.integration.dto.response.MlAnalysisResponse;
 import br.com.financeai.integration.dto.response.MlTransactionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
-import java.math.BigDecimal;
-import java.util.List;
-
+/**
+ * Cliente responsável pela comunicação com o serviço de Machine Learning.
+ * <p>
+ * Esta classe realiza as chamadas HTTP para a API de IA, responsável
+ * pela classificação de transações e pela análise do perfil financeiro.
+ * <p>
+ * Em caso de indisponibilidade do serviço, lança
+ * {@link ExternalServiceException} para que a camada de serviço possa
+ * executar o mecanismo de fallback.
+ */
+@Slf4j
 @Service
 public class MlClient {
+
+    private static final String ML_CONNECTION_ERROR = "Não foi possível conectar ao serviço de Machine Learning.";
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public MlClient(
-            RestClient restClient,
-            ObjectMapper objectMapper
-    ) {
+    public MlClient(RestClient restClient, ObjectMapper objectMapper) {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
 
-    public MlResponse analyze(MlRequest request) {
+    /**
+     * Envia os dados financeiros para o serviço de Machine Learning
+     * responsável pela análise do perfil financeiro do usuário.
+     *
+     * @param request dados financeiros que serão enviados para a API de ML.
+     * @return resposta contendo o perfil financeiro, resumo dos gastos,
+     *         recomendações e demais indicadores calculados pelo modelo.
+     * @throws ExternalServiceException caso o serviço de Machine Learning
+     *         esteja indisponível ou retorne uma resposta inválida.
+     */
+    public MlAnalysisResponse analyze(MlAnalysisRequest request) {
 
         try {
-            System.out.println(
-                    "JSON da análise enviado ao ML: "
-                            + objectMapper.writeValueAsString(request)
-            );
 
-            MlResponse response = restClient.post()
+            logRequest("JSON da análise enviado ao ML:", request);
+
+            MlAnalysisResponse response = restClient.post()
                     .uri("/analise-financeira")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
-                    .body(MlResponse.class);
+                    .body(MlAnalysisResponse.class);
 
             if (response == null) {
                 throw new ExternalServiceException(
@@ -58,49 +71,50 @@ public class MlClient {
             return response;
 
         } catch (RestClientResponseException ex) {
-            System.err.println("Status retornado pelo ML: "
-                    + ex.getStatusCode());
-
-            System.err.println("Resposta retornada pelo ML: "
-                    + ex.getResponseBodyAsString());
-
-            throw new ExternalServiceException(
-                    "O ML rejeitou a análise: "
-                            + ex.getResponseBodyAsString()
+            log.error(
+                    "Erro ao chamar /analise-financeira. Status: {} - Body: {}",
+                    ex.getStatusCode(),
+                    ex.getResponseBodyAsString()
             );
 
-        } catch (JsonProcessingException ex) {
             throw new ExternalServiceException(
-                    "Não foi possível visualizar o JSON da análise."
+                    "O serviço de Machine Learning retornou um erro.",
+                    ex
             );
 
-        } catch (ExternalServiceException ex) {
-            throw ex;
+        } catch (ResourceAccessException ex) {
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("{}: {}", ML_CONNECTION_ERROR, ex.getMessage());
 
             throw new ExternalServiceException(
-                    "Não foi possível realizar a análise financeira no serviço de Machine Learning."
+                    "Não foi possível conectar ao serviço de Machine Learning.",
+                    ex
             );
         }
     }
 
+    /**
+     * Envia transações para o serviço de Machine Learning para
+     * classificação automática da categoria.
+     *
+     * @param request transação que será classificada.
+     * @return transações contendo a categoria identificada pelo modelo de IA.
+     * @throws ExternalServiceException caso o serviço de Machine Learning
+     *         esteja indisponível ou retorne uma resposta inválida.
+     */
     public MlTransactionResponse classifyTransaction(
             MlTransactionRequest request
     ) {
+
         try {
-            String json = objectMapper.writeValueAsString(request);
-            System.out.println(
-                    "JSON da transação enviado ao ML: "
-                            + objectMapper.writeValueAsString(request)
-            );
+
+            logRequest("JSON da transação enviado ao ML:", request);
 
             MlTransactionResponse response = restClient.post()
                     .uri("/classificar-transacoes")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(request)
                     .retrieve()
                     .body(MlTransactionResponse.class);
 
@@ -113,98 +127,34 @@ public class MlClient {
             return response;
 
         } catch (RestClientResponseException ex) {
-            System.err.println("Status retornado pelo ML: "
-                    + ex.getStatusCode());
 
-            System.err.println("Resposta retornada pelo ML: "
-                    + ex.getResponseBodyAsString());
-
-            throw new ExternalServiceException(
-                    "O ML rejeitou a transação: "
-                            + ex.getResponseBodyAsString()
+            log.error(
+                    "Erro ao chamar /classificar-transacoes. Status: {} - Body: {}",
+                    ex.getStatusCode(),
+                    ex.getResponseBodyAsString()
             );
 
-        } catch (JsonProcessingException ex) {
             throw new ExternalServiceException(
-                    "Não foi possível visualizar o JSON da transação."
+                    "O serviço de Machine Learning retornou um erro.",
+                    ex
             );
 
-        } catch (ExternalServiceException ex) {
-            throw ex;
+        } catch (ResourceAccessException ex) {
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("{}: {}", ML_CONNECTION_ERROR, ex.getMessage());
 
             throw new ExternalServiceException(
-                    "Não foi possível acessar o serviço de Machine Learning."
+                    "Não foi possível conectar ao serviço de Machine Learning.",
+                    ex
             );
         }
     }
+
+    private void logRequest(String mensagem, Object body) {
+        try {
+            log.debug("{} {}", mensagem, objectMapper.writeValueAsString(body));
+        } catch (JsonProcessingException ex) {
+            log.warn("Não foi possível serializar o JSON.", ex);
+        }
+    }
 }
-
-
-//    public MlTransactionResponse classifyTransaction(MlTransactionRequest request){
-//
-//        //Mock da Classificao de transacoes
-//
-//        TransactionCategory categoria = inferirCategoria(request.descricao());
-//
-//        return new MlTransactionResponse(
-//                request.descricao(),
-//                request.valor(),
-//                request.tipo(),
-//                categoria,
-//                request.data()
-//        );
-//    }
-
-//    private TransactionCategory inferirCategoria(String descricao) {
-//        String texto = descricao.toLowerCase();
-//
-//        if (texto.contains("supermercado") || texto.contains("mercado") || texto.contains("restaurante")) {
-//            return TransactionCategory.ALIMENTACAO;
-//        }
-//        if (texto.contains("uber") || texto.contains("combustivel") || texto.contains("onibus")) {
-//            return TransactionCategory.TRAJETO;
-//        }
-//        if (texto.contains("cinema") || texto.contains("netflix") || texto.contains("show")) {
-//            return TransactionCategory.ENTRETENIMENTO;
-//        }
-//        if (texto.contains("farmacia") || texto.contains("consulta") || texto.contains("plano de saude")) {
-//            return TransactionCategory.SAUDE;
-//        }
-//        if (texto.contains("aluguel") || texto.contains("condominio")) {
-//            return TransactionCategory.MORADIA;
-//        }
-//
-//        return TransactionCategory.OUTROS;
-//    }
-//
-//    public MlResponse analyze(MlRequest request) {
-//
-//        //Mock resposta da análise financeira da API
-//        return new MlResponse(
-//                FinancialProfile.EM_OBSERVACAO,
-//                new BigDecimal(25),
-//                SavingFrequency.BAIXA,
-//                new BigDecimal("0.82"),
-//                new ExpenseSummaryResponse(
-//                        new BigDecimal("420"),
-//                        new BigDecimal("300"),
-//                        new BigDecimal("40"),
-//                        new BigDecimal("100"),
-//                        new BigDecimal("200"),
-//                        new BigDecimal("150"),
-//                        new BigDecimal("1000"),
-//                        new BigDecimal("100"),
-//                        new BigDecimal("200"),
-//                        new BigDecimal("300")
-//                ),
-//                List.of(
-//                        "Monitorar gastos recorrentes de entretenimento",
-//                        "Aumentar reserva financeira mensal"
-//                )
-//        );
-//    }
-//
-//}

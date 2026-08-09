@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.util.List;
 
+/** Resultado de uma análise financeira recém-gerada, devolvido ao frontend. */
 public record FinancialAnalysisResponse(
 
         @JsonProperty("perfil_financeiro")

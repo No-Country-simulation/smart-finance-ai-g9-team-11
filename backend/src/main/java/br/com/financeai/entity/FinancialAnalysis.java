@@ -1,5 +1,6 @@
 package br.com.financeai.entity;
 
+import br.com.financeai.enums.Source;
 import br.com.financeai.enums.FinancialProfile;
 import br.com.financeai.enums.SavingFrequency;
 import jakarta.persistence.*;
@@ -7,6 +8,17 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+
+/**
+ * Representa o resultado persistido de uma análise financeira, gerada a
+ * partir do histórico de transações de um usuário num determinado período.
+ *
+ * Não possui vínculo direto com as transações que a originaram — é um
+ * "retrato" do resultado, não uma referência aos dados brutos. O campo
+ * {@code origem} indica se o resultado veio da IA ({@link Source#ML}) ou
+ * do cálculo local de fallback ({@link Source#FALLBACK}).
+ */
 
 @Entity
 @Table(name = "analises_financeiras")
@@ -21,7 +33,7 @@ public class FinancialAnalysis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, precision = 5, scale = 3)
+    @Column(nullable = false, precision = 7, scale = 3)
     private BigDecimal nivelEndividamento;
 
     @Enumerated(EnumType.STRING)
@@ -41,5 +53,9 @@ public class FinancialAnalysis {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private AppUser usuario;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Source origem;
 
 }

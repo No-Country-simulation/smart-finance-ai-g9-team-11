@@ -1,10 +1,26 @@
-version: '3.8'
-
 networks:
   finance-network:
     driver: bridge
 
 services:
+  db:
+    image: mysql:8.0
+    container_name: finance-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=finance_ai
+    ports:
+      - "3307:3306"
+    volumes:
+      - finance-db-data:/var/lib/mysql
+    networks:
+      - finance-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   ml-service:
     container_name: ml-service
     build:
@@ -26,10 +42,16 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - ML_SERVICE_URL=http://ml-service:8000
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/finance_ai?createDatabaseIfNotExist=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - ML_API_URL=http://ml-service:8000
+      - JWT_SECRET=troque-por-um-segredo-forte-em-producao
     depends_on:
-      - ml-service
+      db:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
     networks:
       - finance-network
 
@@ -44,3 +66,6 @@ services:
       - backend-service
     networks:
       - finance-network
+
+volumes:
+  finance-db-data:

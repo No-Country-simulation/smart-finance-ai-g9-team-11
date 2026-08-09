@@ -12,7 +12,7 @@ RUN npm install --legacy-peer-deps
 COPY frontend/ .
 
 # Roda o build do Vite
-RUN npm run build
+RUN npx vite build
 
 # Stage 2: Production
 FROM nginx:alpine

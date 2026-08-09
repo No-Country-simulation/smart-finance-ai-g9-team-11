@@ -1,8 +1,14 @@
-import { useState } from "react";
+import {
+  useState,
+} from "react";
 
-import { cn } from "@/lib/utils";
+import {
+  useNavigate,
+} from "react-router-dom";
 
 import { CreateTransactionModal } from "@/components/transactions/CreateTransactionModal";
+
+import { cn } from "@/lib/utils";
 
 import { AIInsights } from "../AIInsights";
 import { Alerts } from "../Alerts";
@@ -31,6 +37,9 @@ export function DashboardGrid({
   data,
   onReload,
 }: Readonly<DashboardGridProps>) {
+  const navigate =
+    useNavigate();
+
   const [
     isCreateTransactionOpen,
     setIsCreateTransactionOpen,
@@ -41,24 +50,26 @@ export function DashboardGrid({
   ): void => {
     switch (action.id) {
       case "add-transaction":
-        setIsCreateTransactionOpen(true);
+        setIsCreateTransactionOpen(
+          true,
+        );
         break;
 
       case "run-analysis":
-        console.info(
-          "Executar nova análise financeira.",
+        navigate(
+          "/app/analysis",
         );
         break;
 
       case "view-recommendations":
-        console.info(
-          "Abrir recomendações financeiras.",
+        navigate(
+          "/app/analysis",
         );
         break;
 
       case "import-transactions":
         console.info(
-          "Importação de transações indisponível.",
+          "Importação de transações ainda não disponível.",
         );
         break;
 
@@ -74,6 +85,13 @@ export function DashboardGrid({
   const handleTransactionCreated =
     async (): Promise<void> => {
       await onReload();
+    };
+
+  const handleViewAllTransactions =
+    (): void => {
+      navigate(
+        "/app/transactions",
+      );
     };
 
   return (
@@ -116,7 +134,9 @@ export function DashboardGrid({
           aria-label="Fluxo financeiro"
         >
           <BalanceChart
-            data={data.cashFlow}
+            data={
+              data.cashFlow
+            }
           />
         </div>
 
@@ -171,6 +191,9 @@ export function DashboardGrid({
             <TransactionsTable
               transactions={
                 data.transactions
+              }
+              onViewAll={
+                handleViewAllTransactions
               }
             />
           </div>

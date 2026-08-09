@@ -2,6 +2,7 @@ import {
   useMemo,
   useState,
 } from "react";
+
 import {
   ArrowRight,
   ReceiptText,
@@ -14,8 +15,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/common/Card";
+
 import { cn } from "@/lib/utils";
-import { dashboardService } from "@/services/dashboard.service";
 
 import { TransactionsTableHeader } from "./TransactionsTableHeader";
 import { TransactionsTableRow } from "./TransactionsTableRow";
@@ -26,47 +27,54 @@ import type {
 } from "./TransactionsTable.types";
 
 export function TransactionsTable({
-  transactions: providedTransactions,
+  transactions = [],
   title = "Transações recentes",
   description = "Acompanhe as movimentações mais recentes da sua conta.",
   onViewAll,
 }: Readonly<TransactionsTableProps>) {
-  const [search, setSearch] = useState("");
+  const [
+    search,
+    setSearch,
+  ] = useState("");
 
-  const serviceTransactions =
-    dashboardService.getTransactions();
+  const filteredTransactions =
+    useMemo(() => {
+      const normalizedTerm =
+        search
+          .trim()
+          .toLocaleLowerCase(
+            "pt-BR",
+          );
 
-  const transactions =
-    providedTransactions ??
-    serviceTransactions;
+      if (!normalizedTerm) {
+        return transactions;
+      }
 
-  const filteredTransactions = useMemo(() => {
-    const normalizedTerm = search
-      .trim()
-      .toLocaleLowerCase("pt-BR");
+      return transactions.filter(
+        (transaction) => {
+          const searchableContent =
+            [
+              transaction.description,
+              transaction.category,
+              transaction.status ===
+              "completed"
+                ? "concluída"
+                : "pendente",
+            ]
+              .join(" ")
+              .toLocaleLowerCase(
+                "pt-BR",
+              );
 
-    if (!normalizedTerm) {
-      return transactions;
-    }
-
-    return transactions.filter(
-      (transaction) => {
-        const searchableContent = [
-          transaction.description,
-          transaction.category,
-          transaction.status === "completed"
-            ? "concluída"
-            : "pendente",
-        ]
-          .join(" ")
-          .toLocaleLowerCase("pt-BR");
-
-        return searchableContent.includes(
-          normalizedTerm,
-        );
-      },
-    );
-  }, [search, transactions]);
+          return searchableContent.includes(
+            normalizedTerm,
+          );
+        },
+      );
+    }, [
+      search,
+      transactions,
+    ]);
 
   const hasSearch =
     search.trim().length > 0;
@@ -83,14 +91,17 @@ export function TransactionsTable({
         <div className="flex min-w-0 items-start gap-3">
           <div
             className={cn(
-              "flex size-10 shrink-0 items-center",
-              "justify-center rounded-[13px]",
+              "flex size-10 shrink-0",
+              "items-center justify-center",
+              "rounded-[13px]",
               "border border-primary/20",
               "bg-primary/10 text-primary-bright",
             )}
             aria-hidden="true"
           >
-            <ReceiptText size={18} />
+            <ReceiptText
+              size={18}
+            />
           </div>
 
           <div className="min-w-0">
@@ -157,9 +168,10 @@ export function TransactionsTable({
       </CardHeader>
 
       <CardContent className="p-0">
-        {filteredTransactions.length > 0 ? (
+        {filteredTransactions.length >
+        0 ? (
           <div className="max-h-[520px] overflow-auto">
-            <table className="min-w-[790px] w-full border-collapse">
+            <table className="w-full min-w-[790px] border-collapse">
               <caption className="sr-only">
                 Lista de transações financeiras recentes
               </caption>
@@ -170,8 +182,12 @@ export function TransactionsTable({
                 {filteredTransactions.map(
                   (transaction) => (
                     <TransactionsTableRow
-                      key={transaction.id}
-                      transaction={transaction}
+                      key={
+                        transaction.id
+                      }
+                      transaction={
+                        transaction
+                      }
                     />
                   ),
                 )}
@@ -196,7 +212,9 @@ export function TransactionsTable({
               )}
               aria-hidden="true"
             >
-              <SearchX size={21} />
+              <SearchX
+                size={21}
+              />
             </div>
 
             <p className="mt-4 text-sm font-semibold text-text">
@@ -214,7 +232,9 @@ export function TransactionsTable({
             {hasSearch && (
               <button
                 type="button"
-                onClick={() => setSearch("")}
+                onClick={() => {
+                  setSearch("");
+                }}
                 className={cn(
                   "mt-4 rounded-[10px]",
                   "border border-primary/20",

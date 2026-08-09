@@ -1,0 +1,1520 @@
+﻿RELATORIO - TRANSACOES UI
+Gerado em: 09/08/2026 12:08:30
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/transactions/CreateTransactionModal/CreateTransactionModal.tsx
+========================================================================================================================
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  LoaderCircle,
+  Plus,
+  X,
+} from "lucide-react";
+
+import {
+  getApiErrorMessage,
+} from "@/services/api";
+
+import {
+  transactionService,
+} from "@/services/transaction.service";
+
+import {
+  cn,
+} from "@/lib/utils";
+
+import type {
+  CreateTransactionRequest,
+  TransactionType,
+} from "@/types/transaction";
+
+import type {
+  CreateTransactionModalProps,
+} from "./CreateTransactionModal.types";
+
+const getCurrentDate = (): string => {
+  const now = new Date();
+
+  const year =
+    now.getFullYear();
+
+  const month = String(
+    now.getMonth() + 1,
+  ).padStart(2, "0");
+
+  const day = String(
+    now.getDate(),
+  ).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const INITIAL_FORM: CreateTransactionRequest = {
+  descricao: "",
+  valor: 0,
+  tipo: "Despesa",
+  data: getCurrentDate(),
+};
+
+export function CreateTransactionModal({
+  isOpen,
+  onClose,
+  onCreated,
+}: Readonly<CreateTransactionModalProps>) {
+  const [
+    form,
+    setForm,
+  ] = useState<CreateTransactionRequest>(
+    INITIAL_FORM,
+  );
+
+  const [
+    isSubmitting,
+    setIsSubmitting,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    setForm({
+      ...INITIAL_FORM,
+      data: getCurrentDate(),
+    });
+
+    setError(null);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handleKeyDown = (
+      event: KeyboardEvent,
+    ): void => {
+      if (
+        event.key === "Escape" &&
+        !isSubmitting
+      ) {
+        onClose();
+      }
+    };
+
+    document.addEventListener(
+      "keydown",
+      handleKeyDown,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "keydown",
+        handleKeyDown,
+      );
+    };
+  }, [
+    isOpen,
+    isSubmitting,
+    onClose,
+  ]);
+
+  const handleTypeChange = (
+    type: TransactionType,
+  ): void => {
+    setForm((current) => ({
+      ...current,
+      tipo: type,
+    }));
+  };
+
+  const handleSubmit = async (
+    event:
+      React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
+    event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    const description =
+      form.descricao.trim();
+
+    if (!description) {
+      setError(
+        "Informe a descriÃ§Ã£o da transaÃ§Ã£o.",
+      );
+
+      return;
+    }
+
+    if (
+      !Number.isFinite(form.valor) ||
+      form.valor <= 0
+    ) {
+      setError(
+        "Informe um valor maior que zero.",
+      );
+
+      return;
+    }
+
+    if (!form.data) {
+      setError(
+        "Informe a data da transaÃ§Ã£o.",
+      );
+
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const transaction =
+        await transactionService.create({
+          descricao: description,
+          valor: form.valor,
+          tipo: form.tipo,
+          data: form.data,
+        });
+
+      await onCreated?.(
+        transaction,
+      );
+
+      onClose();
+    }
+    catch (requestError) {
+      setError(
+        getApiErrorMessage(
+          requestError,
+          "NÃ£o foi possÃ­vel registrar a transaÃ§Ã£o.",
+        ),
+      );
+    }
+    finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div
+      className={cn(
+        "fixed inset-0 z-50",
+        "flex items-center justify-center",
+        "bg-black/60 px-4 py-8",
+        "backdrop-blur-sm",
+      )}
+      role="presentation"
+      onMouseDown={(event) => {
+        if (
+          event.target ===
+            event.currentTarget &&
+          !isSubmitting
+        ) {
+          onClose();
+        }
+      }}
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-transaction-title"
+        className={cn(
+          "w-full max-w-lg",
+          "overflow-hidden",
+          "rounded-[24px]",
+          "border border-border",
+          "bg-card",
+          "shadow-2xl",
+        )}
+      >
+        <header
+          className={cn(
+            "flex items-start",
+            "justify-between gap-4",
+            "border-b border-border",
+            "px-5 py-5",
+            "sm:px-6",
+          )}
+        >
+          <div className="flex min-w-0 items-start gap-3">
+            <div
+              className={cn(
+                "flex size-10 shrink-0",
+                "items-center justify-center",
+                "rounded-[13px]",
+                "border border-primary/20",
+                "bg-primary/10",
+                "text-primary-bright",
+              )}
+            >
+              <Plus
+                size={19}
+                aria-hidden="true"
+              />
+            </div>
+
+            <div>
+              <h2
+                id="create-transaction-title"
+                className="text-base font-bold text-text"
+              >
+                Nova transaÃ§Ã£o
+              </h2>
+
+              <p className="mt-1 text-xs leading-5 text-text-muted">
+                Registre uma receita ou despesa.
+                A categoria serÃ¡ identificada
+                automaticamente.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSubmitting}
+            aria-label="Fechar"
+            className={cn(
+              "flex size-9 shrink-0",
+              "items-center justify-center",
+              "rounded-[11px]",
+              "text-text-muted",
+              "transition-colors",
+              "hover:bg-surface-elevated",
+              "hover:text-text",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
+            )}
+          >
+            <X
+              size={18}
+              aria-hidden="true"
+            />
+          </button>
+        </header>
+
+        <form
+          onSubmit={(event) => {
+            void handleSubmit(
+              event,
+            );
+          }}
+        >
+          <div className="space-y-5 px-5 py-6 sm:px-6">
+            <div>
+              <label
+                htmlFor="transaction-description"
+                className="text-xs font-semibold text-text"
+              >
+                DescriÃ§Ã£o
+              </label>
+
+              <input
+                id="transaction-description"
+                type="text"
+                value={
+                  form.descricao
+                }
+                disabled={
+                  isSubmitting
+                }
+                autoFocus
+                placeholder="Ex.: Supermercado"
+                onChange={(
+                  event,
+                ) => {
+                  setForm(
+                    (current) => ({
+                      ...current,
+                      descricao:
+                        event.target
+                          .value,
+                    }),
+                  );
+                }}
+                className={cn(
+                  "mt-2 h-11 w-full",
+                  "rounded-[12px]",
+                  "border border-border",
+                  "bg-background px-3",
+                  "text-sm text-text",
+                  "outline-none",
+                  "transition-colors",
+                  "placeholder:text-text-subtle",
+                  "focus:border-primary/60",
+                  "focus:ring-2",
+                  "focus:ring-primary/10",
+                  "disabled:opacity-60",
+                )}
+              />
+            </div>
+
+            <div>
+              <span className="text-xs font-semibold text-text">
+                Tipo
+              </span>
+
+              <div className="mt-2 grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  disabled={
+                    isSubmitting
+                  }
+                  onClick={() =>
+                    handleTypeChange(
+                      "Receita",
+                    )
+                  }
+                  className={cn(
+                    "flex h-11",
+                    "items-center justify-center",
+                    "gap-2 rounded-[12px]",
+                    "border text-xs",
+                    "font-semibold",
+                    "transition-colors",
+                    form.tipo ===
+                      "Receita"
+                      ? [
+                          "border-success/40",
+                          "bg-success/10",
+                          "text-success",
+                        ]
+                      : [
+                          "border-border",
+                          "bg-background",
+                          "text-text-muted",
+                          "hover:bg-surface-elevated",
+                        ],
+                  )}
+                >
+                  <ArrowUpRight
+                    size={16}
+                  />
+
+                  Receita
+                </button>
+
+                <button
+                  type="button"
+                  disabled={
+                    isSubmitting
+                  }
+                  onClick={() =>
+                    handleTypeChange(
+                      "Despesa",
+                    )
+                  }
+                  className={cn(
+                    "flex h-11",
+                    "items-center justify-center",
+                    "gap-2 rounded-[12px]",
+                    "border text-xs",
+                    "font-semibold",
+                    "transition-colors",
+                    form.tipo ===
+                      "Despesa"
+                      ? [
+                          "border-danger/40",
+                          "bg-danger/10",
+                          "text-danger",
+                        ]
+                      : [
+                          "border-border",
+                          "bg-background",
+                          "text-text-muted",
+                          "hover:bg-surface-elevated",
+                        ],
+                  )}
+                >
+                  <ArrowDownRight
+                    size={16}
+                  />
+
+                  Despesa
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="transaction-value"
+                  className="text-xs font-semibold text-text"
+                >
+                  Valor
+                </label>
+
+                <input
+                  id="transaction-value"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  inputMode="decimal"
+                  disabled={
+                    isSubmitting
+                  }
+                  value={
+                    form.valor === 0
+                      ? ""
+                      : form.valor
+                  }
+                  placeholder="0,00"
+                  onChange={(
+                    event,
+                  ) => {
+                    const value =
+                      event.target
+                        .value;
+
+                    setForm(
+                      (current) => ({
+                        ...current,
+                        valor:
+                          value === ""
+                            ? 0
+                            : Number(
+                                value,
+                              ),
+                      }),
+                    );
+                  }}
+                  className={cn(
+                    "mt-2 h-11 w-full",
+                    "rounded-[12px]",
+                    "border border-border",
+                    "bg-background px-3",
+                    "text-sm text-text",
+                    "outline-none",
+                    "transition-colors",
+                    "placeholder:text-text-subtle",
+                    "focus:border-primary/60",
+                    "focus:ring-2",
+                    "focus:ring-primary/10",
+                  )}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="transaction-date"
+                  className="text-xs font-semibold text-text"
+                >
+                  Data
+                </label>
+
+                <input
+                  id="transaction-date"
+                  type="date"
+                  value={form.data}
+                  disabled={
+                    isSubmitting
+                  }
+                  onChange={(
+                    event,
+                  ) => {
+                    setForm(
+                      (current) => ({
+                        ...current,
+                        data:
+                          event.target
+                            .value,
+                      }),
+                    );
+                  }}
+                  className={cn(
+                    "mt-2 h-11 w-full",
+                    "rounded-[12px]",
+                    "border border-border",
+                    "bg-background px-3",
+                    "text-sm text-text",
+                    "outline-none",
+                    "transition-colors",
+                    "focus:border-primary/60",
+                    "focus:ring-2",
+                    "focus:ring-primary/10",
+                  )}
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div
+                role="alert"
+                className={cn(
+                  "rounded-[12px]",
+                  "border border-danger/20",
+                  "bg-danger/5",
+                  "px-4 py-3",
+                  "text-xs leading-5",
+                  "text-danger",
+                )}
+              >
+                {error}
+              </div>
+            )}
+          </div>
+
+          <footer
+            className={cn(
+              "flex flex-col-reverse",
+              "gap-3 border-t",
+              "border-border",
+              "px-5 py-4",
+              "sm:flex-row",
+              "sm:justify-end",
+              "sm:px-6",
+            )}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={
+                isSubmitting
+              }
+              className={cn(
+                "h-10 rounded-[11px]",
+                "border border-border",
+                "px-4 text-xs",
+                "font-semibold",
+                "text-text-muted",
+                "transition-colors",
+                "hover:bg-surface-elevated",
+                "hover:text-text",
+                "disabled:opacity-50",
+              )}
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              disabled={
+                isSubmitting
+              }
+              className={cn(
+                "inline-flex h-10",
+                "items-center justify-center",
+                "gap-2 rounded-[11px]",
+                "bg-primary px-5",
+                "text-xs font-semibold",
+                "text-white",
+                "transition-opacity",
+                "hover:opacity-90",
+                "disabled:cursor-not-allowed",
+                "disabled:opacity-60",
+              )}
+            >
+              {isSubmitting ? (
+                <>
+                  <LoaderCircle
+                    size={15}
+                    className="animate-spin"
+                  />
+
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Plus
+                    size={15}
+                  />
+
+                  Adicionar transaÃ§Ã£o
+                </>
+              )}
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/transactions/CreateTransactionModal/CreateTransactionModal.types.ts
+========================================================================================================================
+
+import type {
+  Transaction,
+} from "@/types/transaction";
+
+export interface CreateTransactionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreated?: (
+    transaction: Transaction,
+  ) => void | Promise<void>;
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/transactions/CreateTransactionModal/index.ts
+========================================================================================================================
+
+export {
+  CreateTransactionModal,
+} from "./CreateTransactionModal";
+
+export type {
+  CreateTransactionModalProps,
+} from "./CreateTransactionModal.types";
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/TransactionsTable/TransactionsTableHeader.tsx
+========================================================================================================================
+
+import { cn } from "@/lib/utils";
+
+interface TransactionColumn {
+  label: string;
+  className?: string;
+}
+
+const columns: readonly TransactionColumn[] = [
+  {
+    label: "Categoria",
+    className: "min-w-[180px]",
+  },
+  {
+    label: "DescriÃ§Ã£o",
+    className: "min-w-[210px]",
+  },
+  {
+    label: "Data",
+    className: "min-w-[125px]",
+  },
+  {
+    label: "Valor",
+    className: "min-w-[145px] text-right",
+  },
+  {
+    label: "Status",
+    className: "min-w-[130px] text-right",
+  },
+];
+
+export function TransactionsTableHeader() {
+  return (
+    <thead
+      className={cn(
+        "sticky top-0 z-10",
+        "border-y border-border-muted",
+        "bg-surface-elevated/95",
+        "backdrop-blur-md",
+      )}
+    >
+      <tr>
+        {columns.map((column) => (
+          <th
+            key={column.label}
+            scope="col"
+            className={cn(
+              "px-5 py-3.5",
+              "text-left text-[10px]",
+              "font-semibold uppercase",
+              "tracking-[0.09em]",
+              "text-text-subtle",
+              column.className,
+            )}
+          >
+            {column.label}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/TransactionsTable/TransactionsTableRow.tsx
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+import {
+  CarFront,
+  CircleDollarSign,
+  CreditCard,
+  Dumbbell,
+  HeartPulse,
+  Home,
+  ReceiptText,
+  ShoppingBasket,
+  Utensils,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type { TransactionsTableRowProps } from "./TransactionsTable.types";
+
+interface CategoryVisual {
+  icon: LucideIcon;
+  iconContainerClassName: string;
+  iconClassName: string;
+}
+
+const currencyFormatter = new Intl.NumberFormat(
+  "pt-BR",
+  {
+    style: "currency",
+    currency: "BRL",
+  },
+);
+
+const dateFormatter = new Intl.DateTimeFormat(
+  "pt-BR",
+  {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  },
+);
+
+const categoryVisuals: Record<
+  string,
+  CategoryVisual
+> = {
+  receita: {
+    icon: CircleDollarSign,
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    iconClassName: "text-success",
+  },
+
+  alimentação: {
+    icon: ShoppingBasket,
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+
+  assinatura: {
+    icon: CreditCard,
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+  },
+
+  transporte: {
+    icon: CarFront,
+    iconContainerClassName:
+      "border-info/20 bg-info/10",
+    iconClassName: "text-info",
+  },
+
+  moradia: {
+    icon: Home,
+    iconContainerClassName:
+      "border-secondary/20 bg-secondary/10",
+    iconClassName: "text-secondary-bright",
+  },
+
+  saúde: {
+    icon: HeartPulse,
+    iconContainerClassName:
+      "border-danger/20 bg-danger/10",
+    iconClassName: "text-danger",
+  },
+
+  academia: {
+    icon: Dumbbell,
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+  },
+
+  restaurante: {
+    icon: Utensils,
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+};
+
+const fallbackCategoryVisual: CategoryVisual = {
+  icon: ReceiptText,
+  iconContainerClassName:
+    "border-border bg-surface-muted",
+  iconClassName: "text-text-muted",
+};
+
+function normalizeCategory(
+  category: string,
+): string {
+  return category
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("pt-BR");
+}
+
+function getCategoryVisual(
+  category: string,
+): CategoryVisual {
+  const normalizedCategory =
+    normalizeCategory(category);
+
+  const matchingEntry = Object.entries(
+    categoryVisuals,
+  ).find(([key]) =>
+    normalizedCategory.includes(
+      normalizeCategory(key),
+    ),
+  );
+
+  return (
+    matchingEntry?.[1] ??
+    fallbackCategoryVisual
+  );
+}
+
+function parseLocalDate(
+  date: string,
+): Date {
+  return new Date(`${date}T00:00:00`);
+}
+
+export function TransactionsTableRow({
+  transaction,
+}: Readonly<TransactionsTableRowProps>) {
+  const isIncome =
+    transaction.type === "income";
+
+  const isCompleted =
+    transaction.status === "completed";
+
+  const categoryVisual =
+    getCategoryVisual(transaction.category);
+
+  const CategoryIcon =
+    categoryVisual.icon;
+
+  const formattedAmount =
+    currencyFormatter.format(
+      Math.abs(transaction.amount),
+    );
+
+  return (
+    <tr
+      className={cn(
+        "group transition-colors duration-150",
+        "hover:bg-surface-elevated/55",
+      )}
+    >
+      <td className="px-5 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className={cn(
+              "flex size-9 shrink-0",
+              "items-center justify-center",
+              "rounded-[11px] border",
+              categoryVisual.iconContainerClassName,
+              categoryVisual.iconClassName,
+            )}
+            aria-hidden="true"
+          >
+            <CategoryIcon size={16} />
+          </div>
+
+          <span className="truncate text-xs font-semibold text-text">
+            {transaction.category}
+          </span>
+        </div>
+      </td>
+
+      <td className="px-5 py-4">
+        <div className="min-w-0">
+          <p className="truncate text-xs font-medium text-text">
+            {transaction.description}
+          </p>
+
+          <p className="mt-1 text-[10px] text-text-subtle">
+            ID #{transaction.id}
+          </p>
+        </div>
+      </td>
+
+      <td className="px-5 py-4">
+        <time
+          dateTime={transaction.date}
+          className="whitespace-nowrap text-xs text-text-muted"
+        >
+          {dateFormatter.format(
+            parseLocalDate(transaction.date),
+          )}
+        </time>
+      </td>
+
+      <td className="px-5 py-4 text-right">
+        <span
+          className={cn(
+            "inline-flex items-center",
+            "justify-end gap-1",
+            "whitespace-nowrap text-xs",
+            "font-semibold tabular-nums",
+            isIncome
+              ? "text-success"
+              : "text-danger",
+          )}
+        >
+          {isIncome ? "+" : "−"}
+
+          {formattedAmount}
+        </span>
+      </td>
+
+      <td className="px-5 py-4 text-right">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5",
+            "rounded-full border",
+            "px-2.5 py-1",
+            "text-[10px] font-semibold",
+            isCompleted
+              ? [
+                  "border-success/20",
+                  "bg-success/10",
+                  "text-success",
+                ]
+              : [
+                  "border-warning/20",
+                  "bg-warning/10",
+                  "text-warning",
+                ],
+          )}
+        >
+          <span
+            className={cn(
+              "size-1.5 rounded-full",
+              isCompleted
+                ? "bg-success"
+                : "bg-warning",
+            )}
+            aria-hidden="true"
+          />
+
+          {isCompleted
+            ? "Concluída"
+            : "Pendente"}
+        </span>
+      </td>
+    </tr>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/TransactionsTable/TransactionsTableSearch.tsx
+========================================================================================================================
+
+import {
+  Search,
+  X,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type { TransactionsTableSearchProps } from "./TransactionsTable.types";
+
+export function TransactionsTableSearch({
+  value,
+  onChange,
+  resultCount,
+}: Readonly<TransactionsTableSearchProps>) {
+  const hasValue = value.trim().length > 0;
+
+  return (
+    <div className="min-w-0">
+      <label
+        htmlFor="transactions-search"
+        className="sr-only"
+      >
+        Pesquisar transaÃ§Ãµes
+      </label>
+
+      <div className="relative w-full min-w-0 sm:w-72">
+        <Search
+          size={16}
+          className={cn(
+            "pointer-events-none absolute",
+            "left-3 top-1/2 -translate-y-1/2",
+            "text-text-subtle",
+          )}
+          aria-hidden="true"
+        />
+
+        <input
+          id="transactions-search"
+          type="search"
+          value={value}
+          onChange={(event) =>
+            onChange(event.target.value)
+          }
+          placeholder="Pesquisar transaÃ§Ãµes..."
+          autoComplete="off"
+          className={cn(
+            "h-10 w-full min-w-0",
+            "rounded-[12px] border border-border",
+            "bg-background/45",
+            "pl-9 pr-10",
+            "text-xs text-text outline-none",
+            "placeholder:text-text-subtle",
+            "transition-[border-color,box-shadow,background-color]",
+            "duration-200",
+            "hover:bg-background/65",
+            "focus:border-primary/45",
+            "focus:ring-4 focus:ring-primary/10",
+          )}
+        />
+
+        {hasValue && (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            aria-label="Limpar pesquisa"
+            title="Limpar pesquisa"
+            className={cn(
+              "absolute right-2 top-1/2",
+              "flex size-7 -translate-y-1/2",
+              "items-center justify-center",
+              "rounded-lg text-text-subtle",
+              "transition-colors",
+              "hover:bg-surface-muted",
+              "hover:text-text",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary/40",
+            )}
+          >
+            <X
+              size={14}
+              aria-hidden="true"
+            />
+          </button>
+        )}
+      </div>
+
+      {hasValue &&
+        resultCount !== undefined && (
+          <p
+            className="mt-1.5 text-[10px] text-text-subtle"
+            aria-live="polite"
+          >
+            {resultCount}{" "}
+            {resultCount === 1
+              ? "resultado encontrado"
+              : "resultados encontrados"}
+          </p>
+        )}
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/DashboardGrid/DashboardGrid.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/DashbordGrid/DashboardGrid.tsx
+========================================================================================================================
+
+import { useState } from "react";
+
+import { cn } from "@/lib/utils";
+
+import { CreateTransactionModal } from "@/components/transactions/CreateTransactionModal";
+
+import { AIInsights } from "../AIInsights";
+import { Alerts } from "../Alerts";
+import { BalanceChart } from "../BalanceChart";
+import { ExpenseDistribution } from "../ExpenseDistribution";
+import { FinancialCards } from "../FinancialCards";
+
+import {
+  QuickActions,
+  type QuickAction,
+} from "../QuickActions";
+
+import { ScoreCard } from "../ScoreCard";
+import { TransactionsTable } from "../TransactionsTable";
+
+import type {
+  DashboardData,
+} from "@/types/dashboard";
+
+interface DashboardGridProps {
+  data: DashboardData;
+  onReload: () => Promise<void>;
+}
+
+export function DashboardGrid({
+  data,
+  onReload,
+}: Readonly<DashboardGridProps>) {
+  const [
+    isCreateTransactionOpen,
+    setIsCreateTransactionOpen,
+  ] = useState(false);
+
+  const handleQuickAction = (
+    action: QuickAction,
+  ): void => {
+    switch (action.id) {
+      case "add-transaction":
+        setIsCreateTransactionOpen(true);
+        break;
+
+      case "run-analysis":
+        console.info(
+          "Executar nova anÃ¡lise financeira.",
+        );
+        break;
+
+      case "view-recommendations":
+        console.info(
+          "Abrir recomendaÃ§Ãµes financeiras.",
+        );
+        break;
+
+      case "import-transactions":
+        console.info(
+          "ImportaÃ§Ã£o de transaÃ§Ãµes indisponÃ­vel.",
+        );
+        break;
+
+      default: {
+        const exhaustiveCheck: never =
+          action.id;
+
+        return exhaustiveCheck;
+      }
+    }
+  };
+
+  const handleTransactionCreated =
+    async (): Promise<void> => {
+      await onReload();
+    };
+
+  return (
+    <>
+      <section
+        className={cn(
+          "min-w-0 space-y-4",
+          "sm:space-y-5",
+          "2xl:space-y-6",
+        )}
+        aria-labelledby="dashboard-overview-title"
+      >
+        <h2
+          id="dashboard-overview-title"
+          className="sr-only"
+        >
+          VisÃ£o geral financeira
+        </h2>
+
+        <div
+          className={cn(
+            "grid min-w-0 grid-cols-1 items-stretch gap-4",
+            "sm:grid-cols-2 sm:gap-5",
+            "xl:grid-cols-[repeat(3,minmax(0,1fr))_minmax(280px,1.35fr)]",
+            "2xl:gap-6",
+          )}
+          aria-label="Resumo financeiro"
+        >
+          <FinancialCards
+            summary={data.summary}
+          />
+
+          <div className="min-w-0 sm:col-span-2 xl:col-span-1">
+            <ScoreCard />
+          </div>
+        </div>
+
+        <div
+          className="min-w-0"
+          aria-label="Fluxo financeiro"
+        >
+          <BalanceChart
+            data={data.cashFlow}
+          />
+        </div>
+
+        <div
+          className={cn(
+            "grid min-w-0 grid-cols-1 items-stretch gap-4",
+            "sm:gap-5",
+            "xl:grid-cols-2",
+            "2xl:gap-6",
+          )}
+        >
+          <div
+            className="min-w-0"
+            aria-label="DistribuiÃ§Ã£o das despesas"
+          >
+            <ExpenseDistribution
+              categories={
+                data.categories
+              }
+            />
+          </div>
+
+          <div
+            className="min-w-0"
+            aria-label="Insights financeiros"
+          >
+            <AIInsights />
+          </div>
+        </div>
+
+        <div
+          className="min-w-0"
+          aria-label="Alertas financeiros"
+        >
+          <Alerts
+            alerts={[]}
+            maxVisibleAlerts={4}
+          />
+        </div>
+
+        <div
+          className={cn(
+            "grid min-w-0 grid-cols-1 items-start gap-4",
+            "sm:gap-5",
+            "xl:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]",
+            "2xl:grid-cols-[minmax(0,3.2fr)_minmax(360px,1fr)]",
+            "2xl:gap-6",
+          )}
+          aria-label="TransaÃ§Ãµes recentes e aÃ§Ãµes rÃ¡pidas"
+        >
+          <div className="min-w-0">
+            <TransactionsTable
+              transactions={
+                data.transactions
+              }
+            />
+          </div>
+
+          <div className="min-w-0">
+            <QuickActions
+              onAction={
+                handleQuickAction
+              }
+            />
+          </div>
+        </div>
+      </section>
+
+      <CreateTransactionModal
+        isOpen={
+          isCreateTransactionOpen
+        }
+        onClose={() => {
+          setIsCreateTransactionOpen(
+            false,
+          );
+        }}
+        onCreated={
+          handleTransactionCreated
+        }
+      />
+    </>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/hooks/useDashboard.ts
+========================================================================================================================
+
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  getApiErrorMessage,
+} from "@/services/api";
+import { dashboardService } from "@/services/dashboard.service";
+
+import type {
+  DashboardData,
+} from "@/types/dashboard";
+
+const INITIAL_DASHBOARD_DATA: DashboardData = {
+  summary: {
+    balance: 0,
+    income: 0,
+    expenses: 0,
+    transactionCount: 0,
+  },
+  cashFlow: [],
+  categories: [],
+  transactions: [],
+};
+
+interface UseDashboardReturn {
+  data: DashboardData;
+  isLoading: boolean;
+  error: string | null;
+  reload: () => Promise<void>;
+}
+
+export function useDashboard(): UseDashboardReturn {
+  const [data, setData] =
+    useState<DashboardData>(
+      INITIAL_DASHBOARD_DATA,
+    );
+
+  const [isLoading, setIsLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const loadDashboard =
+    useCallback(async (): Promise<void> => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const dashboardData =
+          await dashboardService.getDashboardData();
+
+        setData(dashboardData);
+      }
+      catch (requestError) {
+        setError(
+          getApiErrorMessage(
+            requestError,
+            "NÃ£o foi possÃ­vel carregar os dados do dashboard.",
+          ),
+        );
+      }
+      finally {
+        setIsLoading(false);
+      }
+    }, []);
+
+  useEffect(() => {
+    void loadDashboard();
+  }, [loadDashboard]);
+
+  return {
+    data,
+    isLoading,
+    error,
+    reload: loadDashboard,
+  };
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/api.ts
+========================================================================================================================
+
+import axios from "axios";
+import type { AxiosError } from "axios";
+
+import type { ApiError } from "@/types/api";
+
+const DEFAULT_API_BASE_URL =
+  "http://localhost:8080";
+
+const ACCESS_TOKEN_STORAGE_KEY =
+  "finance-ai:access-token";
+
+const configuredApiBaseUrl =
+  import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const API_BASE_URL = (
+  configuredApiBaseUrl || DEFAULT_API_BASE_URL
+).replace(/\/+$/, "");
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15_000,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+api.interceptors.request.use((config) => {
+  if (typeof window === "undefined") {
+    return config;
+  }
+
+  const accessToken = window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+
+  if (accessToken) {
+    config.headers.Authorization =
+      `Bearer ${accessToken}`;
+  }
+
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiError>) =>
+    Promise.reject(error),
+);
+
+export function saveAccessToken(
+  accessToken: string,
+): void {
+  window.localStorage.setItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+    accessToken,
+  );
+}
+
+export function getAccessToken(): string | null {
+  return window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function removeAccessToken(): void {
+  window.localStorage.removeItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function getApiErrorMessage(
+  error: unknown,
+  fallbackMessage =
+    "Não foi possível concluir a solicitação.",
+): string {
+  if (!axios.isAxiosError<ApiError>(error)) {
+    return fallbackMessage;
+  }
+
+  return (
+    error.response?.data?.message ||
+    error.message ||
+    fallbackMessage
+  );
+}

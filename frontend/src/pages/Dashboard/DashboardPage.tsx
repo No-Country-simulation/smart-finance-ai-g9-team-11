@@ -127,6 +127,7 @@ export function DashboardPage() {
     <main className="space-y-2">
       <DashboardGrid
         data={data}
+        onReload={reload}
       />
     </main>
   );

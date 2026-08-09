@@ -1,0 +1,6560 @@
+﻿RELATORIO - COMPONENTES REAIS DO DASHBOARD
+Gerado em: 08/08/2026 13:56:59
+
+========================================================================================================================
+ARQUITETURA: components/dashboard
+========================================================================================================================
+
+FullName                                                                                                                      
+--------                                                                                                                      
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIInsights                                          
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard                                       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\Alerts                                              
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart                                        
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashboardGrid                                       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashobordGrid                                       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseChart                                        
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseDistribution                                 
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis                                   
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCard                                       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCards                                      
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialHealthRadar                                
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions                                        
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard                                           
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable                                   
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\.gitkeep                                            
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIInsights\AIInsights.tsx                           
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIInsights\AIInsights.types.ts                      
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIInsights\index.ts                                 
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIInsights\InsightItem.tsx                          
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIConfidenceGauge.tsx                 
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx                     
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.types.ts                
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\index.ts                              
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\Alerts\AlertItem.tsx                                
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\Alerts\Alerts.tsx                                   
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\Alerts\Alerts.types.ts                              
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\Alerts\index.ts                                     
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart\BalanceChart.tsx                       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart\BalanceChart.types.ts                  
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart\BalanceChartTooltip.tsx                
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart\index.ts                               
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashboardGrid\DashboardGrid.tsx                     
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashboardGrid\index.ts                              
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashobordGrid\DashboardGrid.tsx                     
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseChart\ExpenseChart.tsx                       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseChart\ExpenseChart.types.ts                  
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseChart\index.ts                               
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseDistribution\ExpenseDistribution.tsx         
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseDistribution\ExpenseDistribution.types.ts    
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseDistribution\ExpenseDistributionTooltip.tsx  
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseDistribution\index.ts                        
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx         
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\index.ts                          
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCard\FinancialCard.tsx                     
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCard\FinancialCard.types.ts                
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCard\index.ts                              
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCards\FinancialCards.tsx                   
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCards\index.ts                             
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialHealthRadar\FinancialHealthRadar.tsx       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialHealthRadar\FinancialHealthRadar.types.ts  
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialHealthRadar\FinancialHealthRadarTooltip.tsx
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialHealthRadar\index.ts                       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions\index.ts                               
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions\QuickActionButton.tsx                  
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions\quickActions.data.ts                   
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions\QuickActions.tsx                       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions\QuickActions.types.ts                  
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\index.ts                                  
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.tsx                             
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.types.ts                        
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreGauge.tsx                            
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable\index.ts                          
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable\TransactionsTable.tsx             
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable\TransactionsTable.types.ts        
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable\TransactionsTableHeader.tsx       
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable\TransactionsTableRow.tsx          
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable\TransactionsTableSearch.tsx       
+
+
+
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\AIInsights\AIInsights.tsx
+========================================================================================================================
+
+import {
+  ArrowUpRight,
+  Bot,
+  CreditCard,
+  Lightbulb,
+  Send,
+  Sparkles,
+  TriangleAlert,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { InsightItem } from "./InsightItem";
+
+import type {
+  AIInsightsProps,
+  InsightPresentation,
+} from "./AIInsights.types";
+
+const DEFAULT_MAX_VISIBLE_INSIGHTS = 4;
+
+const fallbackPresentations: readonly InsightPresentation[] =
+  [
+    {
+      icon: Sparkles,
+      tone: "success",
+      title: "Seu desempenho melhorou",
+    },
+    {
+      icon: Lightbulb,
+      tone: "warning",
+      title: "Oportunidade de economia",
+    },
+    {
+      icon: ArrowUpRight,
+      tone: "info",
+      title: "MovimentaÃ§Ã£o financeira",
+    },
+    {
+      icon: TriangleAlert,
+      tone: "danger",
+      title: "Ponto de atenÃ§Ã£o",
+    },
+  ];
+
+function getInsightPresentation(
+  insight: string,
+  index: number,
+): InsightPresentation {
+  const normalizedInsight =
+    insight.toLocaleLowerCase("pt-BR");
+
+  if (
+    normalizedInsight.includes("assinatura") ||
+    normalizedInsight.includes("atenÃ§Ã£o") ||
+    normalizedInsight.includes("risco")
+  ) {
+    return {
+      icon: CreditCard,
+      tone: "danger",
+      title: "AtenÃ§Ã£o necessÃ¡ria",
+    };
+  }
+
+  if (
+    normalizedInsight.includes("economizar") ||
+    normalizedInsight.includes("gasto") ||
+    normalizedInsight.includes("despesa") ||
+    normalizedInsight.includes("reduziu")
+  ) {
+    return {
+      icon: Lightbulb,
+      tone: "warning",
+      title: "Oportunidade de economia",
+    };
+  }
+
+  if (
+    normalizedInsight.includes("aument") ||
+    normalizedInsight.includes("crescimento") ||
+    normalizedInsight.includes("receita") ||
+    normalizedInsight.includes("renda") ||
+    normalizedInsight.includes("score")
+  ) {
+    return {
+      icon: ArrowUpRight,
+      tone: "success",
+      title: "EvoluÃ§Ã£o positiva",
+    };
+  }
+
+  return (
+    fallbackPresentations[
+      index % fallbackPresentations.length
+    ] ?? fallbackPresentations[0]
+  );
+}
+
+export function AIInsights({
+  title = "AI Assistant",
+  subtitle = "Insights e recomendaÃ§Ãµes inteligentes para suas finanÃ§as.",
+  maxVisibleInsights = DEFAULT_MAX_VISIBLE_INSIGHTS,
+}: Readonly<AIInsightsProps>) {
+  const insights: readonly string[] =
+    dashboardService.getInsights();
+
+  const safeMaxVisibleInsights = Math.max(
+    0,
+    maxVisibleInsights,
+  );
+
+  const visibleInsights = insights.slice(
+    0,
+    safeMaxVisibleInsights,
+  );
+
+  const hiddenInsightsCount = Math.max(
+    insights.length - visibleInsights.length,
+    0,
+  );
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0 items-center",
+              "justify-center rounded-[13px]",
+              "border border-primary/25",
+              "bg-gradient-to-br from-primary/20",
+              "via-primary/10 to-secondary/15",
+              "text-primary-bright",
+              "shadow-[0_0_24px_-12px_var(--glow-primary)]",
+            )}
+            aria-hidden="true"
+          >
+            <Bot size={20} />
+          </div>
+
+          <div className="min-w-0">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <span className="truncate">
+                {title}
+              </span>
+
+              <Sparkles
+                size={14}
+                className="shrink-0 text-secondary-bright"
+                aria-hidden="true"
+              />
+            </CardTitle>
+
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              {subtitle}
+            </p>
+          </div>
+        </div>
+
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5",
+            "rounded-full border border-success/20",
+            "bg-success/10 px-2.5 py-1",
+            "text-[10px] font-semibold text-success",
+          )}
+        >
+          <span
+            className="relative flex size-1.5"
+            aria-hidden="true"
+          >
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-50 motion-reduce:animate-none" />
+
+            <span className="relative inline-flex size-1.5 rounded-full bg-success" />
+          </span>
+
+          Online
+        </span>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {visibleInsights.length > 0 ? (
+          <div
+            className={cn(
+              "grid min-w-0 flex-1 grid-cols-1 gap-3",
+              "md:grid-cols-2",
+            )}
+            aria-label="Insights do assistente financeiro"
+          >
+            {visibleInsights.map(
+              (
+                insight: string,
+                index: number,
+              ) => {
+                const presentation =
+                  getInsightPresentation(
+                    insight,
+                    index,
+                  );
+
+                return (
+                  <InsightItem
+                    key={`${index}-${insight}`}
+                    insight={insight}
+                    presentation={presentation}
+                  />
+                );
+              },
+            )}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[280px] flex-col",
+              "items-center justify-center",
+              "rounded-[16px] border",
+              "border-dashed border-border",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-primary/20",
+                "bg-primary/10 text-primary-bright",
+              )}
+              aria-hidden="true"
+            >
+              <Bot size={22} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhum insight disponÃ­vel
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Uma nova anÃ¡lise financeira poderÃ¡ gerar
+              recomendaÃ§Ãµes personalizadas.
+            </p>
+          </div>
+        )}
+
+        {hiddenInsightsCount > 0 && (
+          <p className="mt-3 text-center text-xs text-text-muted">
+            +{hiddenInsightsCount}{" "}
+            {hiddenInsightsCount === 1
+              ? "insight adicional"
+              : "insights adicionais"}
+          </p>
+        )}
+
+        <div
+          className={cn(
+            "mt-4 flex min-w-0 items-center gap-2",
+            "rounded-[14px] border border-border",
+            "bg-background/50 p-1.5",
+            "transition-colors duration-200",
+            "focus-within:border-primary/40",
+          )}
+        >
+          <label
+            htmlFor="ai-financial-question"
+            className="sr-only"
+          >
+            Pergunte algo sobre suas finanÃ§as
+          </label>
+
+          <input
+            id="ai-financial-question"
+            type="text"
+            disabled
+            placeholder="Pergunte algo sobre suas finanÃ§as..."
+            className={cn(
+              "h-9 min-w-0 flex-1 bg-transparent px-2",
+              "text-xs text-text outline-none",
+              "placeholder:text-text-subtle",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-80",
+            )}
+          />
+
+          <button
+            type="button"
+            disabled
+            aria-label="Enviar pergunta"
+            title="DisponÃ­vel apÃ³s a integraÃ§Ã£o com o backend"
+            className={cn(
+              "flex size-9 shrink-0 items-center",
+              "justify-center rounded-[11px]",
+              "bg-gradient-to-br from-primary",
+              "to-secondary text-white",
+              "shadow-sm transition-opacity",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
+            )}
+          >
+            <Send
+              size={16}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-text-subtle">
+          <Sparkles
+            size={11}
+            aria-hidden="true"
+          />
+
+          <span>
+            Chat disponÃ­vel apÃ³s a integraÃ§Ã£o com o backend.
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\AIInsights\AIInsights.types.ts
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+
+export type InsightTone =
+  | "success"
+  | "warning"
+  | "danger"
+  | "info";
+
+export interface AIInsightsProps {
+  title?: string;
+  subtitle?: string;
+  maxVisibleInsights?: number;
+}
+
+export interface InsightPresentation {
+  icon: LucideIcon;
+  tone: InsightTone;
+  title: string;
+}
+
+export interface InsightItemProps {
+  insight: string;
+  presentation: InsightPresentation;
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\AIInsights\index.ts
+========================================================================================================================
+
+export * from "./AIInsights";
+export * from "./AIInsights.types";
+export * from "./InsightItem";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\AIInsights\InsightItem.tsx
+========================================================================================================================
+
+import { cn } from "@/lib/utils";
+
+import type {
+  InsightItemProps,
+  InsightTone,
+} from "./AIInsights.types";
+
+interface InsightToneStyle {
+  accent: string;
+  iconContainer: string;
+  icon: string;
+  badge: string;
+}
+
+const toneStyles: Record<
+  InsightTone,
+  InsightToneStyle
+> = {
+  success: {
+    accent: "bg-success",
+    iconContainer:
+      "border-success/20 bg-success/10",
+    icon: "text-success",
+    badge:
+      "border-success/20 bg-success/10 text-success",
+  },
+
+  warning: {
+    accent: "bg-warning",
+    iconContainer:
+      "border-warning/20 bg-warning/10",
+    icon: "text-warning",
+    badge:
+      "border-warning/20 bg-warning/10 text-warning",
+  },
+
+  danger: {
+    accent: "bg-danger",
+    iconContainer:
+      "border-danger/20 bg-danger/10",
+    icon: "text-danger",
+    badge:
+      "border-danger/20 bg-danger/10 text-danger",
+  },
+
+  info: {
+    accent: "bg-primary-bright",
+    iconContainer:
+      "border-primary/20 bg-primary/10",
+    icon: "text-primary-bright",
+    badge:
+      "border-primary/20 bg-primary/10 text-primary-bright",
+  },
+};
+
+const toneLabels: Record<InsightTone, string> = {
+  success: "Positivo",
+  warning: "Oportunidade",
+  danger: "AtenÃ§Ã£o",
+  info: "InformaÃ§Ã£o",
+};
+
+export function InsightItem({
+  insight,
+  presentation,
+}: Readonly<InsightItemProps>) {
+  const Icon = presentation.icon;
+  const styles = toneStyles[presentation.tone];
+
+  return (
+    <article
+      className={cn(
+        "group relative flex min-h-[132px]",
+        "min-w-0 flex-col overflow-hidden",
+        "rounded-[16px] border border-border",
+        "bg-surface-elevated/55 p-4",
+        "transition-[border-color,background-color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-px",
+        "hover:border-border-highlight",
+        "hover:bg-card-hover",
+        "hover:shadow-card",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+      )}
+    >
+      <span
+        className={cn(
+          "absolute inset-y-0 left-0 w-0.5",
+          styles.accent,
+        )}
+        aria-hidden="true"
+      />
+
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <div
+          className={cn(
+            "flex size-9 shrink-0 items-center",
+            "justify-center rounded-[11px] border",
+            styles.iconContainer,
+            styles.icon,
+          )}
+          aria-hidden="true"
+        >
+          <Icon size={17} />
+        </div>
+
+        <span
+          className={cn(
+            "inline-flex shrink-0 rounded-full border",
+            "px-2 py-1 text-[9px] font-semibold",
+            "uppercase tracking-[0.08em]",
+            styles.badge,
+          )}
+        >
+          {toneLabels[presentation.tone]}
+        </span>
+      </div>
+
+      <div className="mt-3 min-w-0">
+        <h4 className="text-sm font-semibold leading-5 text-text">
+          {presentation.title}
+        </h4>
+
+        <p className="mt-1.5 text-xs leading-5 text-text-muted">
+          {insight}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\AIProfileCard\AIConfidenceGauge.tsx
+========================================================================================================================
+
+import { useId } from "react";
+
+import { cn } from "@/lib/utils";
+
+import type { AIConfidenceGaugeProps } from "./AIProfileCard.types";
+
+export function AIConfidenceGauge({
+  value,
+  size = 92,
+}: Readonly<AIConfidenceGaugeProps>) {
+  const gradientId = useId().replaceAll(":", "");
+
+  const safeValue = Math.min(
+    Math.max(value, 0),
+    100,
+  );
+
+  const strokeWidth = 8;
+  const radius =
+    size / 2 - strokeWidth;
+
+  const circumference =
+    2 * Math.PI * radius;
+
+  const strokeDashoffset =
+    circumference *
+    (1 - safeValue / 100);
+
+  return (
+    <div
+      className="relative flex shrink-0 items-center justify-center"
+      style={{
+        width: size,
+        height: size,
+      }}
+      role="img"
+      aria-label={`ConfianÃ§a da IA: ${safeValue}%`}
+    >
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="-rotate-90"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient
+            id={`${gradientId}-gauge`}
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="1"
+          >
+            <stop
+              offset="0%"
+              stopColor="#7c3aed"
+            />
+
+            <stop
+              offset="55%"
+              stopColor="#3b82f6"
+            />
+
+            <stop
+              offset="100%"
+              stopColor="#10b981"
+            />
+          </linearGradient>
+        </defs>
+
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="transparent"
+          stroke="var(--border-muted)"
+          strokeWidth={strokeWidth}
+        />
+
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="transparent"
+          stroke={`url(#${gradientId}-gauge)`}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          className={cn(
+            "transition-[stroke-dashoffset]",
+            "duration-700 ease-out",
+          )}
+        />
+      </svg>
+
+      <div className="absolute flex flex-col items-center justify-center">
+        <span className="text-lg font-bold tabular-nums text-text">
+          {safeValue}%
+        </span>
+
+        <span className="mt-0.5 text-[8px] font-medium uppercase tracking-[0.08em] text-text-subtle">
+          confianÃ§a
+        </span>
+      </div>
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+
+import {
+  AlertTriangle,
+  ArrowRight,
+  BrainCircuit,
+  CheckCircle2,
+  ShieldAlert,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+import { AIConfidenceGauge } from "./AIConfidenceGauge";
+
+import type {
+  AIClassificationVisualConfig,
+  AIFinancialClassification,
+  AIFinancialIndicatorStatus,
+  AIFinancialProfile,
+  AIProfileCardProps,
+} from "./AIProfileCard.types";
+
+const defaultProfile: AIFinancialProfile = {
+  classification: "attention",
+  riskLabel: "Risco moderado",
+  confidence: 82,
+  indicators: [
+    {
+      id: "debt-level",
+      label: "Nível de endividamento",
+      value: 25,
+      status: "good",
+    },
+    {
+      id: "income-commitment",
+      label: "Comprometimento da renda",
+      value: 75,
+      status: "attention",
+    },
+    {
+      id: "savings-rate",
+      label: "Taxa de poupança",
+      value: 25,
+      status: "good",
+    },
+  ],
+};
+
+const classificationConfig: Record<
+  AIFinancialClassification,
+  AIClassificationVisualConfig
+> = {
+  healthy: {
+    label: "Saudável",
+    description:
+      "Sua situação financeira apresenta bons indicadores.",
+    accentClassName: "bg-success",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    iconClassName: "text-success",
+  },
+
+  attention: {
+    label: "Em observação",
+    description:
+      "Alguns indicadores precisam de acompanhamento.",
+    accentClassName: "bg-warning",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+
+  risk: {
+    label: "Em risco",
+    description:
+      "Existem indicadores financeiros que exigem ação.",
+    accentClassName: "bg-danger",
+    badgeClassName:
+      "border-danger/20 bg-danger/10 text-danger",
+    iconContainerClassName:
+      "border-danger/20 bg-danger/10",
+    iconClassName: "text-danger",
+  },
+};
+
+const classificationIcons: Record<
+  AIFinancialClassification,
+  LucideIcon
+> = {
+  healthy: ShieldCheck,
+  attention: ShieldAlert,
+  risk: AlertTriangle,
+};
+
+const indicatorStatusConfig: Record<
+  AIFinancialIndicatorStatus,
+  {
+    label: string;
+    badgeClassName: string;
+    progressClassName: string;
+  }
+> = {
+  good: {
+    label: "Bom",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+    progressClassName: "bg-success",
+  },
+
+  attention: {
+    label: "Atenção",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+    progressClassName: "bg-warning",
+  },
+
+  critical: {
+    label: "Crítico",
+    badgeClassName:
+      "border-danger/20 bg-danger/10 text-danger",
+    progressClassName: "bg-danger",
+  },
+};
+
+export function AIProfileCard({
+  title = "Como a IA classificou sua situação?",
+  description = "Perfil financeiro gerado pela análise inteligente.",
+  profile = defaultProfile,
+  onViewDetails,
+}: Readonly<AIProfileCardProps>) {
+  const safeConfidence = Math.min(
+    Math.max(profile.confidence, 0),
+    100,
+  );
+
+  const classification =
+    classificationConfig[
+      profile.classification
+    ];
+
+  const ClassificationIcon =
+    classificationIcons[
+      profile.classification
+    ];
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <CardTitle className="text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-primary/20",
+            "bg-primary/10 text-primary-bright",
+          )}
+          aria-hidden="true"
+        >
+          <BrainCircuit size={18} />
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        <div
+          className={cn(
+            "relative overflow-hidden",
+            "rounded-[16px] border border-border",
+            "bg-surface-elevated/55 p-4",
+          )}
+        >
+          <span
+            className={cn(
+              "absolute inset-y-0 left-0 w-0.5",
+              classification.accentClassName,
+            )}
+            aria-hidden="true"
+          />
+
+          <div
+            className={cn(
+              "grid min-w-0 grid-cols-1",
+              "items-center gap-4",
+              "sm:grid-cols-[minmax(0,1fr)_auto]",
+            )}
+          >
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-start gap-3">
+                <div
+                  className={cn(
+                    "flex size-10 shrink-0",
+                    "items-center justify-center",
+                    "rounded-[12px] border",
+                    classification.iconContainerClassName,
+                    classification.iconClassName,
+                  )}
+                  aria-hidden="true"
+                >
+                  <ClassificationIcon size={18} />
+                </div>
+
+                <div className="min-w-0">
+                  <span
+                    className={cn(
+                      "inline-flex rounded-full border",
+                      "px-2.5 py-1",
+                      "text-[9px] font-semibold",
+                      "uppercase tracking-[0.08em]",
+                      classification.badgeClassName,
+                    )}
+                  >
+                    {classification.label}
+                  </span>
+
+                  <p className="mt-2 text-xs font-semibold text-text">
+                    {profile.riskLabel}
+                  </p>
+
+                  <p className="mt-1 text-xs leading-5 text-text-muted">
+                    {classification.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <AIConfidenceGauge
+              value={safeConfidence}
+            />
+          </div>
+        </div>
+
+        <div
+          className="mt-4 space-y-2.5"
+          aria-label="Indicadores da classificação financeira"
+        >
+          {profile.indicators.map(
+            (indicator) => {
+              const safeValue = Math.min(
+                Math.max(
+                  indicator.value,
+                  0,
+                ),
+                100,
+              );
+
+              const status =
+                indicatorStatusConfig[
+                  indicator.status
+                ];
+
+              return (
+                <div
+                  key={indicator.id}
+                  className={cn(
+                    "rounded-[12px]",
+                    "border border-border-muted",
+                    "bg-background/30",
+                    "px-3 py-2.5",
+                  )}
+                >
+                  <div className="flex min-w-0 items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <CheckCircle2
+                        size={14}
+                        className={cn(
+                          "shrink-0",
+                          indicator.status === "good"
+                            ? "text-success"
+                            : indicator.status ===
+                                "attention"
+                              ? "text-warning"
+                              : "text-danger",
+                        )}
+                        aria-hidden="true"
+                      />
+
+                      <span className="truncate text-[11px] font-medium text-text-muted">
+                        {indicator.label}
+                      </span>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="text-[10px] font-semibold tabular-nums text-text">
+                        {safeValue}%
+                      </span>
+
+                      <span
+                        className={cn(
+                          "rounded-full border",
+                          "px-2 py-0.5",
+                          "text-[9px] font-semibold",
+                          status.badgeClassName,
+                        )}
+                      >
+                        {status.label}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-muted">
+                    <div
+                      className={cn(
+                        "h-full rounded-full",
+                        "transition-[width] duration-500",
+                        status.progressClassName,
+                      )}
+                      style={{
+                        width: `${safeValue}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            },
+          )}
+        </div>
+
+        <div
+          className={cn(
+            "mt-4 flex items-center",
+            "justify-between gap-3",
+            "rounded-[12px]",
+            "border border-primary/15",
+            "bg-primary/5 px-3 py-2.5",
+          )}
+        >
+          <div className="flex min-w-0 items-center gap-2">
+            <BrainCircuit
+              size={14}
+              className="shrink-0 text-primary-bright"
+              aria-hidden="true"
+            />
+
+            <span className="text-[10px] leading-4 text-text-muted">
+              Resultado gerado pela análise do Finance AI.
+            </span>
+          </div>
+
+          <span className="shrink-0 text-[10px] font-semibold tabular-nums text-primary-bright">
+            {safeConfidence}% confiável
+          </span>
+        </div>
+
+        {onViewDetails && (
+          <button
+            type="button"
+            onClick={onViewDetails}
+            className={cn(
+              "mt-4 inline-flex h-10",
+              "w-full items-center",
+              "justify-center gap-2",
+              "rounded-[12px]",
+              "border border-primary/15",
+              "bg-primary/5",
+              "text-xs font-semibold",
+              "text-primary-bright",
+              "transition-[border-color,background-color]",
+              "hover:border-primary/30",
+              "hover:bg-primary/10",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary/40",
+            )}
+          >
+            Ver detalhes
+
+            <ArrowRight
+              size={14}
+              aria-hidden="true"
+            />
+          </button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\AIProfileCard\AIProfileCard.types.ts
+========================================================================================================================
+
+export type AIFinancialClassification =
+  | "healthy"
+  | "attention"
+  | "risk";
+
+export type AIFinancialIndicatorStatus =
+  | "good"
+  | "attention"
+  | "critical";
+
+export interface AIFinancialIndicator {
+  id: string;
+  label: string;
+  value: number;
+  status: AIFinancialIndicatorStatus;
+}
+
+export interface AIFinancialProfile {
+  classification: AIFinancialClassification;
+  riskLabel: string;
+  confidence: number;
+  indicators: readonly AIFinancialIndicator[];
+}
+
+export interface AIProfileCardProps {
+  title?: string;
+  description?: string;
+  profile?: AIFinancialProfile;
+  onViewDetails?: () => void;
+}
+
+export interface AIConfidenceGaugeProps {
+  value: number;
+  size?: number;
+}
+
+export interface AIClassificationVisualConfig {
+  label: string;
+  description: string;
+  accentClassName: string;
+  badgeClassName: string;
+  iconContainerClassName: string;
+  iconClassName: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\AIProfileCard\index.ts
+========================================================================================================================
+
+export * from "./AIConfidenceGauge";
+export * from "./AIProfileCard";
+export * from "./AIProfileCard.types";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\Alerts\AlertItem.tsx
+========================================================================================================================
+
+import {
+  AlertCircle,
+  ArrowRight,
+  BadgeCheck,
+  CircleAlert,
+  Info,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type {
+  AlertItemProps,
+  AlertVisualConfig,
+  FinancialAlertType,
+} from "./Alerts.types";
+
+const alertVisualConfig: Record<
+  FinancialAlertType,
+  AlertVisualConfig
+> = {
+  info: {
+    icon: Info,
+    label: "Informativo",
+    accentClassName: "bg-primary-bright",
+    iconClassName: "text-primary-bright",
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    badgeClassName:
+      "border-primary/20 bg-primary/10 text-primary-bright",
+  },
+
+  success: {
+    icon: BadgeCheck,
+    label: "Positivo",
+    accentClassName: "bg-success",
+    iconClassName: "text-success",
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+  },
+
+  warning: {
+    icon: CircleAlert,
+    label: "AtenÃ§Ã£o",
+    accentClassName: "bg-warning",
+    iconClassName: "text-warning",
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+  },
+
+  danger: {
+    icon: AlertCircle,
+    label: "CrÃ­tico",
+    accentClassName: "bg-danger",
+    iconClassName: "text-danger",
+    iconContainerClassName:
+      "border-danger/20 bg-danger/10",
+    badgeClassName:
+      "border-danger/20 bg-danger/10 text-danger",
+  },
+};
+
+export function AlertItem({
+  alert,
+  onAction,
+}: Readonly<AlertItemProps>) {
+  const config = alertVisualConfig[alert.type];
+  const Icon = config.icon;
+
+  const hasAction = Boolean(
+    alert.actionLabel && onAction,
+  );
+
+  return (
+    <article
+      className={cn(
+        "group relative flex min-h-[156px]",
+        "min-w-0 flex-col overflow-hidden",
+        "rounded-[16px] border border-border",
+        "bg-surface-elevated/55 p-4",
+        "transition-[border-color,background-color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-px",
+        "hover:border-border-highlight",
+        "hover:bg-card-hover",
+        "hover:shadow-card",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+      )}
+      aria-label={`${config.label}: ${alert.title}`}
+    >
+      <span
+        className={cn(
+          "absolute inset-y-0 left-0 w-0.5",
+          config.accentClassName,
+        )}
+        aria-hidden="true"
+      />
+
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <div
+          className={cn(
+            "flex size-9 shrink-0 items-center",
+            "justify-center rounded-[11px] border",
+            config.iconContainerClassName,
+            config.iconClassName,
+          )}
+          aria-hidden="true"
+        >
+          <Icon className="size-4" />
+        </div>
+
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center",
+            "rounded-full border px-2 py-1",
+            "text-[9px] font-semibold uppercase",
+            "tracking-[0.08em]",
+            config.badgeClassName,
+          )}
+        >
+          {config.label}
+        </span>
+      </div>
+
+      <div className="mt-3 min-w-0 flex-1">
+        <h4 className="text-sm font-semibold leading-5 text-text">
+          {alert.title}
+        </h4>
+
+        {alert.description && (
+          <p className="mt-1.5 text-xs leading-5 text-text-muted">
+            {alert.description}
+          </p>
+        )}
+      </div>
+
+      {hasAction && (
+        <button
+          type="button"
+          onClick={() => onAction?.(alert)}
+          className={cn(
+            "mt-3 inline-flex w-fit items-center gap-1.5",
+            "rounded-lg text-xs font-semibold",
+            "text-primary-bright",
+            "transition-[color,transform]",
+            "hover:text-primary",
+            "focus-visible:outline-none",
+            "focus-visible:ring-2",
+            "focus-visible:ring-primary/40",
+            "focus-visible:ring-offset-2",
+            "focus-visible:ring-offset-background",
+          )}
+        >
+          {alert.actionLabel}
+
+          <ArrowRight
+            className={cn(
+              "size-3.5 transition-transform",
+              "group-hover:translate-x-0.5",
+              "motion-reduce:transition-none",
+              "motion-reduce:translate-x-0",
+            )}
+            aria-hidden="true"
+          />
+        </button>
+      )}
+    </article>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\Alerts\Alerts.tsx
+========================================================================================================================
+
+import {
+  BellRing,
+  CheckCircle2,
+  Eye,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../common/Card";
+import { cn } from "@/lib/utils";
+
+import { AlertItem } from "./AlertItem";
+
+import type {
+  AlertsProps,
+  FinancialAlertType,
+} from "./Alerts.types";
+
+const DEFAULT_MAX_VISIBLE_ALERTS = 4;
+
+function countAlertsByType(
+  alerts: AlertsProps["alerts"],
+  type: FinancialAlertType,
+): number {
+  return alerts.filter(
+    (alert) => alert.type === type,
+  ).length;
+}
+
+export function Alerts({
+  alerts,
+  title = "Alertas financeiros",
+  description = "Pontos que merecem sua atenÃ§Ã£o.",
+  maxVisibleAlerts = DEFAULT_MAX_VISIBLE_ALERTS,
+  onAlertAction,
+}: Readonly<AlertsProps>) {
+  const safeMaxVisibleAlerts = Math.max(
+    0,
+    maxVisibleAlerts,
+  );
+
+  const visibleAlerts = alerts.slice(
+    0,
+    safeMaxVisibleAlerts,
+  );
+
+  const hiddenAlertsCount = Math.max(
+    alerts.length - visibleAlerts.length,
+    0,
+  );
+
+  const dangerCount = countAlertsByType(
+    alerts,
+    "danger",
+  );
+
+  const warningCount = countAlertsByType(
+    alerts,
+    "warning",
+  );
+
+  const attentionCount =
+    dangerCount + warningCount;
+
+  const shouldShowSummary =
+    visibleAlerts.length > 0 &&
+    visibleAlerts.length < 4;
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <CardTitle className="text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "relative flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-warning/20 bg-warning/10",
+            "text-warning",
+          )}
+          aria-hidden="true"
+        >
+          <BellRing className="size-4" />
+
+          {alerts.length > 0 && (
+            <span
+              className={cn(
+                "absolute -right-1 -top-1",
+                "flex size-5 items-center justify-center",
+                "rounded-full border-2 border-card",
+                "bg-danger text-[9px]",
+                "font-bold text-white",
+              )}
+            >
+              {alerts.length}
+            </span>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {visibleAlerts.length > 0 ? (
+          <div
+            className={cn(
+              "grid min-w-0 flex-1",
+              "grid-cols-1 gap-3",
+              "md:grid-cols-2",
+            )}
+            aria-label="Lista de alertas financeiros"
+          >
+            {visibleAlerts.map((alert) => (
+              <AlertItem
+                key={alert.id}
+                alert={alert}
+                onAction={onAlertAction}
+              />
+            ))}
+
+            {shouldShowSummary && (
+              <article
+                className={cn(
+                  "relative flex min-h-[156px]",
+                  "min-w-0 flex-col overflow-hidden",
+                  "rounded-[16px] border border-border",
+                  "bg-gradient-to-br",
+                  "from-primary/5 via-surface-elevated/55",
+                  "to-secondary/5 p-4",
+                )}
+                aria-label="Resumo do monitoramento financeiro"
+              >
+                <span
+                  className={cn(
+                    "absolute inset-y-0 left-0 w-0.5",
+                    attentionCount > 0
+                      ? "bg-warning"
+                      : "bg-success",
+                  )}
+                  aria-hidden="true"
+                />
+
+                <div className="flex items-start justify-between gap-3">
+                  <div
+                    className={cn(
+                      "flex size-9 shrink-0 items-center",
+                      "justify-center rounded-[11px]",
+                      "border border-primary/20",
+                      "bg-primary/10 text-primary-bright",
+                    )}
+                    aria-hidden="true"
+                  >
+                    <ShieldCheck className="size-4" />
+                  </div>
+
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5",
+                      "rounded-full border",
+                      "border-success/20 bg-success/10",
+                      "px-2 py-1 text-[9px]",
+                      "font-semibold uppercase",
+                      "tracking-[0.08em] text-success",
+                    )}
+                  >
+                    <span
+                      className="size-1.5 rounded-full bg-success"
+                      aria-hidden="true"
+                    />
+
+                    Ativo
+                  </span>
+                </div>
+
+                <div className="mt-3 min-w-0 flex-1">
+                  <h4 className="text-sm font-semibold text-text">
+                    Monitoramento financeiro
+                  </h4>
+
+                  <p className="mt-1.5 text-xs leading-5 text-text-muted">
+                    O Finance AI acompanha suas movimentaÃ§Ãµes
+                    e identifica alteraÃ§Ãµes relevantes.
+                  </p>
+                </div>
+
+                <div
+                  className={cn(
+                    "mt-3 flex items-center justify-between",
+                    "gap-3 rounded-[11px]",
+                    "border border-border-muted",
+                    "bg-background/40 px-3 py-2",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <Eye
+                      className="size-3.5 text-text-muted"
+                      aria-hidden="true"
+                    />
+
+                    <span className="text-[10px] font-medium text-text-muted">
+                      Alertas ativos
+                    </span>
+                  </div>
+
+                  <span className="text-xs font-bold text-text">
+                    {alerts.length}
+                  </span>
+                </div>
+              </article>
+            )}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[330px] flex-col",
+              "items-center justify-center",
+              "rounded-[16px] border",
+              "border-dashed border-border",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center justify-center",
+                "rounded-[15px]",
+                "border border-success/20",
+                "bg-success/10 text-success",
+              )}
+              aria-hidden="true"
+            >
+              <CheckCircle2 className="size-5" />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhum alerta no momento
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Sua situaÃ§Ã£o financeira nÃ£o apresenta pontos
+              crÃ­ticos ou mudanÃ§as relevantes.
+            </p>
+          </div>
+        )}
+
+        {hiddenAlertsCount > 0 && (
+          <div
+            className={cn(
+              "mt-3 flex items-center justify-center",
+              "rounded-[11px] border",
+              "border-border-muted bg-background/35",
+              "px-3 py-2",
+            )}
+          >
+            <p className="text-xs text-text-muted">
+              +{hiddenAlertsCount}{" "}
+              {hiddenAlertsCount === 1
+                ? "alerta adicional"
+                : "alertas adicionais"}
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\Alerts\Alerts.types.ts
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+
+export type FinancialAlertType =
+  | "success"
+  | "warning"
+  | "danger"
+  | "info";
+
+export interface FinancialAlert {
+  id: number;
+  title: string;
+  type: FinancialAlertType;
+  description?: string;
+  actionLabel?: string;
+}
+
+export interface AlertsProps {
+  alerts: readonly FinancialAlert[];
+  title?: string;
+  description?: string;
+  maxVisibleAlerts?: number;
+  onAlertAction?: (alert: FinancialAlert) => void;
+}
+
+export interface AlertItemProps {
+  alert: FinancialAlert;
+  onAction?: (alert: FinancialAlert) => void;
+}
+
+export interface AlertVisualConfig {
+  icon: LucideIcon;
+  label: string;
+  accentClassName: string;
+  iconClassName: string;
+  iconContainerClassName: string;
+  badgeClassName: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\Alerts\index.ts
+========================================================================================================================
+
+export { AlertItem } from "./AlertItem";
+export { Alerts } from "./Alerts";
+
+export type {
+  AlertItemProps,
+  AlertsProps,
+  AlertVisualConfig,
+  FinancialAlert,
+  FinancialAlertType,
+} from "./Alerts.types";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\BalanceChart\BalanceChart.tsx
+========================================================================================================================
+
+import { useMemo } from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
+  CalendarDays,
+  WalletCards,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { BalanceChartTooltip } from "./BalanceChartTooltip";
+
+const compactCurrencyFormatter = new Intl.NumberFormat(
+  "pt-BR",
+  {
+    notation: "compact",
+    compactDisplay: "short",
+    maximumFractionDigits: 0,
+  },
+);
+
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  minimumFractionDigits: 2,
+});
+
+function formatAxisValue(value: number): string {
+  return `R$ ${compactCurrencyFormatter.format(value)}`;
+}
+
+export function BalanceChart() {
+  const data = dashboardService.getCashFlow();
+
+  const summary = useMemo(() => {
+    const latest = data.at(-1);
+
+    if (!latest) {
+      return null;
+    }
+
+    const balance = latest.income - latest.expenses;
+
+    const expensePercentage =
+      latest.income > 0
+        ? Math.round(
+            (latest.expenses / latest.income) * 100,
+          )
+        : 0;
+
+    return {
+      month: latest.month,
+      income: latest.income,
+      expenses: latest.expenses,
+      balance,
+      expensePercentage,
+    };
+  }, [data]);
+
+  return (
+    <Card className="min-w-0 overflow-hidden">
+      <CardHeader
+        className={cn(
+          "flex flex-col gap-4",
+          "lg:flex-row lg:items-start",
+          "lg:justify-between",
+        )}
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0 items-center",
+              "justify-center rounded-[13px]",
+              "border border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <BarChart3 size={19} />
+          </div>
+
+          <div className="min-w-0">
+            <CardTitle>
+              Fluxo financeiro
+            </CardTitle>
+
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              Comparativo entre receitas e despesas nos
+              Ãºltimos seis meses.
+            </p>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "inline-flex w-fit items-center gap-2",
+            "rounded-[12px] border border-border",
+            "bg-surface-elevated/65 px-3 py-2",
+            "text-[11px] font-medium text-text-muted",
+          )}
+        >
+          <CalendarDays
+            size={15}
+            aria-hidden="true"
+          />
+
+          Ãšltimos 6 meses
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        {data.length > 0 && summary ? (
+          <>
+            <div
+              className={cn(
+                "mb-5 grid min-w-0 grid-cols-1 gap-3",
+                "sm:grid-cols-3",
+              )}
+            >
+              <div
+                className={cn(
+                  "min-w-0 rounded-[14px]",
+                  "border border-success/15",
+                  "bg-success/5 px-4 py-3",
+                )}
+              >
+                <div className="flex items-center gap-2 text-success">
+                  <ArrowUpRight
+                    size={15}
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-[10px] font-semibold uppercase tracking-wide">
+                    Receitas em {summary.month}
+                  </span>
+                </div>
+
+                <p className="mt-2 truncate text-sm font-bold text-text">
+                  {currencyFormatter.format(
+                    summary.income,
+                  )}
+                </p>
+              </div>
+
+              <div
+                className={cn(
+                  "min-w-0 rounded-[14px]",
+                  "border border-danger/15",
+                  "bg-danger/5 px-4 py-3",
+                )}
+              >
+                <div className="flex items-center gap-2 text-danger">
+                  <ArrowDownRight
+                    size={15}
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-[10px] font-semibold uppercase tracking-wide">
+                    Despesas em {summary.month}
+                  </span>
+                </div>
+
+                <p className="mt-2 truncate text-sm font-bold text-text">
+                  {currencyFormatter.format(
+                    summary.expenses,
+                  )}
+                </p>
+              </div>
+
+              <div
+                className={cn(
+                  "min-w-0 rounded-[14px]",
+                  "border border-primary/15",
+                  "bg-primary/5 px-4 py-3",
+                )}
+              >
+                <div className="flex items-center gap-2 text-primary-bright">
+                  <WalletCards
+                    size={15}
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-[10px] font-semibold uppercase tracking-wide">
+                    Resultado mensal
+                  </span>
+                </div>
+
+                <p className="mt-2 truncate text-sm font-bold text-text">
+                  {currencyFormatter.format(
+                    summary.balance,
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "min-w-0 rounded-[16px]",
+                "border border-border-muted",
+                "bg-background/25 px-2 pb-2 pt-5",
+                "sm:px-4",
+              )}
+            >
+              <div className="h-[280px] min-w-0 sm:h-[320px] lg:h-[350px]">
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                >
+                  <AreaChart
+                    data={data}
+                    margin={{
+                      top: 8,
+                      right: 8,
+                      left: 0,
+                      bottom: 0,
+                    }}
+                  >
+                    <defs>
+                      <linearGradient
+                        id="balance-income-gradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="#10b981"
+                          stopOpacity={0.34}
+                        />
+
+                        <stop
+                          offset="92%"
+                          stopColor="#10b981"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+
+                      <linearGradient
+                        id="balance-expense-gradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="#f43f5e"
+                          stopOpacity={0.24}
+                        />
+
+                        <stop
+                          offset="92%"
+                          stopColor="#f43f5e"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+
+                    <CartesianGrid
+                      stroke="var(--border-muted)"
+                      strokeDasharray="4 6"
+                      vertical={false}
+                    />
+
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{
+                        fill: "var(--text-muted)",
+                        fontSize: 11,
+                      }}
+                      tickMargin={12}
+                    />
+
+                    <YAxis
+                      width={62}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{
+                        fill: "var(--text-muted)",
+                        fontSize: 10,
+                      }}
+                      tickFormatter={formatAxisValue}
+                    />
+
+                    <Tooltip
+                      cursor={{
+                        stroke: "var(--border-highlight)",
+                        strokeWidth: 1,
+                        strokeDasharray: "4 4",
+                      }}
+                      content={
+                        <BalanceChartTooltip />
+                      }
+                    />
+
+                    <Area
+                      type="monotone"
+                      dataKey="income"
+                      name="Receitas"
+                      stroke="#10b981"
+                      fill="url(#balance-income-gradient)"
+                      strokeWidth={2.5}
+                      dot={false}
+                      activeDot={{
+                        r: 5,
+                        strokeWidth: 3,
+                        stroke: "var(--card)",
+                        fill: "#10b981",
+                      }}
+                      animationDuration={700}
+                    />
+
+                    <Area
+                      type="monotone"
+                      dataKey="expenses"
+                      name="Despesas"
+                      stroke="#f43f5e"
+                      fill="url(#balance-expense-gradient)"
+                      strokeWidth={2.5}
+                      dot={false}
+                      activeDot={{
+                        r: 5,
+                        strokeWidth: 3,
+                        stroke: "var(--card)",
+                        fill: "#f43f5e",
+                      }}
+                      animationDuration={850}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "mt-4 flex flex-col gap-3",
+                "sm:flex-row sm:items-center",
+                "sm:justify-between",
+              )}
+            >
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="size-2.5 rounded-full bg-success"
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-xs font-medium text-text-muted">
+                    Receitas
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span
+                    className="size-2.5 rounded-full bg-danger"
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-xs font-medium text-text-muted">
+                    Despesas
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-xs text-text-muted">
+                Despesas representam{" "}
+                <strong className="font-semibold text-text">
+                  {summary.expensePercentage}%
+                </strong>{" "}
+                das receitas em {summary.month}.
+              </p>
+            </div>
+          </>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[340px] flex-col",
+              "items-center justify-center",
+              "rounded-[16px] border",
+              "border-dashed border-border",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "bg-primary/10 text-primary-bright",
+              )}
+            >
+              <BarChart3
+                size={22}
+                aria-hidden="true"
+              />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhum dado financeiro disponÃ­vel
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              O grÃ¡fico serÃ¡ exibido quando houver receitas
+              e despesas registradas.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\BalanceChart\BalanceChart.types.ts
+========================================================================================================================
+
+export interface BalanceChartData {
+  month: string;
+  income: number;
+  expenses: number;
+}
+
+export interface BalanceChartTooltipPayload {
+  name?: string;
+  value?: number | string;
+  color?: string;
+  dataKey?: string | number;
+}
+
+export interface BalanceChartTooltipProps {
+  active?: boolean;
+  label?: string | number;
+  payload?: readonly BalanceChartTooltipPayload[];
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\BalanceChart\BalanceChartTooltip.tsx
+========================================================================================================================
+
+import { cn } from "@/lib/utils";
+
+import type {
+  BalanceChartTooltipPayload,
+  BalanceChartTooltipProps,
+} from "./BalanceChart.types";
+
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  minimumFractionDigits: 2,
+});
+
+function getPayloadLabel(
+  item: BalanceChartTooltipPayload,
+): string {
+  if (item.dataKey === "income") {
+    return "Receitas";
+  }
+
+  if (item.dataKey === "expenses") {
+    return "Despesas";
+  }
+
+  return item.name ?? "Valor";
+}
+
+function getPayloadKey(
+  item: BalanceChartTooltipPayload,
+  index: number,
+): string {
+  return [
+    String(item.dataKey ?? "data"),
+    String(item.name ?? "valor"),
+    index,
+  ].join("-");
+}
+
+export function BalanceChartTooltip({
+  active,
+  label,
+  payload,
+}: Readonly<BalanceChartTooltipProps>) {
+  if (!active || !payload?.length) {
+    return null;
+  }
+
+  return (
+    <div
+      className={cn(
+        "min-w-44 rounded-[14px]",
+        "border border-border bg-surface-elevated/95",
+        "p-3 text-text shadow-elevated",
+        "backdrop-blur-xl",
+      )}
+    >
+      <p className="text-xs font-semibold text-text">
+        {label}
+      </p>
+
+      <div className="mt-2 space-y-2">
+        {payload.map((item, index) => {
+          const numericValue = Number(item.value ?? 0);
+
+          return (
+            <div
+              key={getPayloadKey(item, index)}
+              className="flex items-center justify-between gap-4"
+            >
+              <div className="flex min-w-0 items-center gap-2">
+                <span
+                  className="size-2 shrink-0 rounded-full"
+                  style={{
+                    backgroundColor:
+                      item.color ?? "var(--primary)",
+                  }}
+                  aria-hidden="true"
+                />
+
+                <span className="truncate text-[11px] text-text-muted">
+                  {getPayloadLabel(item)}
+                </span>
+              </div>
+
+              <span className="shrink-0 text-[11px] font-semibold text-text">
+                {Number.isFinite(numericValue)
+                  ? currencyFormatter.format(numericValue)
+                  : currencyFormatter.format(0)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\BalanceChart\index.ts
+========================================================================================================================
+
+export * from "./BalanceChart";
+export * from "./BalanceChart.types";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\DashboardGrid\DashboardGrid.tsx
+========================================================================================================================
+
+import { cn } from "@/lib/utils";
+import { dashboardMock } from "@/mocks/dashboard.mock";
+
+import { AIInsights } from "../AIInsights";
+import { Alerts } from "../Alerts";
+import { BalanceChart } from "../BalanceChart";
+import { FinancialCards } from "../FinancialCards";
+import {
+  QuickActions,
+  type QuickAction,
+} from "../QuickActions";
+import { ScoreCard } from "../ScoreCard";
+import { TransactionsTable } from "../TransactionsTable";
+
+export function DashboardGrid() {
+  const { alerts } = dashboardMock.financialHealth;
+
+  const handleQuickAction = (
+    action: QuickAction,
+  ): void => {
+    switch (action.id) {
+      case "add-transaction":
+        console.info(
+          "Abrir fluxo de nova transaÃ§Ã£o.",
+        );
+        break;
+
+      case "run-analysis":
+        console.info(
+          "Executar nova anÃ¡lise financeira.",
+        );
+        break;
+
+      case "view-recommendations":
+        console.info(
+          "Abrir recomendaÃ§Ãµes financeiras.",
+        );
+        break;
+
+      case "import-transactions":
+        console.info(
+          "ImportaÃ§Ã£o de transaÃ§Ãµes indisponÃ­vel.",
+        );
+        break;
+
+      default: {
+        const exhaustiveCheck: never = action.id;
+        return exhaustiveCheck;
+      }
+    }
+  };
+
+  return (
+    <section
+      className={cn(
+        "min-w-0 space-y-4",
+        "sm:space-y-5",
+        "2xl:space-y-6",
+      )}
+      aria-labelledby="dashboard-overview-title"
+    >
+      <h2
+        id="dashboard-overview-title"
+        className="sr-only"
+      >
+        VisÃ£o geral financeira
+      </h2>
+
+      <div
+        className={cn(
+          "grid min-w-0 grid-cols-1 items-stretch gap-4",
+          "sm:grid-cols-2 sm:gap-5",
+          "xl:grid-cols-[repeat(3,minmax(0,1fr))_minmax(280px,1.35fr)]",
+          "2xl:gap-6",
+        )}
+        aria-label="Resumo financeiro"
+      >
+        <FinancialCards />
+
+        <div className="min-w-0 sm:col-span-2 xl:col-span-1">
+          <ScoreCard />
+        </div>
+      </div>
+
+      <div className="min-w-0">
+        <BalanceChart />
+      </div>
+
+      <div
+        className={cn(
+          "grid min-w-0 grid-cols-1 items-stretch gap-4",
+          "sm:gap-5",
+          "xl:grid-cols-2",
+          "2xl:gap-6",
+        )}
+      >
+        <div className="min-w-0">
+          <AIInsights />
+        </div>
+
+        <div className="min-w-0">
+          <Alerts
+            alerts={alerts}
+            maxVisibleAlerts={4}
+          />
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "grid min-w-0 grid-cols-1 items-start gap-4",
+          "sm:gap-5",
+          "xl:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]",
+          "2xl:grid-cols-[minmax(0,3.2fr)_minmax(360px,1fr)]",
+          "2xl:gap-6",
+        )}
+      >
+        <div className="min-w-0">
+          <TransactionsTable />
+        </div>
+
+        <div className="min-w-0">
+          <QuickActions
+            onAction={handleQuickAction}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\DashboardGrid\index.ts
+========================================================================================================================
+
+export * from "./DashboardGrid";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\DashobordGrid\DashboardGrid.tsx
+========================================================================================================================
+
+import { cn } from "@/lib/utils";
+import { dashboardMock } from "@/mocks/dashboard.mock";
+
+import { AIInsights } from "../AIInsights";
+import { AIProfileCard } from "../AIProfileCard";
+import { Alerts } from "../Alerts";
+import { BalanceChart } from "../BalanceChart";
+import { ExpenseDistribution } from "../ExpenseDistribution";
+import { FinancialCards } from "../FinancialCards";
+import { FinancialHealthRadar } from "../FinancialHealthRadar";
+import { QuickActions, type QuickAction } from "../QuickActions";
+import { ScoreCard } from "../ScoreCard";
+import { TransactionsTable } from "../TransactionsTable";
+
+export function DashboardGrid() {
+  const { alerts } = dashboardMock.financialHealth;
+
+  const handleQuickAction = (action: QuickAction): void => {
+    switch (action.id) {
+      case "add-transaction":
+        console.info("Abrir fluxo de nova transaÃ§Ã£o.");
+        break;
+
+      case "run-analysis":
+        console.info("Executar nova anÃ¡lise financeira.");
+        break;
+
+      case "view-recommendations":
+        console.info("Abrir recomendaÃ§Ãµes financeiras.");
+        break;
+
+      case "import-transactions":
+        console.info("ImportaÃ§Ã£o de transaÃ§Ãµes indisponÃ­vel.");
+        break;
+
+      default: {
+        const exhaustiveCheck: never = action.id;
+        return exhaustiveCheck;
+      }
+    }
+  };
+
+  return (
+    <section
+      className={cn("w-full min-w-0 space-y-4 sm:space-y-5 lg:space-y-6")}
+      aria-labelledby="dashboard-overview-title"
+    >
+      <h2 id="dashboard-overview-title" className="sr-only">
+        VisÃ£o geral financeira
+      </h2>
+
+      {/* 1. TOPO: 4 Cards de MÃ©tricas + 1 ScoreCard alinhados na mesma linha no XL */}
+      <div
+        className={cn(
+          "grid w-full min-w-0 grid-cols-1 gap-4",
+          "sm:grid-cols-2 sm:gap-5",
+          "lg:grid-cols-4",
+          "xl:grid-cols-5 xl:gap-5",
+        )}
+        aria-label="Resumo financeiro"
+      >
+        <FinancialCards />
+        <div className="min-w-0 sm:col-span-2 lg:col-span-4 xl:col-span-1">
+          <ScoreCard />
+        </div>
+      </div>
+
+      {/* 2. FLUXO FINANCEIRO (GrÃ¡fico Principal) */}
+      <div className="w-full min-w-0" aria-label="Fluxo financeiro">
+        <BalanceChart />
+      </div>
+
+      {/* 3. DIAGNÃ“STICOS E ANÃLISES (Lado a lado em telas grandes para evitar espaÃ§o vago) */}
+      <div
+        className={cn(
+          "grid w-full min-w-0 grid-cols-1 gap-4",
+          "sm:gap-5",
+          "lg:grid-cols-2",
+          "xl:grid-cols-3 xl:gap-5",
+        )}
+      >
+        <div className="min-w-0" aria-label="DistribuiÃ§Ã£o dos gastos">
+          <ExpenseDistribution />
+        </div>
+
+        <div className="min-w-0" aria-label="SaÃºde financeira">
+          <FinancialHealthRadar />
+        </div>
+
+        <div
+          className="min-w-0 lg:col-span-2 xl:col-span-1"
+          aria-label="ClassificaÃ§Ã£o financeira pela inteligÃªncia artificial"
+        >
+          <AIProfileCard />
+        </div>
+      </div>
+
+      {/* 4. INSIGHTS E ALERTAS */}
+      <div
+        className={cn(
+          "grid w-full min-w-0 grid-cols-1 items-stretch gap-4",
+          "sm:gap-5 lg:grid-cols-2 xl:gap-5",
+        )}
+        aria-label="Insights e alertas financeiros"
+      >
+        <div className="min-w-0">
+          <AIInsights />
+        </div>
+        <div className="min-w-0">
+          <Alerts alerts={alerts} maxVisibleAlerts={4} />
+        </div>
+      </div>
+
+      {/* 5. TRANSAÃ‡Ã•ES RECENTES E AÃ‡Ã•ES RÃPIDAS */}
+      <div
+        className={cn(
+          "grid w-full min-w-0 grid-cols-1 items-start gap-4",
+          "sm:gap-5",
+          "xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-5",
+        )}
+        aria-label="TransaÃ§Ãµes recentes e aÃ§Ãµes rÃ¡pidas"
+      >
+        <div className="min-w-0">
+          <TransactionsTable />
+        </div>
+        <div className="min-w-0">
+          <QuickActions onAction={handleQuickAction} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ExpenseChart\ExpenseChart.tsx
+========================================================================================================================
+
+import {
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+} from "recharts";
+
+import {
+  ChartContainer,
+  ChartLegend,
+} from "@/components/common/Chart";
+
+import { dashboardService } from "@/services/dashboard.service";
+
+const COLORS = [
+  "#2563eb",
+  "#3b82f6",
+  "#60a5fa",
+  "#93c5fd",
+  "#bfdbfe",
+];
+
+export function ExpenseChart() {
+  const data = dashboardService.getCategories();
+
+  const total = data.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
+
+  return (
+    <ChartContainer
+      title="Despesas por Categoria"
+      subtitle="Ãšltimos 30 dias"
+    >
+      <div className="flex h-full flex-col">
+        <div className="relative flex-1">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                innerRadius={65}
+                outerRadius={90}
+                paddingAngle={4}
+                dataKey="value"
+              >
+                {data.map((_, index) => (
+                  <Cell
+                    key={index}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-xs text-slate-500">
+              Total
+            </span>
+
+            <span className="text-xl font-bold">
+              {total.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </span>
+          </div>
+        </div>
+
+        <ChartLegend
+          items={data.map((item, index) => ({
+            label: item.name,
+            color: COLORS[index % COLORS.length],
+          }))}
+        />
+      </div>
+    </ChartContainer>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ExpenseChart\ExpenseChart.types.ts
+========================================================================================================================
+
+export interface ExpenseCategory {
+  name: string;
+  value: number;
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ExpenseChart\index.ts
+========================================================================================================================
+
+export * from "./ExpenseChart";
+export * from "./ExpenseChart.types";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ExpenseDistribution\ExpenseDistribution.tsx
+========================================================================================================================
+
+import {
+  useId,
+  useMemo,
+  useState,
+} from "react";
+import {
+  ArrowRight,
+  PieChart as PieChartIcon,
+  ReceiptText,
+} from "lucide-react";
+import {
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+} from "recharts";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import type {
+  ExpenseDistributionItem,
+  ExpenseDistributionProps,
+} from "./ExpenseDistribution.types";
+
+const DEFAULT_MAX_VISIBLE_CATEGORIES = 6;
+
+const chartColors = [
+  "#7c3aed",
+  "#10b981",
+  "#3b82f6",
+  "#f59e0b",
+  "#f43f5e",
+  "#06b6d4",
+  "#8b5cf6",
+  "#84cc16",
+] as const;
+
+const currencyFormatter = new Intl.NumberFormat(
+  "pt-BR",
+  {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+  },
+);
+
+function buildDistributionItems(
+  categories: readonly {
+    name: string;
+    value: number;
+  }[],
+  maxVisibleCategories: number,
+): ExpenseDistributionItem[] {
+  const safeCategories = [...categories]
+    .filter((category) => category.value > 0)
+    .sort(
+      (first, second) =>
+        second.value - first.value,
+    );
+
+  const visibleCategories = safeCategories.slice(
+    0,
+    maxVisibleCategories,
+  );
+
+  const hiddenCategories = safeCategories.slice(
+    maxVisibleCategories,
+  );
+
+  const hiddenValue = hiddenCategories.reduce(
+    (total, category) =>
+      total + category.value,
+    0,
+  );
+
+  const groupedCategories =
+    hiddenValue > 0
+      ? [
+          ...visibleCategories,
+          {
+            name: "Outros",
+            value: hiddenValue,
+          },
+        ]
+      : visibleCategories;
+
+  const total = groupedCategories.reduce(
+    (sum, category) =>
+      sum + category.value,
+    0,
+  );
+
+  return groupedCategories.map(
+    (category, index) => ({
+      ...category,
+      percentage:
+        total > 0
+          ? (category.value / total) * 100
+          : 0,
+      color:
+        chartColors[
+          index % chartColors.length
+        ] ?? chartColors[0],
+    }),
+  );
+}
+
+export function ExpenseDistribution({
+  title = "Para onde estÃ¡ indo seu dinheiro?",
+  description = "DistribuiÃ§Ã£o dos gastos por categoria.",
+  categories: providedCategories,
+  maxVisibleCategories =
+    DEFAULT_MAX_VISIBLE_CATEGORIES,
+  onViewDetails,
+}: Readonly<ExpenseDistributionProps>) {
+  const chartTitleId = useId();
+
+  const [activeIndex, setActiveIndex] =
+    useState(0);
+
+  const serviceCategories =
+    dashboardService.getCategories();
+
+  const categories =
+    providedCategories ??
+    serviceCategories;
+
+  const safeMaxVisibleCategories =
+    Math.max(
+      1,
+      maxVisibleCategories,
+    );
+
+  const distributionItems = useMemo(
+    () =>
+      buildDistributionItems(
+        categories,
+        safeMaxVisibleCategories,
+      ),
+    [
+      categories,
+      safeMaxVisibleCategories,
+    ],
+  );
+
+  const total = useMemo(
+    () =>
+      distributionItems.reduce(
+        (sum, item) =>
+          sum + item.value,
+        0,
+      ),
+    [distributionItems],
+  );
+
+  const activeItem =
+    distributionItems[activeIndex] ??
+    distributionItems[0];
+
+  const handleSliceEnter = (
+    _data: unknown,
+    index: number,
+  ): void => {
+    setActiveIndex(index);
+  };
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <div id={chartTitleId}>
+            <CardTitle className="text-sm font-semibold">
+              {title}
+            </CardTitle>
+          </div>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-primary/20",
+            "bg-primary/10 text-primary-bright",
+          )}
+          aria-hidden="true"
+        >
+          <PieChartIcon size={18} />
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {distributionItems.length > 0 &&
+        activeItem ? (
+          <>
+            <div
+              className={cn(
+                "grid min-w-0 flex-1",
+                "grid-cols-1 items-center gap-5",
+                "lg:grid-cols-[minmax(200px,0.9fr)_minmax(0,1.1fr)]",
+              )}
+              aria-labelledby={chartTitleId}
+            >
+              <div className="min-w-0">
+                <div className="relative mx-auto size-[220px]">
+                  <ResponsiveContainer
+                    width="100%"
+                    height="100%"
+                  >
+                    <PieChart>
+                      <Pie
+                        data={
+                          distributionItems
+                        }
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius="58%"
+                        outerRadius="84%"
+                        paddingAngle={2}
+                        cornerRadius={5}
+                        stroke="var(--card)"
+                        strokeWidth={2}
+                        animationDuration={700}
+                        onMouseEnter={
+                          handleSliceEnter
+                        }
+                      >
+                        {distributionItems.map(
+                          (item, index) => (
+                            <Cell
+                              key={item.name}
+                              fill={item.color}
+                              opacity={
+                                index ===
+                                activeIndex
+                                  ? 1
+                                  : 0.62
+                              }
+                              className="cursor-pointer transition-opacity duration-200"
+                            />
+                          ),
+                        )}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+
+                  <div
+                    className={cn(
+                      "pointer-events-none",
+                      "absolute inset-0",
+                      "flex flex-col",
+                      "items-center justify-center",
+                      "text-center",
+                    )}
+                  >
+                    <ReceiptText
+                      size={15}
+                      className="mb-1.5 text-text-subtle"
+                      aria-hidden="true"
+                    />
+
+                    <span
+                      className={cn(
+                        "text-[10px]",
+                        "font-medium uppercase",
+                        "tracking-[0.08em]",
+                        "text-text-subtle",
+                      )}
+                    >
+                      Total
+                    </span>
+
+                    <strong
+                      className={cn(
+                        "mt-1 max-w-[150px]",
+                        "text-base font-bold",
+                        "leading-tight",
+                        "tracking-[-0.035em]",
+                        "tabular-nums text-text",
+                      )}
+                    >
+                      {currencyFormatter.format(
+                        total,
+                      )}
+                    </strong>
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    "mt-4 rounded-[14px]",
+                    "border border-border",
+                    "bg-surface-elevated/55",
+                    "p-4",
+                  )}
+                  aria-live="polite"
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="size-2.5 shrink-0 rounded-full"
+                      style={{
+                        backgroundColor:
+                          activeItem.color,
+                      }}
+                      aria-hidden="true"
+                    />
+
+                    <span className="text-xs font-semibold text-text">
+                      {activeItem.name}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-[10px] font-medium uppercase tracking-[0.07em] text-text-subtle">
+                        Valor
+                      </p>
+
+                      <p className="mt-1 text-xs font-semibold tabular-nums text-text">
+                        {currencyFormatter.format(
+                          activeItem.value,
+                        )}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] font-medium uppercase tracking-[0.07em] text-text-subtle">
+                        ParticipaÃ§Ã£o
+                      </p>
+
+                      <p className="mt-1 text-xs font-semibold tabular-nums text-text">
+                        {activeItem.percentage.toFixed(
+                          1,
+                        )}
+                        %
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="min-w-0 space-y-2"
+                aria-label="Categorias de despesas"
+              >
+                {distributionItems.map(
+                  (item, index) => {
+                    const isActive =
+                      index === activeIndex;
+
+                    return (
+                      <button
+                        key={item.name}
+                        type="button"
+                        onMouseEnter={() =>
+                          setActiveIndex(
+                            index,
+                          )
+                        }
+                        onFocus={() =>
+                          setActiveIndex(
+                            index,
+                          )
+                        }
+                        onClick={() =>
+                          setActiveIndex(
+                            index,
+                          )
+                        }
+                        className={cn(
+                          "grid w-full min-w-0",
+                          "grid-cols-[minmax(0,1fr)_auto]",
+                          "items-center gap-3",
+                          "rounded-[11px]",
+                          "border px-3 py-2",
+                          "text-left",
+                          "transition-[border-color,background-color]",
+                          isActive
+                            ? [
+                                "border-border-highlight",
+                                "bg-surface-elevated",
+                              ]
+                            : [
+                                "border-transparent",
+                                "hover:border-border",
+                                "hover:bg-surface-elevated/55",
+                              ],
+                          "focus-visible:outline-none",
+                          "focus-visible:ring-2",
+                          "focus-visible:ring-primary/40",
+                        )}
+                      >
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <span
+                            className="size-2.5 shrink-0 rounded-full"
+                            style={{
+                              backgroundColor:
+                                item.color,
+                            }}
+                            aria-hidden="true"
+                          />
+
+                          <span
+                            className={cn(
+                              "truncate text-[11px]",
+                              "font-medium",
+                              isActive
+                                ? "text-text"
+                                : "text-text-muted",
+                            )}
+                          >
+                            {item.name}
+                          </span>
+                        </div>
+
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className="text-[10px] font-medium tabular-nums text-text">
+                            {currencyFormatter.format(
+                              item.value,
+                            )}
+                          </span>
+
+                          <span
+                            className={cn(
+                              "min-w-9 rounded-full",
+                              "px-1.5 py-0.5",
+                              "text-center text-[9px]",
+                              "font-semibold tabular-nums",
+                              isActive
+                                ? [
+                                    "bg-primary/10",
+                                    "text-primary-bright",
+                                  ]
+                                : [
+                                    "bg-surface-muted",
+                                    "text-text-muted",
+                                  ],
+                            )}
+                          >
+                            {item.percentage.toFixed(
+                              0,
+                            )}
+                            %
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  },
+                )}
+              </div>
+            </div>
+
+            {onViewDetails && (
+              <button
+                type="button"
+                onClick={onViewDetails}
+                className={cn(
+                  "mt-4 inline-flex h-10",
+                  "w-full items-center",
+                  "justify-center gap-2",
+                  "rounded-[12px]",
+                  "border border-primary/15",
+                  "bg-primary/5",
+                  "text-xs font-semibold",
+                  "text-primary-bright",
+                  "transition-[border-color,background-color]",
+                  "hover:border-primary/30",
+                  "hover:bg-primary/10",
+                  "focus-visible:outline-none",
+                  "focus-visible:ring-2",
+                  "focus-visible:ring-primary/40",
+                )}
+              >
+                Ver detalhes
+
+                <ArrowRight
+                  size={14}
+                  aria-hidden="true"
+                />
+              </button>
+            )}
+          </>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[330px]",
+              "flex-1 flex-col",
+              "items-center justify-center",
+              "rounded-[16px]",
+              "border border-dashed",
+              "border-border px-6",
+              "text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center",
+                "rounded-[15px]",
+                "border border-border",
+                "bg-surface-muted",
+                "text-text-muted",
+              )}
+              aria-hidden="true"
+            >
+              <PieChartIcon size={21} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhuma despesa registrada
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              A distribuiÃ§Ã£o por categoria
+              aparecerÃ¡ quando houver despesas
+              disponÃ­veis.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ExpenseDistribution\ExpenseDistribution.types.ts
+========================================================================================================================
+
+export interface ExpenseDistributionCategory {
+  name: string;
+  value: number;
+}
+
+export interface ExpenseDistributionItem
+  extends ExpenseDistributionCategory {
+  percentage: number;
+  color: string;
+}
+
+export interface ExpenseDistributionProps {
+  title?: string;
+  description?: string;
+  categories?: readonly ExpenseDistributionCategory[];
+  maxVisibleCategories?: number;
+  onViewDetails?: () => void;
+}
+
+export interface ExpenseDistributionTooltipPayload {
+  name?: string;
+  value?: number | string;
+  payload?: ExpenseDistributionItem;
+}
+
+export interface ExpenseDistributionTooltipProps {
+  active?: boolean;
+  payload?: readonly ExpenseDistributionTooltipPayload[];
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ExpenseDistribution\ExpenseDistributionTooltip.tsx
+========================================================================================================================
+
+import { cn } from "@/lib/utils";
+
+import type { ExpenseDistributionTooltipProps } from "./ExpenseDistribution.types";
+
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  minimumFractionDigits: 2,
+});
+
+export function ExpenseDistributionTooltip({
+  active,
+  payload,
+}: Readonly<ExpenseDistributionTooltipProps>) {
+  const item = payload?.[0]?.payload;
+
+  if (!active || !item) {
+    return null;
+  }
+
+  return (
+    <div
+      className={cn(
+        "min-w-44 rounded-[14px]",
+        "border border-border",
+        "bg-surface-elevated/95 p-3",
+        "shadow-elevated backdrop-blur-xl",
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className="size-2.5 shrink-0 rounded-full"
+          style={{
+            backgroundColor: item.color,
+          }}
+          aria-hidden="true"
+        />
+
+        <p className="truncate text-xs font-semibold text-text">
+          {item.name}
+        </p>
+      </div>
+
+      <div className="mt-2 flex items-center justify-between gap-4">
+        <span className="text-[11px] text-text-muted">
+          Valor
+        </span>
+
+        <span className="text-[11px] font-semibold tabular-nums text-text">
+          {currencyFormatter.format(item.value)}
+        </span>
+      </div>
+
+      <div className="mt-1.5 flex items-center justify-between gap-4">
+        <span className="text-[11px] text-text-muted">
+          ParticipaÃ§Ã£o
+        </span>
+
+        <span className="text-[11px] font-semibold tabular-nums text-text">
+          {item.percentage.toFixed(1)}%
+        </span>
+      </div>
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ExpenseDistribution\index.ts
+========================================================================================================================
+
+export * from "./ExpenseDistribution";
+export * from "./ExpenseDistribution.types";
+export * from "./ExpenseDistributionTooltip";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx
+========================================================================================================================
+
+import {
+  Activity,
+  BrainCircuit,
+  ChartNoAxesCombined,
+  PieChart,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+import { AIProfileCard } from "../AIProfileCard";
+import { ExpenseDistribution } from "../ExpenseDistribution";
+import { FinancialHealthRadar } from "../FinancialHealthRadar";
+
+export function FinancialAnalysisGrid() {
+  return (
+    <section
+      className="min-w-0 space-y-4"
+      aria-labelledby="financial-analysis-title"
+    >
+      <div
+        className={cn(
+          "flex flex-col gap-3",
+          "sm:flex-row sm:items-start sm:justify-between",
+        )}
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0",
+              "items-center justify-center",
+              "rounded-[13px] border",
+              "border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <ChartNoAxesCombined size={18} />
+          </div>
+
+          <div className="min-w-0">
+            <h2
+              id="financial-analysis-title"
+              className="text-base font-semibold text-text"
+            >
+              AnÃ¡lise financeira
+            </h2>
+
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              Acompanhe a distribuiÃ§Ã£o dos gastos, a saÃºde
+              financeira e a classificaÃ§Ã£o gerada pela IA.
+            </p>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "inline-flex w-fit items-center gap-2",
+            "rounded-[12px] border border-border",
+            "bg-surface-elevated/55 px-3 py-2",
+            "text-[10px] font-medium text-text-muted",
+          )}
+        >
+          <Activity
+            size={13}
+            aria-hidden="true"
+          />
+
+          Atualizado agora
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "grid min-w-0 grid-cols-1",
+          "items-stretch gap-4",
+          "md:grid-cols-2",
+          "xl:grid-cols-3",
+        )}
+      >
+        <div className="min-w-0">
+          <ExpenseDistribution />
+        </div>
+
+        <div className="min-w-0">
+          <FinancialHealthRadar />
+        </div>
+
+        <div
+          className={cn(
+            "min-w-0",
+            "md:col-span-2",
+            "xl:col-span-1",
+          )}
+        >
+          <AIProfileCard />
+        </div>
+      </div>
+
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div
+              className={cn(
+                "flex size-9 shrink-0",
+                "items-center justify-center",
+                "rounded-[11px]",
+                "border border-primary/20",
+                "bg-primary/10 text-primary-bright",
+              )}
+              aria-hidden="true"
+            >
+              <BrainCircuit size={16} />
+            </div>
+
+            <div className="min-w-0">
+              <CardTitle className="text-sm font-semibold">
+                VisÃ£o consolidada
+              </CardTitle>
+
+              <p className="mt-1 text-xs text-text-muted">
+                Os trÃªs blocos representam diferentes dimensÃµes
+                da situaÃ§Ã£o financeira atual.
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="pt-0">
+          <div
+            className={cn(
+              "grid grid-cols-1 gap-3",
+              "sm:grid-cols-3",
+            )}
+          >
+            <div
+              className={cn(
+                "flex items-center gap-3",
+                "rounded-[12px] border",
+                "border-border-muted",
+                "bg-background/30 px-3 py-3",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex size-8 shrink-0",
+                  "items-center justify-center",
+                  "rounded-[10px]",
+                  "bg-primary/10 text-primary-bright",
+                )}
+                aria-hidden="true"
+              >
+                <PieChart size={15} />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium text-text-subtle">
+                  Gastos
+                </p>
+
+                <p className="mt-0.5 text-xs font-semibold text-text">
+                  DistribuiÃ§Ã£o por categoria
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "flex items-center gap-3",
+                "rounded-[12px] border",
+                "border-border-muted",
+                "bg-background/30 px-3 py-3",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex size-8 shrink-0",
+                  "items-center justify-center",
+                  "rounded-[10px]",
+                  "bg-secondary/10 text-secondary-bright",
+                )}
+                aria-hidden="true"
+              >
+                <Activity size={15} />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium text-text-subtle">
+                  SaÃºde
+                </p>
+
+                <p className="mt-0.5 text-xs font-semibold text-text">
+                  Pilares financeiros
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "flex items-center gap-3",
+                "rounded-[12px] border",
+                "border-border-muted",
+                "bg-background/30 px-3 py-3",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex size-8 shrink-0",
+                  "items-center justify-center",
+                  "rounded-[10px]",
+                  "bg-success/10 text-success",
+                )}
+                aria-hidden="true"
+              >
+                <BrainCircuit size={15} />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium text-text-subtle">
+                  IA
+                </p>
+
+                <p className="mt-0.5 text-xs font-semibold text-text">
+                  ClassificaÃ§Ã£o do perfil
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialAnalysis\index.ts
+========================================================================================================================
+
+export * from "./FinancialAnalysisGrid";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialCard\FinancialCard.tsx
+========================================================================================================================
+
+import {
+  useId,
+  type ReactNode,
+} from "react";
+
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+type FinancialCardTrend =
+  | "up"
+  | "down"
+  | "neutral";
+
+interface FinancialCardProps {
+  id?: string;
+  title: string;
+  value: string;
+  variation: string;
+  trend: FinancialCardTrend;
+  icon: ReactNode;
+  updatedAt?: string;
+  className?: string;
+}
+
+type FinancialCardTone =
+  | "balance"
+  | "income"
+  | "expenses"
+  | "neutral";
+
+interface FinancialCardVisual {
+  iconContainer: string;
+  badge: string;
+  lineColor: string;
+  glowColor: string;
+}
+
+const visualStyles: Record<
+  FinancialCardTone,
+  FinancialCardVisual
+> = {
+  balance: {
+    iconContainer:
+      "border-primary/20 bg-primary/10 text-primary-bright",
+    badge:
+      "border-success/15 bg-success/10 text-success",
+    lineColor: "#7c3aed",
+    glowColor: "#7c3aed",
+  },
+
+  income: {
+    iconContainer:
+      "border-success/20 bg-success/10 text-success",
+    badge:
+      "border-success/15 bg-success/10 text-success",
+    lineColor: "#10b981",
+    glowColor: "#10b981",
+  },
+
+  expenses: {
+    iconContainer:
+      "border-danger/20 bg-danger/10 text-danger",
+    badge:
+      "border-danger/15 bg-danger/10 text-danger",
+    lineColor: "#f43f5e",
+    glowColor: "#f43f5e",
+  },
+
+  neutral: {
+    iconContainer:
+      "border-border bg-surface-muted text-text-muted",
+    badge:
+      "border-border bg-surface-muted text-text-muted",
+    lineColor: "#3b82f6",
+    glowColor: "#3b82f6",
+  },
+};
+
+function getCardTone(
+  id: string | undefined,
+  trend: FinancialCardTrend,
+): FinancialCardTone {
+  switch (id) {
+    case "balance":
+      return "balance";
+
+    case "income":
+      return "income";
+
+    case "expenses":
+      return "expenses";
+
+    default:
+      return trend === "down"
+        ? "expenses"
+        : trend === "up"
+          ? "income"
+          : "neutral";
+  }
+}
+
+function getSparklinePath(
+  tone: FinancialCardTone,
+): string {
+  switch (tone) {
+    case "income":
+      return [
+        "M2 36",
+        "C18 36 26 33 40 27",
+        "C55 19 63 18 76 22",
+        "C91 28 104 28 118 19",
+        "C132 10 144 15 158 7",
+        "C166 3 174 4 178 4",
+      ].join(" ");
+
+    case "expenses":
+      return [
+        "M2 34",
+        "C18 33 26 29 39 27",
+        "C54 24 62 28 75 29",
+        "C91 30 102 25 116 25",
+        "C132 25 140 15 153 16",
+        "C165 17 170 12 178 11",
+      ].join(" ");
+
+    case "balance":
+      return [
+        "M2 35",
+        "C14 35 23 32 34 29",
+        "C47 25 55 29 68 28",
+        "C82 27 90 20 103 22",
+        "C117 24 126 18 139 16",
+        "C152 14 163 18 178 14",
+      ].join(" ");
+
+    case "neutral":
+      return [
+        "M2 35",
+        "C17 35 26 31 39 28",
+        "C52 25 63 27 76 23",
+        "C91 18 102 20 116 17",
+        "C130 14 142 16 155 10",
+        "C164 7 172 8 178 7",
+      ].join(" ");
+  }
+}
+
+export function FinancialCard({
+  id,
+  title,
+  value,
+  variation,
+  trend,
+  icon,
+  updatedAt = "Atualizado agora",
+  className,
+}: Readonly<FinancialCardProps>) {
+  const gradientId = useId().replaceAll(
+    ":",
+    "",
+  );
+
+  const tone = getCardTone(id, trend);
+  const visual = visualStyles[tone];
+  const sparklinePath =
+    getSparklinePath(tone);
+
+  return (
+    <Card
+      className={cn(
+        "group relative flex min-h-[228px] min-w-0",
+        "flex-col overflow-hidden",
+        "border-border bg-card",
+        "transition-[border-color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-0.5",
+        "hover:border-border-highlight",
+        "hover:shadow-elevated",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0",
+          "h-24 opacity-0 transition-opacity duration-300",
+          "bg-[radial-gradient(circle_at_top_right,var(--glow-primary),transparent_70%)]",
+          "group-hover:opacity-30",
+        )}
+        aria-hidden="true"
+      />
+
+      <CardHeader className="relative shrink-0 pb-3">
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0 items-center",
+              "justify-center rounded-[13px] border",
+              "[&_svg]:size-5",
+              visual.iconContainer,
+            )}
+            aria-hidden="true"
+          >
+            {icon}
+          </div>
+
+          <span
+            className={cn(
+              "inline-flex shrink-0 items-center",
+              "rounded-full border px-2.5 py-1",
+              "text-[10px] font-semibold leading-none",
+              visual.badge,
+            )}
+          >
+            {variation}
+          </span>
+        </div>
+      </CardHeader>
+
+      <CardContent className="relative flex flex-1 flex-col pb-3 pt-0">
+        <p className="text-xs font-medium text-text-muted">
+          {title}
+        </p>
+
+        <p
+          className={cn(
+            "mt-2 min-w-0 break-words",
+            "text-[clamp(1.35rem,2vw,1.75rem)]",
+            "font-bold leading-tight tracking-[-0.035em]",
+            "text-text",
+          )}
+        >
+          {value}
+        </p>
+
+        <div className="mt-auto pt-5">
+          <svg
+            width="100%"
+            height="48"
+            viewBox="0 0 180 48"
+            preserveAspectRatio="none"
+            fill="none"
+            role="img"
+            aria-label={`TendÃªncia de ${title}`}
+          >
+            <defs>
+              <linearGradient
+                id={`${gradientId}-area`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="0%"
+                  stopColor={visual.glowColor}
+                  stopOpacity="0.28"
+                />
+
+                <stop
+                  offset="100%"
+                  stopColor={visual.glowColor}
+                  stopOpacity="0"
+                />
+              </linearGradient>
+            </defs>
+
+            <path
+              d={`${sparklinePath} L178 48 L2 48 Z`}
+              fill={`url(#${gradientId}-area)`}
+            />
+
+            <path
+              d={sparklinePath}
+              stroke={visual.lineColor}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        </div>
+      </CardContent>
+
+      <CardFooter
+        className={cn(
+          "relative shrink-0 border-t border-border-muted",
+          "pb-4 pt-3",
+        )}
+      >
+        <span className="text-[10px] font-medium text-text-subtle">
+          {updatedAt}
+        </span>
+      </CardFooter>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialCard\FinancialCard.types.ts
+========================================================================================================================
+
+import type { ReactNode } from "react";
+
+export interface FinancialCardProps {
+  id?: string;
+  title: string;
+  value: string;
+  variation: string;
+
+  trend: "up" | "down" | "neutral";
+
+  icon: ReactNode;
+
+  updatedAt?: string;
+
+  className?: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialCard\index.ts
+========================================================================================================================
+
+export * from "./FinancialCard";
+export * from "./FinancialCard.types";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialCards\FinancialCards.tsx
+========================================================================================================================
+
+import { dashboardMock } from "@/mocks/dashboard.mock";
+
+import {
+  FinancialCard,
+  type FinancialCardProps,
+} from "../FinancialCard";
+
+export function FinancialCards() {
+  const summaryCards: FinancialCardProps[] =
+    dashboardMock.summary;
+
+  return (
+    <>
+      {summaryCards.map(
+        (card: FinancialCardProps) => (
+          <FinancialCard
+            key={card.id ?? card.title}
+            id={card.id}
+            title={card.title}
+            value={card.value}
+            variation={card.variation}
+            trend={card.trend}
+            icon={card.icon}
+            updatedAt={card.updatedAt}
+            className={card.className}
+          />
+        ),
+      )}
+    </>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialCards\index.ts
+========================================================================================================================
+
+export * from "./FinancialCards";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialHealthRadar\FinancialHealthRadar.tsx
+========================================================================================================================
+
+import {
+  useId,
+  useMemo,
+  useState,
+} from "react";
+import {
+  Activity,
+  ArrowRight,
+  HeartPulse,
+} from "lucide-react";
+import {
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
+  ResponsiveContainer,
+} from "recharts";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+import { FinancialHealthRadarTooltip } from "./FinancialHealthRadarTooltip";
+
+import type {
+  FinancialHealthMetric,
+  FinancialHealthRadarProps,
+} from "./FinancialHealthRadar.types";
+
+const defaultMetrics: readonly FinancialHealthMetric[] = [
+  {
+    id: "savings",
+    subject: "PoupanÃ§a",
+    value: 80,
+    fullMark: 100,
+    description:
+      "Avalia sua capacidade de reservar parte da renda mensal.",
+  },
+  {
+    id: "planning",
+    subject: "Planejamento",
+    value: 70,
+    fullMark: 100,
+    description:
+      "Mede a organizaÃ§Ã£o do orÃ§amento e a previsÃ£o dos gastos.",
+  },
+  {
+    id: "control",
+    subject: "Controle",
+    value: 85,
+    fullMark: 100,
+    description:
+      "Representa o acompanhamento e o controle das movimentaÃ§Ãµes.",
+  },
+  {
+    id: "investments",
+    subject: "Investimentos",
+    value: 60,
+    fullMark: 100,
+    description:
+      "Analisa a diversificaÃ§Ã£o e a regularidade dos investimentos.",
+  },
+  {
+    id: "debt-control",
+    subject: "DÃ­vidas",
+    value: 40,
+    fullMark: 100,
+    description:
+      "Avalia o controle do endividamento e a capacidade de pagamento.",
+  },
+];
+
+function sanitizeMetrics(
+  metrics: readonly FinancialHealthMetric[],
+): FinancialHealthMetric[] {
+  return metrics.map((metric) => {
+    const safeFullMark = Math.max(
+      metric.fullMark,
+      1,
+    );
+
+    return {
+      ...metric,
+      fullMark: safeFullMark,
+      value: Math.min(
+        Math.max(metric.value, 0),
+        safeFullMark,
+      ),
+    };
+  });
+}
+
+function getMetricPercentage(
+  metric: FinancialHealthMetric,
+): number {
+  const safeFullMark = Math.max(
+    metric.fullMark,
+    1,
+  );
+
+  return Math.min(
+    Math.max(
+      Math.round(
+        (metric.value / safeFullMark) * 100,
+      ),
+      0,
+    ),
+    100,
+  );
+}
+
+export function FinancialHealthRadar({
+  title = "QuÃ£o saudÃ¡vel estÃ¡ sua vida financeira?",
+  description = "AnÃ¡lise dos principais pilares financeiros.",
+  metrics: providedMetrics = defaultMetrics,
+  onViewDetails,
+}: Readonly<FinancialHealthRadarProps>) {
+  const chartTitleId = useId();
+
+  const metrics = useMemo(
+    () => sanitizeMetrics(providedMetrics),
+    [providedMetrics],
+  );
+
+  const [activeMetricId, setActiveMetricId] =
+    useState<string>(
+      metrics[0]?.id ?? "",
+    );
+
+  const activeMetric =
+    metrics.find(
+      (metric) =>
+        metric.id === activeMetricId,
+    ) ?? metrics[0];
+
+  const averageScore = useMemo(() => {
+    if (metrics.length === 0) {
+      return 0;
+    }
+
+    const totalPercentage = metrics.reduce(
+      (total, metric) =>
+        total +
+        (metric.value / metric.fullMark) *
+          100,
+      0,
+    );
+
+    return Math.round(
+      totalPercentage / metrics.length,
+    );
+  }, [metrics]);
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <div id={chartTitleId}>
+            <CardTitle className="text-sm font-semibold">
+              {title}
+            </CardTitle>
+          </div>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "relative flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-secondary/20",
+            "bg-secondary/10",
+            "text-secondary-bright",
+          )}
+          aria-hidden="true"
+        >
+          <HeartPulse size={18} />
+
+          <span
+            className={cn(
+              "absolute -right-1 -top-1",
+              "flex size-6 items-center",
+              "justify-center rounded-full",
+              "border-2 border-card",
+              "bg-secondary-bright",
+              "text-[8px] font-bold text-white",
+            )}
+          >
+            {averageScore}
+          </span>
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {metrics.length > 0 &&
+        activeMetric ? (
+          <>
+            <div
+              className={cn(
+                "grid min-w-0 flex-1",
+                "grid-cols-1 items-center gap-5",
+                "lg:grid-cols-[minmax(220px,0.95fr)_minmax(0,1.05fr)]",
+              )}
+              aria-labelledby={chartTitleId}
+            >
+              <div className="min-w-0">
+                <div className="relative h-[280px] min-w-0">
+                  <ResponsiveContainer
+                    width="100%"
+                    height="100%"
+                  >
+                    <RadarChart
+                      data={metrics}
+                      outerRadius="68%"
+                      margin={{
+                        top: 24,
+                        right: 35,
+                        bottom: 24,
+                        left: 35,
+                      }}
+                    >
+                      <defs>
+                        <linearGradient
+                          id="financial-health-radar-fill"
+                          x1="0"
+                          y1="0"
+                          x2="1"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#7c3aed"
+                            stopOpacity={0.48}
+                          />
+
+                          <stop
+                            offset="100%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0.18}
+                          />
+                        </linearGradient>
+                      </defs>
+
+                      <PolarGrid
+                        stroke="var(--border-muted)"
+                        gridType="polygon"
+                      />
+
+                      <PolarAngleAxis
+                        dataKey="subject"
+                        tick={{
+                          fill: "var(--text-muted)",
+                          fontSize: 10,
+                          fontWeight: 600,
+                        }}
+                        tickLine={false}
+                      />
+
+                      <PolarRadiusAxis
+                        angle={90}
+                        domain={[0, 100]}
+                        tick={false}
+                        axisLine={false}
+                      />
+
+                      <Radar
+                        name="SaÃºde financeira"
+                        dataKey="value"
+                        stroke="#7c3aed"
+                        strokeWidth={2.5}
+                        fill="url(#financial-health-radar-fill)"
+                        fillOpacity={1}
+                        dot={{
+                          r: 4,
+                          fill: "#7c3aed",
+                          stroke: "var(--card)",
+                          strokeWidth: 2,
+                        }}
+                        activeDot={{
+                          r: 6,
+                          fill: "#3b82f6",
+                          stroke: "var(--card)",
+                          strokeWidth: 3,
+                        }}
+                        animationDuration={700}
+                      />
+                    </RadarChart>
+                  </ResponsiveContainer>
+
+                  <div
+                    className={cn(
+                      "pointer-events-none absolute inset-0",
+                      "flex items-center justify-center",
+                    )}
+                    aria-hidden="true"
+                  >
+                    <div
+                      className={cn(
+                        "flex size-[74px] flex-col",
+                        "items-center justify-center",
+                        "rounded-full border border-border",
+                        "bg-card/90 shadow-card",
+                        "backdrop-blur-sm",
+                      )}
+                    >
+                      <Activity
+                        size={14}
+                        className="text-secondary-bright"
+                      />
+
+                      <strong className="mt-1 text-lg font-bold tabular-nums text-text">
+                        {averageScore}
+                      </strong>
+
+                      <span className="text-[8px] font-medium uppercase tracking-[0.08em] text-text-subtle">
+                        mÃ©dia
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="min-w-0 space-y-2"
+                aria-label="Pilares da saÃºde financeira"
+              >
+                {metrics.map((metric) => {
+                  const isActive =
+                    metric.id === activeMetric.id;
+
+                  const percentage =
+                    getMetricPercentage(metric);
+
+                  return (
+                    <button
+                      key={metric.id}
+                      type="button"
+                      onMouseEnter={() =>
+                        setActiveMetricId(
+                          metric.id,
+                        )
+                      }
+                      onFocus={() =>
+                        setActiveMetricId(
+                          metric.id,
+                        )
+                      }
+                      onClick={() =>
+                        setActiveMetricId(
+                          metric.id,
+                        )
+                      }
+                      className={cn(
+                        "w-full min-w-0",
+                        "rounded-[11px] border",
+                        "px-3 py-2.5 text-left",
+                        "transition-[border-color,background-color]",
+                        isActive
+                          ? [
+                              "border-secondary/30",
+                              "bg-secondary/10",
+                            ]
+                          : [
+                              "border-transparent",
+                              "hover:border-border",
+                              "hover:bg-surface-elevated/55",
+                            ],
+                        "focus-visible:outline-none",
+                        "focus-visible:ring-2",
+                        "focus-visible:ring-secondary/40",
+                      )}
+                    >
+                      <div className="flex min-w-0 items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <span
+                            className={cn(
+                              "size-2.5 shrink-0 rounded-full",
+                              isActive
+                                ? "bg-secondary-bright"
+                                : "bg-text-subtle",
+                            )}
+                            aria-hidden="true"
+                          />
+
+                          <span
+                            className={cn(
+                              "truncate text-[11px]",
+                              "font-medium",
+                              isActive
+                                ? "text-text"
+                                : "text-text-muted",
+                            )}
+                          >
+                            {metric.subject}
+                          </span>
+                        </div>
+
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className="text-[10px] font-semibold tabular-nums text-text">
+                            {metric.value}
+                          </span>
+
+                          <span
+                            className={cn(
+                              "min-w-10 rounded-full",
+                              "px-1.5 py-0.5",
+                              "text-center text-[9px]",
+                              "font-semibold tabular-nums",
+                              isActive
+                                ? [
+                                    "bg-secondary/15",
+                                    "text-secondary-bright",
+                                  ]
+                                : [
+                                    "bg-surface-muted",
+                                    "text-text-muted",
+                                  ],
+                            )}
+                          >
+                            {percentage}%
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-muted">
+                        <div
+                          className={cn(
+                            "h-full rounded-full",
+                            "transition-[width] duration-500",
+                            isActive
+                              ? "bg-secondary-bright"
+                              : "bg-text-subtle",
+                          )}
+                          style={{
+                            width: `${percentage}%`,
+                          }}
+                        />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <FinancialHealthRadarTooltip
+                metric={activeMetric}
+              />
+            </div>
+
+            {onViewDetails && (
+              <button
+                type="button"
+                onClick={onViewDetails}
+                className={cn(
+                  "mt-4 inline-flex h-10",
+                  "w-full items-center",
+                  "justify-center gap-2",
+                  "rounded-[12px]",
+                  "border border-secondary/15",
+                  "bg-secondary/5",
+                  "text-xs font-semibold",
+                  "text-secondary-bright",
+                  "transition-[border-color,background-color]",
+                  "hover:border-secondary/30",
+                  "hover:bg-secondary/10",
+                  "focus-visible:outline-none",
+                  "focus-visible:ring-2",
+                  "focus-visible:ring-secondary/40",
+                )}
+              >
+                Ver detalhes
+
+                <ArrowRight
+                  size={14}
+                  aria-hidden="true"
+                />
+              </button>
+            )}
+          </>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[360px] flex-1",
+              "flex-col items-center",
+              "justify-center rounded-[16px]",
+              "border border-dashed",
+              "border-border px-6",
+              "text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-border",
+                "bg-surface-muted",
+                "text-text-muted",
+              )}
+              aria-hidden="true"
+            >
+              <HeartPulse size={21} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              AnÃ¡lise indisponÃ­vel
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Os pilares da saÃºde financeira serÃ£o exibidos
+              quando houver dados suficientes.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialHealthRadar\FinancialHealthRadar.types.ts
+========================================================================================================================
+
+export type FinancialHealthStatus =
+  | "excellent"
+  | "good"
+  | "attention"
+  | "critical";
+
+export interface FinancialHealthMetric {
+  id: string;
+  subject: string;
+  value: number;
+  fullMark: number;
+  description: string;
+}
+
+export interface FinancialHealthRadarProps {
+  title?: string;
+  description?: string;
+  metrics?: readonly FinancialHealthMetric[];
+  onViewDetails?: () => void;
+}
+
+export interface FinancialHealthRadarDetailProps {
+  metric: FinancialHealthMetric;
+}
+
+export interface FinancialHealthStatusConfig {
+  label: string;
+  className: string;
+  progressClassName: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialHealthRadar\FinancialHealthRadarTooltip.tsx
+========================================================================================================================
+
+import {
+  Activity,
+  CircleCheck,
+  TriangleAlert,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type {
+  FinancialHealthRadarDetailProps,
+  FinancialHealthStatus,
+  FinancialHealthStatusConfig,
+} from "./FinancialHealthRadar.types";
+
+const statusConfig: Record<
+  FinancialHealthStatus,
+  FinancialHealthStatusConfig
+> = {
+  excellent: {
+    label: "Excelente",
+    className:
+      "border-success/20 bg-success/10 text-success",
+    progressClassName: "bg-success",
+  },
+
+  good: {
+    label: "Bom",
+    className:
+      "border-primary/20 bg-primary/10 text-primary-bright",
+    progressClassName: "bg-primary-bright",
+  },
+
+  attention: {
+    label: "AtenÃ§Ã£o",
+    className:
+      "border-warning/20 bg-warning/10 text-warning",
+    progressClassName: "bg-warning",
+  },
+
+  critical: {
+    label: "CrÃ­tico",
+    className:
+      "border-danger/20 bg-danger/10 text-danger",
+    progressClassName: "bg-danger",
+  },
+};
+
+function getStatus(
+  value: number,
+  fullMark: number,
+): FinancialHealthStatus {
+  const safeFullMark = Math.max(fullMark, 1);
+  const percentage = (value / safeFullMark) * 100;
+
+  if (percentage >= 80) {
+    return "excellent";
+  }
+
+  if (percentage >= 60) {
+    return "good";
+  }
+
+  if (percentage >= 40) {
+    return "attention";
+  }
+
+  return "critical";
+}
+
+export function FinancialHealthRadarTooltip({
+  metric,
+}: Readonly<FinancialHealthRadarDetailProps>) {
+  const safeFullMark = Math.max(
+    metric.fullMark,
+    1,
+  );
+
+  const percentage = Math.min(
+    Math.max(
+      Math.round(
+        (metric.value / safeFullMark) * 100,
+      ),
+      0,
+    ),
+    100,
+  );
+
+  const status = getStatus(
+    metric.value,
+    metric.fullMark,
+  );
+
+  const config = statusConfig[status];
+
+  const StatusIcon =
+    status === "excellent" || status === "good"
+      ? CircleCheck
+      : TriangleAlert;
+
+  return (
+    <div
+      className={cn(
+        "rounded-[14px] border border-border",
+        "bg-surface-elevated/55 p-4",
+      )}
+      aria-live="polite"
+    >
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className={cn(
+              "flex size-9 shrink-0 items-center",
+              "justify-center rounded-[11px]",
+              "border border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <Activity size={16} />
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-text-subtle">
+              Pilar selecionado
+            </p>
+
+            <h4 className="mt-1 truncate text-sm font-semibold text-text">
+              {metric.subject}
+            </h4>
+          </div>
+        </div>
+
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5",
+            "rounded-full border px-2 py-1",
+            "text-[9px] font-semibold uppercase",
+            "tracking-[0.08em]",
+            config.className,
+          )}
+        >
+          <StatusIcon
+            size={11}
+            aria-hidden="true"
+          />
+
+          {config.label}
+        </span>
+      </div>
+
+      <p className="mt-3 text-xs leading-5 text-text-muted">
+        {metric.description}
+      </p>
+
+      <div className="mt-4 space-y-2">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[10px] font-medium text-text-muted">
+            PontuaÃ§Ã£o do pilar
+          </span>
+
+          <span className="text-xs font-bold tabular-nums text-text">
+            {metric.value}/{metric.fullMark}
+          </span>
+        </div>
+
+        <div className="h-1.5 overflow-hidden rounded-full bg-surface-muted">
+          <div
+            className={cn(
+              "h-full rounded-full",
+              "transition-[width] duration-500 ease-out",
+              config.progressClassName,
+            )}
+            style={{
+              width: `${percentage}%`,
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\FinancialHealthRadar\index.ts
+========================================================================================================================
+
+export * from "./FinancialHealthRadar";
+export * from "./FinancialHealthRadar.types";
+export * from "./FinancialHealthRadarTooltip";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\QuickActions\index.ts
+========================================================================================================================
+
+export { QuickActionButton } from "./QuickActionButton";
+export { QuickActions } from "./QuickActions";
+export { dashboardQuickActions } from "./quickActions.data";
+
+export type {
+  QuickAction,
+  QuickActionButtonProps,
+  QuickActionId,
+  QuickActionsProps,
+  QuickActionVariant,
+} from "./QuickActions.types";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\QuickActions\QuickActionButton.tsx
+========================================================================================================================
+
+import {
+  ArrowUpRight,
+  LockKeyhole,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type {
+  QuickActionButtonProps,
+  QuickActionVariant,
+  QuickActionVisualConfig,
+} from "./QuickActions.types";
+
+const variantStyles: Record<
+  QuickActionVariant,
+  QuickActionVisualConfig
+> = {
+  primary: {
+    accentClassName: "bg-primary-bright",
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+    badgeClassName:
+      "border-primary/20 bg-primary/10 text-primary-bright",
+    hoverBorderClassName:
+      "hover:border-primary/35",
+  },
+
+  neutral: {
+    accentClassName: "bg-text-subtle",
+    iconContainerClassName:
+      "border-border bg-surface-muted",
+    iconClassName: "text-text-muted",
+    badgeClassName:
+      "border-border bg-surface-muted text-text-muted",
+    hoverBorderClassName:
+      "hover:border-border-highlight",
+  },
+
+  success: {
+    accentClassName: "bg-success",
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    iconClassName: "text-success",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+    hoverBorderClassName:
+      "hover:border-success/35",
+  },
+
+  warning: {
+    accentClassName: "bg-warning",
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+    hoverBorderClassName:
+      "hover:border-warning/35",
+  },
+};
+
+export function QuickActionButton({
+  action,
+  onAction,
+}: Readonly<QuickActionButtonProps>) {
+  const Icon = action.icon;
+  const styles =
+    variantStyles[action.variant];
+
+  const isDisabled =
+    action.disabled === true;
+
+  const handleClick = (): void => {
+    if (isDisabled) {
+      return;
+    }
+
+    onAction?.(action);
+  };
+
+  return (
+    <button
+      type="button"
+      disabled={isDisabled}
+      onClick={handleClick}
+      className={cn(
+        "group relative flex min-h-[158px]",
+        "min-w-0 flex-col items-start",
+        "overflow-hidden rounded-[16px]",
+        "border border-border",
+        "bg-surface-elevated/55 p-4",
+        "text-left",
+        "transition-[border-color,background-color,box-shadow,transform]",
+        "duration-200 ease-out",
+        "hover:-translate-y-px",
+        "hover:bg-card-hover",
+        "hover:shadow-card",
+        "focus-visible:outline-none",
+        "focus-visible:ring-2",
+        "focus-visible:ring-primary/40",
+        "focus-visible:ring-offset-2",
+        "focus-visible:ring-offset-background",
+        "disabled:pointer-events-none",
+        "disabled:cursor-not-allowed",
+        "disabled:opacity-60",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+        styles.hoverBorderClassName,
+      )}
+      aria-label={
+        isDisabled
+          ? `${action.title}. IndisponÃ­vel no momento.`
+          : action.title
+      }
+    >
+      <span
+        className={cn(
+          "absolute inset-y-0 left-0 w-0.5",
+          styles.accentClassName,
+        )}
+        aria-hidden="true"
+      />
+
+      <div className="flex w-full items-start justify-between gap-3">
+        <div
+          className={cn(
+            "flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[12px] border",
+            styles.iconContainerClassName,
+            styles.iconClassName,
+          )}
+          aria-hidden="true"
+        >
+          <Icon className="size-[18px]" />
+        </div>
+
+        {isDisabled ? (
+          <span
+            className={cn(
+              "inline-flex shrink-0 items-center gap-1.5",
+              "rounded-full border",
+              "border-border bg-surface-muted",
+              "px-2 py-1",
+              "text-[9px] font-semibold",
+              "uppercase tracking-[0.08em]",
+              "text-text-muted",
+            )}
+          >
+            <LockKeyhole
+              size={10}
+              aria-hidden="true"
+            />
+
+            {action.badge ?? "IndisponÃ­vel"}
+          </span>
+        ) : action.badge ? (
+          <span
+            className={cn(
+              "inline-flex shrink-0 rounded-full border",
+              "px-2 py-1 text-[9px]",
+              "font-semibold uppercase",
+              "tracking-[0.08em]",
+              styles.badgeClassName,
+            )}
+          >
+            {action.badge}
+          </span>
+        ) : (
+          <ArrowUpRight
+            className={cn(
+              "size-4 shrink-0 text-text-subtle",
+              "transition-[color,transform]",
+              "duration-200",
+              "group-hover:-translate-y-0.5",
+              "group-hover:translate-x-0.5",
+              "group-hover:text-text",
+              "motion-reduce:transition-none",
+              "motion-reduce:transform-none",
+            )}
+            aria-hidden="true"
+          />
+        )}
+      </div>
+
+      <div className="mt-4 min-w-0 flex-1">
+        <h4 className="text-sm font-semibold leading-5 text-text">
+          {action.title}
+        </h4>
+
+        <p className="mt-1.5 text-xs leading-5 text-text-muted">
+          {action.description}
+        </p>
+      </div>
+
+      <div
+        className={cn(
+          "mt-3 flex w-full items-center",
+          "justify-between gap-3",
+          "border-t border-border-muted pt-3",
+        )}
+      >
+        <span className="text-[10px] font-medium text-text-subtle">
+          {isDisabled
+            ? "Recurso em desenvolvimento"
+            : "Abrir recurso"}
+        </span>
+
+        {!isDisabled && (
+          <ArrowUpRight
+            size={13}
+            className={cn(
+              "text-text-subtle",
+              "transition-transform duration-200",
+              "group-hover:-translate-y-0.5",
+              "group-hover:translate-x-0.5",
+            )}
+            aria-hidden="true"
+          />
+        )}
+      </div>
+    </button>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\QuickActions\quickActions.data.ts
+========================================================================================================================
+
+import {
+  FileUp,
+  Lightbulb,
+  Plus,
+  Sparkles,
+} from "lucide-react";
+
+import type { QuickAction } from "./QuickActions.types";
+
+export const dashboardQuickActions = [
+  {
+    id: "add-transaction",
+    title: "Nova transaÃ§Ã£o",
+    description: "Registre uma nova receita ou despesa.",
+    icon: Plus,
+    variant: "primary",
+  },
+  {
+    id: "run-analysis",
+    title: "Analisar finanÃ§as",
+    description: "Atualize sua avaliaÃ§Ã£o financeira.",
+    icon: Sparkles,
+    variant: "success",
+  },
+  {
+    id: "view-recommendations",
+    title: "RecomendaÃ§Ãµes",
+    description: "Veja orientaÃ§Ãµes personalizadas geradas pela IA.",
+    icon: Lightbulb,
+    variant: "warning",
+  },
+  {
+    id: "import-transactions",
+    title: "Importar transaÃ§Ãµes",
+    description: "Envie movimentaÃ§Ãµes financeiras por arquivo.",
+    icon: FileUp,
+    variant: "neutral",
+    disabled: true,
+    badge: "Em breve",
+  },
+] satisfies readonly QuickAction[];
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\QuickActions\QuickActions.tsx
+========================================================================================================================
+
+import {
+  CheckCircle2,
+  Zap,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+import { QuickActionButton } from "./QuickActionButton";
+import { dashboardQuickActions } from "./quickActions.data";
+
+import type { QuickActionsProps } from "./QuickActions.types";
+
+export function QuickActions({
+  actions = dashboardQuickActions,
+  title = "AÃ§Ãµes rÃ¡pidas",
+  description = "Acesse os principais recursos do Finance AI.",
+  onAction,
+}: Readonly<QuickActionsProps>) {
+  const availableActionsCount =
+    actions.filter(
+      (action) => !action.disabled,
+    ).length;
+
+  const disabledActionsCount =
+    actions.length -
+    availableActionsCount;
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <CardTitle className="text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5",
+                "text-[10px] font-medium",
+                "text-success",
+              )}
+            >
+              <CheckCircle2
+                size={12}
+                aria-hidden="true"
+              />
+
+              {availableActionsCount}{" "}
+              {availableActionsCount === 1
+                ? "aÃ§Ã£o disponÃ­vel"
+                : "aÃ§Ãµes disponÃ­veis"}
+            </span>
+
+            {disabledActionsCount > 0 && (
+              <span className="text-[10px] font-medium text-text-subtle">
+                {disabledActionsCount}{" "}
+                {disabledActionsCount === 1
+                  ? "em desenvolvimento"
+                  : "em desenvolvimento"}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "relative flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-primary/20",
+            "bg-primary/10",
+            "text-primary-bright",
+          )}
+          aria-hidden="true"
+        >
+          <Zap className="size-[18px]" />
+
+          <span
+            className={cn(
+              "absolute -right-1 -top-1",
+              "flex size-5 items-center",
+              "justify-center rounded-full",
+              "border-2 border-card",
+              "bg-primary-bright",
+              "text-[9px] font-bold text-white",
+            )}
+          >
+            {availableActionsCount}
+          </span>
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {actions.length > 0 ? (
+          <div
+            className={cn(
+              "grid min-w-0 flex-1",
+              "grid-cols-1 gap-3",
+              "sm:grid-cols-2",
+              "xl:grid-cols-2",
+            )}
+            aria-label="Lista de aÃ§Ãµes rÃ¡pidas"
+          >
+            {actions.map((action) => (
+              <QuickActionButton
+                key={action.id}
+                action={action}
+                onAction={onAction}
+              />
+            ))}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[330px]",
+              "flex-col items-center",
+              "justify-center rounded-[16px]",
+              "border border-dashed",
+              "border-border px-6",
+              "text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-border",
+                "bg-surface-muted",
+                "text-text-muted",
+              )}
+              aria-hidden="true"
+            >
+              <Zap size={21} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhuma aÃ§Ã£o disponÃ­vel
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Os principais recursos do Finance AI aparecerÃ£o
+              aqui quando estiverem disponÃ­veis.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\QuickActions\QuickActions.types.ts
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+
+export type QuickActionId =
+  | "add-transaction"
+  | "run-analysis"
+  | "view-recommendations"
+  | "import-transactions";
+
+export type QuickActionVariant =
+  | "primary"
+  | "neutral"
+  | "success"
+  | "warning";
+
+export interface QuickAction {
+  id: QuickActionId;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  variant: QuickActionVariant;
+  disabled?: boolean;
+  badge?: string;
+}
+
+export interface QuickActionsProps {
+  actions?: readonly QuickAction[];
+  title?: string;
+  description?: string;
+  onAction?: (action: QuickAction) => void;
+}
+
+export interface QuickActionButtonProps {
+  action: QuickAction;
+  onAction?: (action: QuickAction) => void;
+}
+
+export interface QuickActionVisualConfig {
+  accentClassName: string;
+  iconContainerClassName: string;
+  iconClassName: string;
+  badgeClassName: string;
+  hoverBorderClassName: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ScoreCard\index.ts
+========================================================================================================================
+
+export * from "./ScoreCard";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ScoreCard\ScoreCard.tsx
+========================================================================================================================
+
+import {
+  ArrowUpRight,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { ScoreGauge } from "./ScoreGauge";
+import type { ScoreCardProps } from "./ScoreCard.types";
+
+export function ScoreCard({
+  title = "PontuaÃ§Ã£o financeira",
+}: Readonly<ScoreCardProps>) {
+  const score = dashboardService.getScore();
+
+  const safeMaxScore = Math.max(
+    score.maxScore,
+    1,
+  );
+
+  const percentage = Math.min(
+    Math.max(
+      Math.round(
+        (score.score / safeMaxScore) * 100,
+      ),
+      0,
+    ),
+    100,
+  );
+
+  return (
+    <Card
+      className={cn(
+        "group relative flex min-h-[228px] min-w-0",
+        "flex-col overflow-hidden",
+        "border-border bg-card",
+        "transition-[border-color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-0.5",
+        "hover:border-border-highlight",
+        "hover:shadow-elevated",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute right-0 top-0",
+          "size-40 translate-x-1/3 -translate-y-1/3",
+          "rounded-full bg-primary/10 blur-3xl",
+        )}
+        aria-hidden="true"
+      />
+
+      <CardHeader className="relative shrink-0 pb-2">
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <CardTitle className="truncate text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <div
+            className={cn(
+              "flex size-9 shrink-0 items-center",
+              "justify-center rounded-[12px]",
+              "border border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <ShieldCheck size={17} />
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent
+        className={cn(
+          "relative flex flex-1 flex-col",
+          "justify-between gap-3 pt-0",
+        )}
+      >
+        <div className="flex min-w-0 items-center gap-4">
+          <ScoreGauge
+            score={score.score}
+            maxScore={score.maxScore}
+          />
+
+          <div className="min-w-0 flex-1">
+            <span
+              className={cn(
+                "inline-flex items-center rounded-full",
+                "border border-success/20",
+                "bg-success/10 px-2.5 py-1",
+                "text-[10px] font-semibold text-success",
+              )}
+            >
+              {score.classification}
+            </span>
+
+            <p className="mt-3 text-xs leading-5 text-text-muted">
+              Seu desempenho financeiro estÃ¡ acima da mÃ©dia.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3 text-[10px]">
+            <span className="font-medium text-text-muted">
+              Progresso do score
+            </span>
+
+            <span className="font-semibold text-primary-bright">
+              {percentage}%
+            </span>
+          </div>
+
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-muted">
+            <div
+              className={cn(
+                "h-full rounded-full",
+                "bg-gradient-to-r from-primary",
+                "via-primary-bright to-secondary-bright",
+                "transition-[width] duration-700 ease-out",
+              )}
+              style={{
+                width: `${percentage}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "flex items-center gap-2 rounded-[12px]",
+            "border border-border-muted",
+            "bg-surface-elevated/70 px-3 py-2",
+          )}
+        >
+          <div
+            className={cn(
+              "flex size-7 shrink-0 items-center",
+              "justify-center rounded-lg",
+              "bg-success/10 text-success",
+            )}
+            aria-hidden="true"
+          >
+            <ArrowUpRight size={15} />
+          </div>
+
+          <p className="min-w-0 text-[11px] font-medium text-text-muted">
+            {score.variation}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ScoreCard\ScoreCard.types.ts
+========================================================================================================================
+
+export interface ScoreGaugeProps {
+  score: number;
+  maxScore: number;
+}
+
+export interface ScoreCardProps {
+  title?: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\ScoreCard\ScoreGauge.tsx
+========================================================================================================================
+
+import type { ScoreGaugeProps } from "./ScoreCard.types";
+
+export function ScoreGauge({
+  score,
+  maxScore,
+}: Readonly<ScoreGaugeProps>) {
+  const size = 112;
+  const center = size / 2;
+  const radius = 43;
+  const strokeWidth = 9;
+
+  const circumference =
+    2 * Math.PI * radius;
+
+  const safeMaxScore = Math.max(maxScore, 1);
+
+  const progress = Math.min(
+    Math.max(score / safeMaxScore, 0),
+    1,
+  );
+
+  const strokeDashoffset =
+    circumference * (1 - progress);
+
+  return (
+    <div
+      className="relative flex size-28 shrink-0 items-center justify-center"
+      aria-label={`PontuaÃ§Ã£o financeira: ${score} de ${maxScore}`}
+      role="img"
+    >
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="-rotate-90"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient
+            id="score-gauge-gradient"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="1"
+          >
+            <stop
+              offset="0%"
+              stopColor="#7c3aed"
+            />
+
+            <stop
+              offset="52%"
+              stopColor="#2563eb"
+            />
+
+            <stop
+              offset="100%"
+              stopColor="#38bdf8"
+            />
+          </linearGradient>
+
+          <filter
+            id="score-gauge-glow"
+            x="-50%"
+            y="-50%"
+            width="200%"
+            height="200%"
+          >
+            <feGaussianBlur
+              stdDeviation="2.5"
+              result="blur"
+            />
+
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="transparent"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-border-muted"
+        />
+
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="transparent"
+          stroke="url(#score-gauge-gradient)"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          filter="url(#score-gauge-glow)"
+          className="transition-[stroke-dashoffset] duration-700 ease-out"
+        />
+      </svg>
+
+      <div className="absolute flex flex-col items-center">
+        <span className="text-3xl font-bold tracking-[-0.04em] text-text">
+          {score}
+        </span>
+
+        <span className="mt-0.5 text-[10px] font-medium text-text-muted">
+          / {maxScore}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\TransactionsTable\index.ts
+========================================================================================================================
+
+export * from "./TransactionsTable";
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\TransactionsTable\TransactionsTable.tsx
+========================================================================================================================
+
+import {
+  useMemo,
+  useState,
+} from "react";
+import {
+  ArrowRight,
+  ReceiptText,
+  SearchX,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { TransactionsTableHeader } from "./TransactionsTableHeader";
+import { TransactionsTableRow } from "./TransactionsTableRow";
+import { TransactionsTableSearch } from "./TransactionsTableSearch";
+
+import type {
+  TransactionsTableProps,
+} from "./TransactionsTable.types";
+
+export function TransactionsTable({
+  transactions: providedTransactions,
+  title = "TransaÃ§Ãµes recentes",
+  description = "Acompanhe as movimentaÃ§Ãµes mais recentes da sua conta.",
+  onViewAll,
+}: Readonly<TransactionsTableProps>) {
+  const [search, setSearch] = useState("");
+
+  const serviceTransactions =
+    dashboardService.getTransactions();
+
+  const transactions =
+    providedTransactions ??
+    serviceTransactions;
+
+  const filteredTransactions = useMemo(() => {
+    const normalizedTerm = search
+      .trim()
+      .toLocaleLowerCase("pt-BR");
+
+    if (!normalizedTerm) {
+      return transactions;
+    }
+
+    return transactions.filter(
+      (transaction) => {
+        const searchableContent = [
+          transaction.description,
+          transaction.category,
+          transaction.status === "completed"
+            ? "concluÃ­da"
+            : "pendente",
+        ]
+          .join(" ")
+          .toLocaleLowerCase("pt-BR");
+
+        return searchableContent.includes(
+          normalizedTerm,
+        );
+      },
+    );
+  }, [search, transactions]);
+
+  const hasSearch =
+    search.trim().length > 0;
+
+  return (
+    <Card className="min-w-0 overflow-hidden">
+      <CardHeader
+        className={cn(
+          "flex-col items-stretch gap-4",
+          "xl:flex-row xl:items-start",
+          "xl:justify-between",
+        )}
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0 items-center",
+              "justify-center rounded-[13px]",
+              "border border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <ReceiptText size={18} />
+          </div>
+
+          <div className="min-w-0">
+            <CardTitle className="text-sm font-semibold">
+              {title}
+            </CardTitle>
+
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              {description}
+            </p>
+
+            <p className="mt-1 text-[10px] text-text-subtle">
+              {transactions.length}{" "}
+              {transactions.length === 1
+                ? "movimentaÃ§Ã£o registrada"
+                : "movimentaÃ§Ãµes registradas"}
+            </p>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "flex min-w-0 flex-col gap-3",
+            "sm:flex-row sm:items-start",
+          )}
+        >
+          <TransactionsTableSearch
+            value={search}
+            onChange={setSearch}
+            resultCount={
+              filteredTransactions.length
+            }
+          />
+
+          {onViewAll && (
+            <button
+              type="button"
+              onClick={onViewAll}
+              className={cn(
+                "inline-flex h-10 shrink-0",
+                "items-center justify-center gap-2",
+                "rounded-[12px] border",
+                "border-border bg-surface-elevated",
+                "px-3 text-xs font-semibold",
+                "text-text-muted",
+                "transition-[border-color,color,background-color]",
+                "hover:border-border-highlight",
+                "hover:bg-card-hover",
+                "hover:text-text",
+                "focus-visible:outline-none",
+                "focus-visible:ring-2",
+                "focus-visible:ring-primary/40",
+              )}
+            >
+              Ver todas
+
+              <ArrowRight
+                size={14}
+                aria-hidden="true"
+              />
+            </button>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-0">
+        {filteredTransactions.length > 0 ? (
+          <div className="max-h-[520px] overflow-auto">
+            <table className="min-w-[790px] w-full border-collapse">
+              <caption className="sr-only">
+                Lista de transaÃ§Ãµes financeiras recentes
+              </caption>
+
+              <TransactionsTableHeader />
+
+              <tbody className="divide-y divide-border-muted">
+                {filteredTransactions.map(
+                  (transaction) => (
+                    <TransactionsTableRow
+                      key={transaction.id}
+                      transaction={transaction}
+                    />
+                  ),
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[300px] flex-col",
+              "items-center justify-center",
+              "border-t border-border-muted",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-border",
+                "bg-surface-muted text-text-muted",
+              )}
+              aria-hidden="true"
+            >
+              <SearchX size={21} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              {hasSearch
+                ? "Nenhuma transaÃ§Ã£o encontrada"
+                : "Nenhuma transaÃ§Ã£o registrada"}
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              {hasSearch
+                ? `NÃ£o encontramos resultados para â€œ${search.trim()}â€.`
+                : "As movimentaÃ§Ãµes mais recentes aparecerÃ£o aqui."}
+            </p>
+
+            {hasSearch && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className={cn(
+                  "mt-4 rounded-[10px]",
+                  "border border-primary/20",
+                  "bg-primary/10 px-3 py-2",
+                  "text-xs font-semibold",
+                  "text-primary-bright",
+                  "transition-colors",
+                  "hover:bg-primary/15",
+                  "focus-visible:outline-none",
+                  "focus-visible:ring-2",
+                  "focus-visible:ring-primary/40",
+                )}
+              >
+                Limpar pesquisa
+              </button>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\TransactionsTable\TransactionsTable.types.ts
+========================================================================================================================
+
+import type { Transaction } from "@/types/dashboard";
+
+export interface TransactionsTableProps {
+  transactions?: readonly Transaction[];
+  title?: string;
+  description?: string;
+  onViewAll?: () => void;
+}
+
+export interface TransactionsTableSearchProps {
+  value: string;
+  onChange: (value: string) => void;
+  resultCount?: number;
+}
+
+export interface TransactionsTableRowProps {
+  transaction: Transaction;
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\TransactionsTable\TransactionsTableHeader.tsx
+========================================================================================================================
+
+import { cn } from "@/lib/utils";
+
+interface TransactionColumn {
+  label: string;
+  className?: string;
+}
+
+const columns: readonly TransactionColumn[] = [
+  {
+    label: "Categoria",
+    className: "min-w-[180px]",
+  },
+  {
+    label: "DescriÃ§Ã£o",
+    className: "min-w-[210px]",
+  },
+  {
+    label: "Data",
+    className: "min-w-[125px]",
+  },
+  {
+    label: "Valor",
+    className: "min-w-[145px] text-right",
+  },
+  {
+    label: "Status",
+    className: "min-w-[130px] text-right",
+  },
+];
+
+export function TransactionsTableHeader() {
+  return (
+    <thead
+      className={cn(
+        "sticky top-0 z-10",
+        "border-y border-border-muted",
+        "bg-surface-elevated/95",
+        "backdrop-blur-md",
+      )}
+    >
+      <tr>
+        {columns.map((column) => (
+          <th
+            key={column.label}
+            scope="col"
+            className={cn(
+              "px-5 py-3.5",
+              "text-left text-[10px]",
+              "font-semibold uppercase",
+              "tracking-[0.09em]",
+              "text-text-subtle",
+              column.className,
+            )}
+          >
+            {column.label}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\TransactionsTable\TransactionsTableRow.tsx
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+import {
+  CarFront,
+  CircleDollarSign,
+  CreditCard,
+  Dumbbell,
+  HeartPulse,
+  Home,
+  ReceiptText,
+  ShoppingBasket,
+  Utensils,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type { TransactionsTableRowProps } from "./TransactionsTable.types";
+
+interface CategoryVisual {
+  icon: LucideIcon;
+  iconContainerClassName: string;
+  iconClassName: string;
+}
+
+const currencyFormatter = new Intl.NumberFormat(
+  "pt-BR",
+  {
+    style: "currency",
+    currency: "BRL",
+  },
+);
+
+const dateFormatter = new Intl.DateTimeFormat(
+  "pt-BR",
+  {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  },
+);
+
+const categoryVisuals: Record<
+  string,
+  CategoryVisual
+> = {
+  receita: {
+    icon: CircleDollarSign,
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    iconClassName: "text-success",
+  },
+
+  alimentação: {
+    icon: ShoppingBasket,
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+
+  assinatura: {
+    icon: CreditCard,
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+  },
+
+  transporte: {
+    icon: CarFront,
+    iconContainerClassName:
+      "border-info/20 bg-info/10",
+    iconClassName: "text-info",
+  },
+
+  moradia: {
+    icon: Home,
+    iconContainerClassName:
+      "border-secondary/20 bg-secondary/10",
+    iconClassName: "text-secondary-bright",
+  },
+
+  saúde: {
+    icon: HeartPulse,
+    iconContainerClassName:
+      "border-danger/20 bg-danger/10",
+    iconClassName: "text-danger",
+  },
+
+  academia: {
+    icon: Dumbbell,
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+  },
+
+  restaurante: {
+    icon: Utensils,
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+};
+
+const fallbackCategoryVisual: CategoryVisual = {
+  icon: ReceiptText,
+  iconContainerClassName:
+    "border-border bg-surface-muted",
+  iconClassName: "text-text-muted",
+};
+
+function normalizeCategory(
+  category: string,
+): string {
+  return category
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("pt-BR");
+}
+
+function getCategoryVisual(
+  category: string,
+): CategoryVisual {
+  const normalizedCategory =
+    normalizeCategory(category);
+
+  const matchingEntry = Object.entries(
+    categoryVisuals,
+  ).find(([key]) =>
+    normalizedCategory.includes(
+      normalizeCategory(key),
+    ),
+  );
+
+  return (
+    matchingEntry?.[1] ??
+    fallbackCategoryVisual
+  );
+}
+
+function parseLocalDate(
+  date: string,
+): Date {
+  return new Date(`${date}T00:00:00`);
+}
+
+export function TransactionsTableRow({
+  transaction,
+}: Readonly<TransactionsTableRowProps>) {
+  const isIncome =
+    transaction.type === "income";
+
+  const isCompleted =
+    transaction.status === "completed";
+
+  const categoryVisual =
+    getCategoryVisual(transaction.category);
+
+  const CategoryIcon =
+    categoryVisual.icon;
+
+  const formattedAmount =
+    currencyFormatter.format(
+      Math.abs(transaction.amount),
+    );
+
+  return (
+    <tr
+      className={cn(
+        "group transition-colors duration-150",
+        "hover:bg-surface-elevated/55",
+      )}
+    >
+      <td className="px-5 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className={cn(
+              "flex size-9 shrink-0",
+              "items-center justify-center",
+              "rounded-[11px] border",
+              categoryVisual.iconContainerClassName,
+              categoryVisual.iconClassName,
+            )}
+            aria-hidden="true"
+          >
+            <CategoryIcon size={16} />
+          </div>
+
+          <span className="truncate text-xs font-semibold text-text">
+            {transaction.category}
+          </span>
+        </div>
+      </td>
+
+      <td className="px-5 py-4">
+        <div className="min-w-0">
+          <p className="truncate text-xs font-medium text-text">
+            {transaction.description}
+          </p>
+
+          <p className="mt-1 text-[10px] text-text-subtle">
+            ID #{transaction.id}
+          </p>
+        </div>
+      </td>
+
+      <td className="px-5 py-4">
+        <time
+          dateTime={transaction.date}
+          className="whitespace-nowrap text-xs text-text-muted"
+        >
+          {dateFormatter.format(
+            parseLocalDate(transaction.date),
+          )}
+        </time>
+      </td>
+
+      <td className="px-5 py-4 text-right">
+        <span
+          className={cn(
+            "inline-flex items-center",
+            "justify-end gap-1",
+            "whitespace-nowrap text-xs",
+            "font-semibold tabular-nums",
+            isIncome
+              ? "text-success"
+              : "text-danger",
+          )}
+        >
+          {isIncome ? "+" : "−"}
+
+          {formattedAmount}
+        </span>
+      </td>
+
+      <td className="px-5 py-4 text-right">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5",
+            "rounded-full border",
+            "px-2.5 py-1",
+            "text-[10px] font-semibold",
+            isCompleted
+              ? [
+                  "border-success/20",
+                  "bg-success/10",
+                  "text-success",
+                ]
+              : [
+                  "border-warning/20",
+                  "bg-warning/10",
+                  "text-warning",
+                ],
+          )}
+        >
+          <span
+            className={cn(
+              "size-1.5 rounded-full",
+              isCompleted
+                ? "bg-success"
+                : "bg-warning",
+            )}
+            aria-hidden="true"
+          />
+
+          {isCompleted
+            ? "Concluída"
+            : "Pendente"}
+        </span>
+      </td>
+    </tr>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend\src\components\dashboard\TransactionsTable\TransactionsTableSearch.tsx
+========================================================================================================================
+
+import {
+  Search,
+  X,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type { TransactionsTableSearchProps } from "./TransactionsTable.types";
+
+export function TransactionsTableSearch({
+  value,
+  onChange,
+  resultCount,
+}: Readonly<TransactionsTableSearchProps>) {
+  const hasValue = value.trim().length > 0;
+
+  return (
+    <div className="min-w-0">
+      <label
+        htmlFor="transactions-search"
+        className="sr-only"
+      >
+        Pesquisar transaÃ§Ãµes
+      </label>
+
+      <div className="relative w-full min-w-0 sm:w-72">
+        <Search
+          size={16}
+          className={cn(
+            "pointer-events-none absolute",
+            "left-3 top-1/2 -translate-y-1/2",
+            "text-text-subtle",
+          )}
+          aria-hidden="true"
+        />
+
+        <input
+          id="transactions-search"
+          type="search"
+          value={value}
+          onChange={(event) =>
+            onChange(event.target.value)
+          }
+          placeholder="Pesquisar transaÃ§Ãµes..."
+          autoComplete="off"
+          className={cn(
+            "h-10 w-full min-w-0",
+            "rounded-[12px] border border-border",
+            "bg-background/45",
+            "pl-9 pr-10",
+            "text-xs text-text outline-none",
+            "placeholder:text-text-subtle",
+            "transition-[border-color,box-shadow,background-color]",
+            "duration-200",
+            "hover:bg-background/65",
+            "focus:border-primary/45",
+            "focus:ring-4 focus:ring-primary/10",
+          )}
+        />
+
+        {hasValue && (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            aria-label="Limpar pesquisa"
+            title="Limpar pesquisa"
+            className={cn(
+              "absolute right-2 top-1/2",
+              "flex size-7 -translate-y-1/2",
+              "items-center justify-center",
+              "rounded-lg text-text-subtle",
+              "transition-colors",
+              "hover:bg-surface-muted",
+              "hover:text-text",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary/40",
+            )}
+          >
+            <X
+              size={14}
+              aria-hidden="true"
+            />
+          </button>
+        )}
+      </div>
+
+      {hasValue &&
+        resultCount !== undefined && (
+          <p
+            className="mt-1.5 text-[10px] text-text-subtle"
+            aria-live="polite"
+          >
+            {resultCount}{" "}
+            {resultCount === 1
+              ? "resultado encontrado"
+              : "resultados encontrados"}
+          </p>
+        )}
+    </div>
+  );
+}
+
+========================================================================================================================
+MOCKS ENCONTRADOS
+========================================================================================================================
+
+------------------------------------------------------------------------------------------------------------------------
+ARQUIVO: frontend\src\mocks\dashboard.mock.tsx
+------------------------------------------------------------------------------------------------------------------------
+import {
+  ArrowDownCircle,
+  ArrowUpCircle,
+  DollarSign,
+  Wallet,
+} from "lucide-react";
+
+import type { FinancialAlert } from "@/components/dashboard/Alerts";
+import type { DashboardMock } from "@/types/dashboard";
+
+export const dashboardMock: DashboardMock = {
+  summary: [
+    {
+      id: "balance",
+      title: "Saldo atual",
+      value: "R$ 18.540,25",
+      variation: "+8,4% este mÃªs",
+      trend: "up",
+      icon: (
+        <Wallet
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
+    },
+    {
+      id: "income",
+      title: "Receitas",
+      value: "R$ 24.300,00",
+      variation: "+12,8%",
+      trend: "up",
+      icon: (
+        <ArrowUpCircle
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
+    },
+    {
+      id: "expenses",
+      title: "Despesas",
+      value: "R$ 5.759,75",
+      variation: "-3,2%",
+      trend: "down",
+      icon: (
+        <ArrowDownCircle
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
+    },
+    {
+      id: "score",
+      title: "Score financeiro",
+      value: "91",
+      variation: "Excelente",
+      trend: "up",
+      icon: (
+        <DollarSign
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
+    },
+  ],
+
+  cashFlow: [
+    {
+      month: "Jan",
+      income: 42000,
+      expenses: 21000,
+    },
+    {
+      month: "Fev",
+      income: 38000,
+      expenses: 19000,
+    },
+    {
+      month: "Mar",
+      income: 45000,
+      expenses: 22000,
+    },
+    {
+      month: "Abr",
+      income: 47000,
+      expenses: 24000,
+    },
+    {
+      month: "Mai",
+      income: 50000,
+      expenses: 26000,
+    },
+    {
+      month: "Jun",
+      income: 52000,
+      expenses: 28000,
+    },
+  ],
+
+  categories: [
+    {
+      name: "Moradia",
+      value: 24000,
+    },
+    {
+      name: "AlimentaÃ§Ã£o",
+      value: 16000,
+    },
+    {
+      name: "EducaÃ§Ã£o",
+      value: 12000,
+    },
+    {
+      name: "Transporte",
+      value: 8000,
+    },
+    {
+      name: "Lazer",
+      value: 6000,
+    },
+  ],
+
+  transactions: [
+    {
+      id: 1,
+      description: "SalÃ¡rio",
+      category: "Receita",
+      amount: 12000,
+      date: "2026-07-05",
+      type: "income",
+      status: "completed",
+    },
+    {
+      id: 2,
+      description: "Supermercado Mateus",
+      category: "AlimentaÃ§Ã£o",
+      amount: -350.45,
+      date: "2026-07-08",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 3,
+      description: "Netflix",
+      category: "Assinatura",
+      amount: -39.9,
+      date: "2026-07-09",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 4,
+      description: "Posto Shell",
+      category: "Transporte",
+      amount: -220,
+      date: "2026-07-10",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 5,
+      description: "Aluguel",
+      category: "Moradia",
+      amount: -1800,
+      date: "2026-07-01",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 6,
+      description: "Freelance React",
+      category: "Receita",
+      amount: 2800,
+      date: "2026-07-12",
+      type: "income",
+      status: "completed",
+    },
+    {
+      id: 7,
+      description: "Conta de energia",
+      category: "Moradia",
+      amount: -245.8,
+      date: "2026-07-13",
+      type: "expense",
+      status: "pending",
+    },
+    {
+      id: 8,
+      description: "FarmÃ¡cia",
+      category: "SaÃºde",
+      amount: -89.5,
+      date: "2026-07-14",
+      type: "expense",
+      status: "completed",
+    },
+  ],
+
+  financialHealth: {
+    score: 91,
+    maxScore: 100,
+    classification: "Excelente",
+    variation: "+8 pontos este mÃªs",
+
+    insights: [
+      "VocÃª reduziu seus gastos com alimentaÃ§Ã£o em 12% neste mÃªs.",
+      "Sua renda aumentou 8% em relaÃ§Ã£o ao mÃªs anterior.",
+      "Seu score financeiro permanece acima da mÃ©dia dos usuÃ¡rios.",
+      "VocÃª pode economizar atÃ© R$ 420 reduzindo gastos recorrentes.",
+    ],
+
+    alerts: [
+      {
+        id: 1,
+        title: "Despesas recorrentes aumentaram",
+        description:
+          "Seus gastos recorrentes cresceram 12% em relaÃ§Ã£o ao mÃªs anterior.",
+        type: "warning",
+        actionLabel: "Ver despesas",
+      },
+      {
+        id: 2,
+        title: "Gastos com alimentaÃ§Ã£o acima da mÃ©dia",
+        description:
+          "A categoria alimentaÃ§Ã£o representa 28% das suas despesas deste mÃªs.",
+        type: "danger",
+        actionLabel: "Analisar categoria",
+      },
+      {
+        id: 3,
+        title: "Receita mensal aumentou",
+        description:
+          "Sua receita apresentou crescimento de 8% em comparaÃ§Ã£o ao mÃªs anterior.",
+        type: "success",
+      },
+    ] satisfies FinancialAlert[],
+  },
+};
+
+------------------------------------------------------------------------------------------------------------------------
+ARQUIVO: frontend\src\mocks\user.mock.ts
+------------------------------------------------------------------------------------------------------------------------
+import type { User } from "@/types/user";
+
+export const userMock: User = {
+  id: "user-001",
+  name: "Mariana Costa",
+  email: "mariana.costa@email.com",
+  avatar: "",
+  phone: "(98) 99999-9999",
+  occupation: "Analista financeira",
+  financialProfile: "Excelente",
+  memberSince: "2026-01-15",
+
+  preferences: {
+    currency: "BRL",
+    language: "pt-BR",
+    receiveFinancialAlerts: true,
+    receiveAiRecommendations: true,
+    receiveMonthlySummary: true,
+  },
+};
+
+========================================================================================================================
+REFERENCIAS A dashboardService / dashboardMock
+========================================================================================================================
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIInsights\AIInsights.tsx:18
+import { dashboardService } from "@/services/dashboard.service";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIInsights\AIInsights.tsx:112
+    dashboardService.getInsights();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart\BalanceChart.tsx:26
+import { dashboardService } from "@/services/dashboard.service";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart\BalanceChart.tsx:50
+  const data = dashboardService.getCashFlow();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashboardGrid\DashboardGrid.tsx:2
+import { dashboardMock } from "@/mocks/dashboard.mock";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashboardGrid\DashboardGrid.tsx:16
+  const { alerts } = dashboardMock.financialHealth;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashobordGrid\DashboardGrid.tsx:2
+import { dashboardMock } from "@/mocks/dashboard.mock";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashobordGrid\DashboardGrid.tsx:16
+  const { alerts } = dashboardMock.financialHealth;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseChart\ExpenseChart.tsx:13
+import { dashboardService } from "@/services/dashboard.service";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseChart\ExpenseChart.tsx:24
+  const data = dashboardService.getCategories();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseDistribution\ExpenseDistribution.tsx:25
+import { dashboardService } from "@/services/dashboard.service";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseDistribution\ExpenseDistribution.tsx:129
+    dashboardService.getCategories();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCards\FinancialCards.tsx:1
+import { dashboardMock } from "@/mocks/dashboard.mock";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCards\FinancialCards.tsx:10
+    dashboardMock.summary;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.tsx:13
+import { dashboardService } from "@/services/dashboard.service";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.tsx:21
+  const score = dashboardService.getScore();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable\TransactionsTable.tsx:18
+import { dashboardService } from "@/services/dashboard.service";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable\TransactionsTable.tsx:37
+    dashboardService.getTransactions();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\mocks\dashboard.mock.tsx:9
+import type { DashboardMock } from "@/types/dashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\mocks\dashboard.mock.tsx:11
+export const dashboardMock: DashboardMock = {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:1
+import { dashboardMock } from "@/mocks/dashboard.mock";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:3
+export const dashboardService = {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:5
+    return dashboardMock.summary ?? [];
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:9
+    return dashboardMock.cashFlow ?? [];
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:13
+    return dashboardMock.categories ?? [];
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:17
+    return dashboardMock.transactions ?? [];
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:21
+    return dashboardMock.financialHealth;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:25
+    return dashboardMock.financialHealth.insights;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:29
+    return dashboardMock.financialHealth;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:33
+    return dashboardMock.financialHealth.alerts;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:37
+    return Promise.resolve(dashboardMock);
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:33
+export interface DashboardMock {
+

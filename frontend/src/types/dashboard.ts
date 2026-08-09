@@ -1,39 +1,83 @@
-import type { FinancialAlert } from "@/components/dashboard/Alerts";
-import type { BalanceChartData } from "@/components/dashboard/BalanceChart";
-import type { ExpenseCategory } from "@/components/dashboard/ExpenseChart/ExpenseChart.types";
-import type { FinancialCardProps } from "@/components/dashboard/FinancialCard";
+import type {
+  Transaction as ApiTransaction,
+  TransactionCategory,
+} from "@/types/transaction";
 
-export interface Transaction {
+export interface DashboardSummary {
+  balance: number;
+  income: number;
+  expenses: number;
+  transactionCount: number;
+}
+
+export interface DashboardCashFlowItem {
+  month: string;
+  year: number;
+  monthNumber: number;
+  income: number;
+  expenses: number;
+}
+
+export interface DashboardExpenseCategory {
+  name: TransactionCategory;
+  value: number;
+}
+
+export type DashboardTransactionType =
+  | "income"
+  | "expense";
+
+export type DashboardTransactionStatus =
+  "completed";
+
+export interface DashboardTransaction {
   id: number;
   description: string;
   category: string;
   amount: number;
   date: string;
-  type: "income" | "expense";
-  status: "completed" | "pending";
+  type: DashboardTransactionType;
+  status: DashboardTransactionStatus;
 }
 
-export interface FinancialScore {
-  score: number;
-  maxScore: number;
-  classification:
-    | "Excelente"
-    | "Bom"
-    | "Regular"
-    | "Baixo";
-  variation: string;
+export interface DashboardData {
+  summary: DashboardSummary;
+  cashFlow: DashboardCashFlowItem[];
+  categories: DashboardExpenseCategory[];
+  transactions: DashboardTransaction[];
 }
 
-export interface FinancialHealth
-  extends FinancialScore {
-  insights: string[];
-  alerts: FinancialAlert[];
+export interface DashboardPeriod {
+  dataInicial?: string;
+  dataFinal?: string;
 }
 
-export interface DashboardMock {
-  summary: FinancialCardProps[];
-  cashFlow: BalanceChartData[];
-  categories: ExpenseCategory[];
-  transactions: Transaction[];
-  financialHealth: FinancialHealth;
+export interface DashboardMonthlyAccumulator {
+  year: number;
+  monthNumber: number;
+  income: number;
+  expenses: number;
+}
+
+export function mapTransactionToDashboard(
+  transaction: ApiTransaction,
+): DashboardTransaction {
+  const isIncome =
+    transaction.tipo === "Receita";
+
+  return {
+    id: transaction.id,
+    description:
+      transaction.descricao,
+    category:
+      transaction.categoria,
+    amount: isIncome
+      ? transaction.valor
+      : -transaction.valor,
+    date: transaction.data,
+    type: isIncome
+      ? "income"
+      : "expense",
+    status: "completed",
+  };
 }

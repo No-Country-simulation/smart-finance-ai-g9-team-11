@@ -1,13 +1,16 @@
 import {
+  useEffect,
   useId,
   useMemo,
   useState,
 } from "react";
+
 import {
   ArrowRight,
   PieChart as PieChartIcon,
   ReceiptText,
 } from "lucide-react";
+
 import {
   Cell,
   Pie,
@@ -21,8 +24,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/common/Card";
+
 import { cn } from "@/lib/utils";
-import { dashboardService } from "@/services/dashboard.service";
 
 import type {
   ExpenseDistributionItem,
@@ -42,14 +45,15 @@ const chartColors = [
   "#84cc16",
 ] as const;
 
-const currencyFormatter = new Intl.NumberFormat(
-  "pt-BR",
-  {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-  },
-);
+const currencyFormatter =
+  new Intl.NumberFormat(
+    "pt-BR",
+    {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+    },
+  );
 
 function buildDistributionItems(
   categories: readonly {
@@ -58,27 +62,40 @@ function buildDistributionItems(
   }[],
   maxVisibleCategories: number,
 ): ExpenseDistributionItem[] {
-  const safeCategories = [...categories]
-    .filter((category) => category.value > 0)
+  const safeCategories = [
+    ...categories,
+  ]
+    .filter(
+      (category) =>
+        Number.isFinite(
+          category.value,
+        ) &&
+        category.value > 0,
+    )
     .sort(
       (first, second) =>
-        second.value - first.value,
+        second.value -
+        first.value,
     );
 
-  const visibleCategories = safeCategories.slice(
-    0,
-    maxVisibleCategories,
-  );
+  const visibleCategories =
+    safeCategories.slice(
+      0,
+      maxVisibleCategories,
+    );
 
-  const hiddenCategories = safeCategories.slice(
-    maxVisibleCategories,
-  );
+  const hiddenCategories =
+    safeCategories.slice(
+      maxVisibleCategories,
+    );
 
-  const hiddenValue = hiddenCategories.reduce(
-    (total, category) =>
-      total + category.value,
-    0,
-  );
+  const hiddenValue =
+    hiddenCategories.reduce(
+      (total, category) =>
+        total +
+        category.value,
+      0,
+    );
 
   const groupedCategories =
     hiddenValue > 0
@@ -91,23 +108,32 @@ function buildDistributionItems(
         ]
       : visibleCategories;
 
-  const total = groupedCategories.reduce(
-    (sum, category) =>
-      sum + category.value,
-    0,
-  );
+  const total =
+    groupedCategories.reduce(
+      (sum, category) =>
+        sum +
+        category.value,
+      0,
+    );
 
   return groupedCategories.map(
     (category, index) => ({
       ...category,
+
       percentage:
         total > 0
-          ? (category.value / total) * 100
+          ? (
+              category.value /
+              total
+            ) * 100
           : 0,
+
       color:
         chartColors[
-          index % chartColors.length
-        ] ?? chartColors[0],
+          index %
+            chartColors.length
+        ] ??
+        chartColors[0],
     }),
   );
 }
@@ -115,22 +141,18 @@ function buildDistributionItems(
 export function ExpenseDistribution({
   title = "Para onde está indo seu dinheiro?",
   description = "Distribuição dos gastos por categoria.",
-  categories: providedCategories,
+  categories = [],
   maxVisibleCategories =
     DEFAULT_MAX_VISIBLE_CATEGORIES,
   onViewDetails,
 }: Readonly<ExpenseDistributionProps>) {
-  const chartTitleId = useId();
+  const chartTitleId =
+    useId();
 
-  const [activeIndex, setActiveIndex] =
-    useState(0);
-
-  const serviceCategories =
-    dashboardService.getCategories();
-
-  const categories =
-    providedCategories ??
-    serviceCategories;
+  const [
+    activeIndex,
+    setActiveIndex,
+  ] = useState(0);
 
   const safeMaxVisibleCategories =
     Math.max(
@@ -138,30 +160,46 @@ export function ExpenseDistribution({
       maxVisibleCategories,
     );
 
-  const distributionItems = useMemo(
-    () =>
-      buildDistributionItems(
+  const distributionItems =
+    useMemo(
+      () =>
+        buildDistributionItems(
+          categories,
+          safeMaxVisibleCategories,
+        ),
+      [
         categories,
         safeMaxVisibleCategories,
-      ),
-    [
-      categories,
-      safeMaxVisibleCategories,
-    ],
-  );
+      ],
+    );
+
+  useEffect(() => {
+    if (
+      activeIndex >=
+      distributionItems.length
+    ) {
+      setActiveIndex(0);
+    }
+  }, [
+    activeIndex,
+    distributionItems.length,
+  ]);
 
   const total = useMemo(
     () =>
       distributionItems.reduce(
         (sum, item) =>
-          sum + item.value,
+          sum +
+          item.value,
         0,
       ),
     [distributionItems],
   );
 
   const activeItem =
-    distributionItems[activeIndex] ??
+    distributionItems[
+      activeIndex
+    ] ??
     distributionItems[0];
 
   const handleSliceEnter = (
@@ -192,16 +230,20 @@ export function ExpenseDistribution({
             "items-center justify-center",
             "rounded-[13px] border",
             "border-primary/20",
-            "bg-primary/10 text-primary-bright",
+            "bg-primary/10",
+            "text-primary-bright",
           )}
           aria-hidden="true"
         >
-          <PieChartIcon size={18} />
+          <PieChartIcon
+            size={18}
+          />
         </div>
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col pt-4">
-        {distributionItems.length > 0 &&
+        {distributionItems.length >
+          0 &&
         activeItem ? (
           <>
             <div
@@ -210,7 +252,9 @@ export function ExpenseDistribution({
                 "grid-cols-1 items-center gap-5",
                 "lg:grid-cols-[minmax(200px,0.9fr)_minmax(0,1.1fr)]",
               )}
-              aria-labelledby={chartTitleId}
+              aria-labelledby={
+                chartTitleId
+              }
             >
               <div className="min-w-0">
                 <div className="relative mx-auto size-[220px]">
@@ -233,16 +277,23 @@ export function ExpenseDistribution({
                         cornerRadius={5}
                         stroke="var(--card)"
                         strokeWidth={2}
-                        animationDuration={700}
+                        animationDuration={
+                          700
+                        }
                         onMouseEnter={
                           handleSliceEnter
                         }
                       >
                         {distributionItems.map(
-                          (item, index) => (
+                          (
+                            item,
+                            index,
+                          ) => (
                             <Cell
-                              key={item.name}
-                              fill={item.color}
+                              key={`${item.name}-${index}`}
+                              fill={
+                                item.color
+                              }
                               opacity={
                                 index ===
                                 activeIndex
@@ -319,7 +370,9 @@ export function ExpenseDistribution({
                     />
 
                     <span className="text-xs font-semibold text-text">
-                      {activeItem.name}
+                      {
+                        activeItem.name
+                      }
                     </span>
                   </div>
 
@@ -357,13 +410,17 @@ export function ExpenseDistribution({
                 aria-label="Categorias de despesas"
               >
                 {distributionItems.map(
-                  (item, index) => {
+                  (
+                    item,
+                    index,
+                  ) => {
                     const isActive =
-                      index === activeIndex;
+                      index ===
+                      activeIndex;
 
                     return (
                       <button
-                        key={item.name}
+                        key={`${item.name}-${index}`}
                         type="button"
                         onMouseEnter={() =>
                           setActiveIndex(
@@ -422,7 +479,9 @@ export function ExpenseDistribution({
                                 : "text-text-muted",
                             )}
                           >
-                            {item.name}
+                            {
+                              item.name
+                            }
                           </span>
                         </div>
 
@@ -466,7 +525,9 @@ export function ExpenseDistribution({
             {onViewDetails && (
               <button
                 type="button"
-                onClick={onViewDetails}
+                onClick={
+                  onViewDetails
+                }
                 className={cn(
                   "mt-4 inline-flex h-10",
                   "w-full items-center",
@@ -516,7 +577,9 @@ export function ExpenseDistribution({
               )}
               aria-hidden="true"
             >
-              <PieChartIcon size={21} />
+              <PieChartIcon
+                size={21}
+              />
             </div>
 
             <p className="mt-4 text-sm font-semibold text-text">
@@ -524,9 +587,7 @@ export function ExpenseDistribution({
             </p>
 
             <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
-              A distribuição por categoria
-              aparecerá quando houver despesas
-              disponíveis.
+              A distribuição por categoria aparecerá quando houver despesas disponíveis.
             </p>
           </div>
         )}

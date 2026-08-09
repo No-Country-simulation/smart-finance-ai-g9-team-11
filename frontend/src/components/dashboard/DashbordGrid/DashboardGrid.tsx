@@ -1,20 +1,30 @@
 import { cn } from "@/lib/utils";
-import { dashboardMock } from "@/mocks/dashboard.mock";
 
 import { AIInsights } from "../AIInsights";
 import { Alerts } from "../Alerts";
 import { BalanceChart } from "../BalanceChart";
+import { ExpenseDistribution } from "../ExpenseDistribution";
 import { FinancialCards } from "../FinancialCards";
+
 import {
   QuickActions,
   type QuickAction,
 } from "../QuickActions";
+
 import { ScoreCard } from "../ScoreCard";
 import { TransactionsTable } from "../TransactionsTable";
 
-export function DashboardGrid() {
-  const { alerts } = dashboardMock.financialHealth;
+import type {
+  DashboardData,
+} from "@/types/dashboard";
 
+interface DashboardGridProps {
+  data: DashboardData;
+}
+
+export function DashboardGrid({
+  data,
+}: Readonly<DashboardGridProps>) {
   const handleQuickAction = (
     action: QuickAction,
   ): void => {
@@ -44,7 +54,9 @@ export function DashboardGrid() {
         break;
 
       default: {
-        const exhaustiveCheck: never = action.id;
+        const exhaustiveCheck: never =
+          action.id;
+
         return exhaustiveCheck;
       }
     }
@@ -75,15 +87,22 @@ export function DashboardGrid() {
         )}
         aria-label="Resumo financeiro"
       >
-        <FinancialCards />
+        <FinancialCards
+          summary={data.summary}
+        />
 
         <div className="min-w-0 sm:col-span-2 xl:col-span-1">
           <ScoreCard />
         </div>
       </div>
 
-      <div className="min-w-0">
-        <BalanceChart />
+      <div
+        className="min-w-0"
+        aria-label="Fluxo financeiro"
+      >
+        <BalanceChart
+          data={data.cashFlow}
+        />
       </div>
 
       <div
@@ -94,16 +113,31 @@ export function DashboardGrid() {
           "2xl:gap-6",
         )}
       >
-        <div className="min-w-0">
-          <AIInsights />
-        </div>
-
-        <div className="min-w-0">
-          <Alerts
-            alerts={alerts}
-            maxVisibleAlerts={4}
+        <div
+          className="min-w-0"
+          aria-label="Distribuição das despesas"
+        >
+          <ExpenseDistribution
+            categories={data.categories}
           />
         </div>
+
+        <div
+          className="min-w-0"
+          aria-label="Insights financeiros"
+        >
+          <AIInsights />
+        </div>
+      </div>
+
+      <div
+        className="min-w-0"
+        aria-label="Alertas financeiros"
+      >
+        <Alerts
+          alerts={[]}
+          maxVisibleAlerts={4}
+        />
       </div>
 
       <div
@@ -114,14 +148,21 @@ export function DashboardGrid() {
           "2xl:grid-cols-[minmax(0,3.2fr)_minmax(360px,1fr)]",
           "2xl:gap-6",
         )}
+        aria-label="Transações recentes e ações rápidas"
       >
         <div className="min-w-0">
-          <TransactionsTable />
+          <TransactionsTable
+            transactions={
+              data.transactions
+            }
+          />
         </div>
 
         <div className="min-w-0">
           <QuickActions
-            onAction={handleQuickAction}
+            onAction={
+              handleQuickAction
+            }
           />
         </div>
       </div>

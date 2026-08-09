@@ -23,7 +23,9 @@ function validateFilters(
   const hasFinalDate =
     Boolean(filters.dataFinal);
 
-  if (hasInitialDate !== hasFinalDate) {
+  if (
+    hasInitialDate !== hasFinalDate
+  ) {
     throw new Error(
       "Informe a data inicial e a data final.",
     );
@@ -36,12 +38,13 @@ export const transactionService = {
   ): Promise<Transaction[]> {
     validateFilters(filters);
 
-    const response = await api.get<Transaction[]>(
-      TRANSACTIONS_RESOURCE,
-      {
-        params: filters,
-      },
-    );
+    const response =
+      await api.get<Transaction[]>(
+        TRANSACTIONS_RESOURCE,
+        {
+          params: filters,
+        },
+      );
 
     return response.data;
   },
@@ -49,9 +52,10 @@ export const transactionService = {
   async findById(
     transactionId: number,
   ): Promise<Transaction> {
-    const response = await api.get<Transaction>(
-      `${TRANSACTIONS_RESOURCE}/${transactionId}`,
-    );
+    const response =
+      await api.get<Transaction>(
+        `${TRANSACTIONS_RESOURCE}/${transactionId}`,
+      );
 
     return response.data;
   },
@@ -59,21 +63,24 @@ export const transactionService = {
   async create(
     request: CreateTransactionRequest,
   ): Promise<Transaction> {
-    const response = await api.post<Transaction>(
-      TRANSACTIONS_RESOURCE,
-      request,
-    );
+    const response =
+      await api.post<Transaction>(
+        TRANSACTIONS_RESOURCE,
+        request,
+      );
 
     return response.data;
   },
 
   async createBatch(
-    requests: CreateTransactionRequest[],
+    requests:
+      CreateTransactionRequest[],
   ): Promise<Transaction[]> {
-    const response = await api.post<Transaction[]>(
-      `${TRANSACTIONS_RESOURCE}/batch`,
-      requests,
-    );
+    const response =
+      await api.post<Transaction[]>(
+        `${TRANSACTIONS_RESOURCE}/batch`,
+        requests,
+      );
 
     return response.data;
   },
@@ -82,10 +89,11 @@ export const transactionService = {
     transactionId: number,
     request: UpdateTransactionRequest,
   ): Promise<Transaction> {
-    const response = await api.put<Transaction>(
-      `${TRANSACTIONS_RESOURCE}/${transactionId}`,
-      request,
-    );
+    const response =
+      await api.put<Transaction>(
+        `${TRANSACTIONS_RESOURCE}/${transactionId}`,
+        request,
+      );
 
     return response.data;
   },

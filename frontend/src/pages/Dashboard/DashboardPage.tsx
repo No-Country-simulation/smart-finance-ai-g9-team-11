@@ -13,6 +13,10 @@ import {
 } from "@/hooks/useDashboard";
 
 import {
+  useLatestFinancialAnalysis,
+} from "@/hooks/useLatestFinancialAnalysis";
+
+import {
   cn,
 } from "@/lib/utils";
 
@@ -24,12 +28,30 @@ export function DashboardPage() {
     reload,
   } = useDashboard();
 
+  const {
+    analysis,
+    isLoading:
+      isAnalysisLoading,
+    reload:
+      reloadAnalysis,
+  } =
+    useLatestFinancialAnalysis();
+
+  const handleReload =
+    async (): Promise<void> => {
+      await Promise.all([
+        reload(),
+        reloadAnalysis(),
+      ]);
+    };
+
   if (isLoading) {
     return (
       <main
         className={cn(
           "flex min-h-[420px]",
-          "items-center justify-center",
+          "items-center",
+          "justify-center",
         )}
       >
         <div className="text-center">
@@ -59,7 +81,8 @@ export function DashboardPage() {
       <main
         className={cn(
           "flex min-h-[420px]",
-          "items-center justify-center",
+          "items-center",
+          "justify-center",
         )}
       >
         <div
@@ -71,21 +94,10 @@ export function DashboardPage() {
             "text-center",
           )}
         >
-          <div
-            className={cn(
-              "mx-auto flex size-12",
-              "items-center justify-center",
-              "rounded-[15px]",
-              "border border-danger/20",
-              "bg-danger/10",
-              "text-danger",
-            )}
-          >
-            <AlertTriangle
-              size={21}
-              aria-hidden="true"
-            />
-          </div>
+          <AlertTriangle
+            size={24}
+            className="mx-auto text-danger"
+          />
 
           <h2 className="mt-4 text-sm font-semibold text-text">
             Não foi possível carregar o dashboard
@@ -98,22 +110,20 @@ export function DashboardPage() {
           <button
             type="button"
             onClick={() => {
-              void reload();
+              void handleReload();
             }}
             className={cn(
-              "mt-5 inline-flex h-10",
-              "items-center justify-center",
-              "gap-2 rounded-[12px]",
+              "mt-5 inline-flex",
+              "h-10 items-center",
+              "justify-center gap-2",
+              "rounded-[12px]",
               "bg-primary px-4",
               "text-xs font-semibold",
               "text-white",
-              "transition-opacity",
-              "hover:opacity-90",
             )}
           >
             <RefreshCw
               size={14}
-              aria-hidden="true"
             />
 
             Tentar novamente
@@ -127,7 +137,13 @@ export function DashboardPage() {
     <main className="space-y-2">
       <DashboardGrid
         data={data}
-        onReload={reload}
+        analysis={analysis}
+        isAnalysisLoading={
+          isAnalysisLoading
+        }
+        onReload={
+          handleReload
+        }
       />
     </main>
   );

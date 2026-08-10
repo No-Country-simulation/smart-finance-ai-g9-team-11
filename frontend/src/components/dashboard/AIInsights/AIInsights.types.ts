@@ -1,4 +1,6 @@
-import type { LucideIcon } from "lucide-react";
+import type {
+  LucideIcon,
+} from "lucide-react";
 
 export type InsightTone =
   | "success"
@@ -9,6 +11,7 @@ export type InsightTone =
 export interface AIInsightsProps {
   title?: string;
   subtitle?: string;
+  insights?: readonly string[];
   maxVisibleInsights?: number;
 }
 

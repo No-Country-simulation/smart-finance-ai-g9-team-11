@@ -15,7 +15,9 @@ import {
   type TransactionFilters,
 } from "@/types/transaction";
 
-import { transactionService } from "@/services/transaction.service";
+import {
+  transactionService,
+} from "@/services/transaction.service";
 
 const MONTH_FORMATTER =
   new Intl.DateTimeFormat(
@@ -32,25 +34,45 @@ function createSummary(
   transactions: readonly Transaction[],
 ): DashboardSummary {
   const income = transactions
-    .filter(isIncomeTransaction)
+    .filter(
+      isIncomeTransaction,
+    )
     .reduce(
-      (total, transaction) =>
-        total + Number(transaction.valor),
+      (
+        total,
+        transaction,
+      ) =>
+        total +
+        Number(
+          transaction.valor,
+        ),
       0,
     );
 
   const expenses = transactions
-    .filter(isExpenseTransaction)
+    .filter(
+      isExpenseTransaction,
+    )
     .reduce(
-      (total, transaction) =>
-        total + Number(transaction.valor),
+      (
+        total,
+        transaction,
+      ) =>
+        total +
+        Number(
+          transaction.valor,
+        ),
       0,
     );
 
   return {
-    balance: income - expenses,
+    balance:
+      income - expenses,
+
     income,
+
     expenses,
+
     transactionCount:
       transactions.length,
   };
@@ -60,33 +82,48 @@ function createExpenseCategories(
   transactions: readonly Transaction[],
 ): DashboardExpenseCategory[] {
   const categoryTotals =
-    new Map<TransactionCategory, number>();
+    new Map<
+      TransactionCategory,
+      number
+    >();
 
   transactions
-    .filter(isExpenseTransaction)
-    .forEach((transaction) => {
-      const currentValue =
-        categoryTotals.get(
-          transaction.categoria,
-        ) ?? 0;
+    .filter(
+      isExpenseTransaction,
+    )
+    .forEach(
+      (transaction) => {
+        const currentValue =
+          categoryTotals.get(
+            transaction.categoria,
+          ) ?? 0;
 
-      categoryTotals.set(
-        transaction.categoria,
-        currentValue +
-          Number(transaction.valor),
-      );
-    });
+        categoryTotals.set(
+          transaction.categoria,
+          currentValue +
+            Number(
+              transaction.valor,
+            ),
+        );
+      },
+    );
 
   return Array.from(
     categoryTotals.entries(),
   )
-    .map(([name, value]) => ({
-      name,
-      value,
-    }))
+    .map(
+      ([name, value]) => ({
+        name,
+        value,
+      }),
+    )
     .sort(
-      (first, second) =>
-        second.value - first.value,
+      (
+        first,
+        second,
+      ) =>
+        second.value -
+        first.value,
     );
 }
 
@@ -135,7 +172,9 @@ function createCashFlow(
         );
 
       const current =
-        monthlyData.get(key) ?? {
+        monthlyData.get(
+          key,
+        ) ?? {
           year,
           monthNumber,
           income: 0,
@@ -143,16 +182,20 @@ function createCashFlow(
         };
 
       const value =
-        Number(transaction.valor);
+        Number(
+          transaction.valor,
+        );
 
       if (
         transaction.tipo ===
         "Receita"
       ) {
-        current.income += value;
+        current.income +=
+          value;
       }
       else {
-        current.expenses += value;
+        current.expenses +=
+          value;
       }
 
       monthlyData.set(
@@ -165,21 +208,27 @@ function createCashFlow(
   return Array.from(
     monthlyData.values(),
   )
-    .sort((first, second) => {
-      if (
-        first.year !== second.year
-      ) {
-        return (
-          first.year -
+    .sort(
+      (
+        first,
+        second,
+      ) => {
+        if (
+          first.year !==
           second.year
-        );
-      }
+        ) {
+          return (
+            first.year -
+            second.year
+          );
+        }
 
-      return (
-        first.monthNumber -
-        second.monthNumber
-      );
-    })
+        return (
+          first.monthNumber -
+          second.monthNumber
+        );
+      },
+    )
     .slice(
       -MAX_CASH_FLOW_MONTHS,
     )
@@ -193,18 +242,28 @@ function createCashFlow(
 
       const formattedMonth =
         MONTH_FORMATTER
-          .format(referenceDate)
-          .replace(".", "");
+          .format(
+            referenceDate,
+          )
+          .replace(
+            ".",
+            "",
+          );
+
+      const month =
+        formattedMonth
+          .charAt(0)
+          .toLocaleUpperCase(
+            "pt-BR",
+          ) +
+        formattedMonth.slice(
+          1,
+        );
 
       return {
-        month:
-          formattedMonth
-            .charAt(0)
-            .toLocaleUpperCase(
-              "pt-BR",
-            ) +
-          formattedMonth.slice(1),
-        year: item.year,
+        month,
+        year:
+          item.year,
         monthNumber:
           item.monthNumber,
         income:
@@ -218,21 +277,32 @@ function createCashFlow(
 function createRecentTransactions(
   transactions: readonly Transaction[],
 ) {
-  return [...transactions]
-    .sort((first, second) => {
-      const dateComparison =
-        second.data.localeCompare(
-          first.data,
+  return [
+    ...transactions,
+  ]
+    .sort(
+      (
+        first,
+        second,
+      ) => {
+        const dateComparison =
+          second.data.localeCompare(
+            first.data,
+          );
+
+        if (
+          dateComparison !==
+          0
+        ) {
+          return dateComparison;
+        }
+
+        return (
+          second.id -
+          first.id
         );
-
-      if (
-        dateComparison !== 0
-      ) {
-        return dateComparison;
-      }
-
-      return second.id - first.id;
-    })
+      },
+    )
     .slice(
       0,
       MAX_RECENT_TRANSACTIONS,
@@ -247,10 +317,14 @@ function createDashboardData(
 ): DashboardData {
   return {
     summary:
-      createSummary(transactions),
+      createSummary(
+        transactions,
+      ),
 
     cashFlow:
-      createCashFlow(transactions),
+      createCashFlow(
+        transactions,
+      ),
 
     categories:
       createExpenseCategories(
@@ -276,44 +350,5 @@ export const dashboardService = {
     return createDashboardData(
       transactions,
     );
-  },
-
-  /*
-   * Compatibilidade temporária.
-   *
-   * Estes métodos serão removidos conforme
-   * migrarmos os componentes restantes para
-   * receber dados por props.
-   */
-
-  getCashFlow() {
-    return [];
-  },
-
-  getCategories() {
-    return [];
-  },
-
-  getTransactions() {
-    return [];
-  },
-
-  getInsights(): string[] {
-    return [];
-  },
-
-  getScore() {
-    return {
-      score: 0,
-      maxScore: 100,
-      classification:
-        "Regular" as const,
-      variation:
-        "Análise financeira pendente",
-    };
-  },
-
-  getAlerts() {
-    return [];
   },
 };

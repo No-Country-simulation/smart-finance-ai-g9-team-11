@@ -1,4 +1,5 @@
 import {
+  useMemo,
   useState,
 } from "react";
 
@@ -25,16 +26,127 @@ import { ScoreCard } from "../ScoreCard";
 import { TransactionsTable } from "../TransactionsTable";
 
 import type {
+  FinancialAlert,
+} from "../Alerts";
+
+import type {
   DashboardData,
 } from "@/types/dashboard";
 
+import type {
+  FinancialAnalysisHistory,
+} from "@/types/financial-analysis";
+
 interface DashboardGridProps {
   data: DashboardData;
+  analysis:
+    FinancialAnalysisHistory | null;
+  isAnalysisLoading: boolean;
   onReload: () => Promise<void>;
+}
+
+function createAnalysisInsights(
+  analysis:
+    FinancialAnalysisHistory | null,
+): string[] {
+  if (!analysis) {
+    return [];
+  }
+
+  return [
+    `Seu perfil financeiro atual é ${analysis.perfilFinanceiro}.`,
+    `Seu nível de endividamento está em ${Math.round(
+      analysis.nivelEndividamento,
+    )}%.`,
+    `Sua frequência de poupança foi classificada como ${analysis.frequenciaPoupanca}.`,
+    "Abra a análise financeira para consultar recomendações detalhadas.",
+  ];
+}
+
+function createFinancialAlerts(
+  analysis:
+    FinancialAnalysisHistory | null,
+): FinancialAlert[] {
+  if (!analysis) {
+    return [];
+  }
+
+  const alerts:
+    FinancialAlert[] = [];
+
+  if (
+    analysis.perfilFinanceiro ===
+    "Em risco"
+  ) {
+    alerts.push({
+      id: 1,
+      title:
+        "Perfil financeiro em risco",
+      type: "danger",
+      description:
+        "Sua última análise identificou indicadores que exigem atenção.",
+      actionLabel:
+        "Ver análise",
+    });
+  }
+
+  if (
+    analysis.perfilFinanceiro ===
+    "Em observação"
+  ) {
+    alerts.push({
+      id: 2,
+      title:
+        "Perfil em observação",
+      type: "warning",
+      description:
+        "Alguns indicadores financeiros precisam de acompanhamento.",
+      actionLabel:
+        "Ver detalhes",
+    });
+  }
+
+  if (
+    analysis.nivelEndividamento >=
+    50
+  ) {
+    alerts.push({
+      id: 3,
+      title:
+        "Endividamento elevado",
+      type: "danger",
+      description:
+        `O nível de endividamento atual é de ${Math.round(
+          analysis.nivelEndividamento,
+        )}%.`,
+      actionLabel:
+        "Analisar",
+    });
+  }
+
+  if (
+    analysis.frequenciaPoupanca ===
+    "Baixa"
+  ) {
+    alerts.push({
+      id: 4,
+      title:
+        "Baixa frequência de poupança",
+      type: "warning",
+      description:
+        "Sua análise indica baixa recorrência de poupança.",
+      actionLabel:
+        "Ver recomendações",
+    });
+  }
+
+  return alerts;
 }
 
 export function DashboardGrid({
   data,
+  analysis,
+  isAnalysisLoading,
   onReload,
 }: Readonly<DashboardGridProps>) {
   const navigate =
@@ -44,6 +156,24 @@ export function DashboardGrid({
     isCreateTransactionOpen,
     setIsCreateTransactionOpen,
   ] = useState(false);
+
+  const insights =
+    useMemo(
+      () =>
+        createAnalysisInsights(
+          analysis,
+        ),
+      [analysis],
+    );
+
+  const alerts =
+    useMemo(
+      () =>
+        createFinancialAlerts(
+          analysis,
+        ),
+      [analysis],
+    );
 
   const handleQuickAction = (
     action: QuickAction,
@@ -56,11 +186,6 @@ export function DashboardGrid({
         break;
 
       case "run-analysis":
-        navigate(
-          "/app/analysis",
-        );
-        break;
-
       case "view-recommendations":
         navigate(
           "/app/analysis",
@@ -87,10 +212,10 @@ export function DashboardGrid({
       await onReload();
     };
 
-  const handleViewAllTransactions =
+  const handleViewAnalysis =
     (): void => {
       navigate(
-        "/app/transactions",
+        "/app/analysis",
       );
     };
 
@@ -102,109 +227,97 @@ export function DashboardGrid({
           "sm:space-y-5",
           "2xl:space-y-6",
         )}
-        aria-labelledby="dashboard-overview-title"
       >
-        <h2
-          id="dashboard-overview-title"
-          className="sr-only"
-        >
-          Visão geral financeira
-        </h2>
-
         <div
           className={cn(
-            "grid min-w-0 grid-cols-1 items-stretch gap-4",
-            "sm:grid-cols-2 sm:gap-5",
+            "grid min-w-0",
+            "grid-cols-1",
+            "items-stretch gap-4",
+            "sm:grid-cols-2",
             "xl:grid-cols-[repeat(3,minmax(0,1fr))_minmax(280px,1.35fr)]",
-            "2xl:gap-6",
           )}
-          aria-label="Resumo financeiro"
         >
           <FinancialCards
             summary={data.summary}
           />
 
           <div className="min-w-0 sm:col-span-2 xl:col-span-1">
-            <ScoreCard />
+            <ScoreCard
+              confidence={
+                analysis?.probabilidade ??
+                null
+              }
+              profile={
+                analysis?.perfilFinanceiro ??
+                null
+              }
+              debtLevel={
+                analysis?.nivelEndividamento ??
+                null
+              }
+              analysisDate={
+                analysis?.dataAnalise ??
+                null
+              }
+              isLoading={
+                isAnalysisLoading
+              }
+            />
           </div>
         </div>
 
+        <BalanceChart
+          data={data.cashFlow}
+        />
+
         <div
-          className="min-w-0"
-          aria-label="Fluxo financeiro"
+          className={cn(
+            "grid grid-cols-1 gap-4",
+            "xl:grid-cols-2",
+          )}
         >
-          <BalanceChart
-            data={
-              data.cashFlow
+          <ExpenseDistribution
+            categories={
+              data.categories
             }
           />
-        </div>
 
-        <div
-          className={cn(
-            "grid min-w-0 grid-cols-1 items-stretch gap-4",
-            "sm:gap-5",
-            "xl:grid-cols-2",
-            "2xl:gap-6",
-          )}
-        >
-          <div
-            className="min-w-0"
-            aria-label="Distribuição das despesas"
-          >
-            <ExpenseDistribution
-              categories={
-                data.categories
-              }
-            />
-          </div>
-
-          <div
-            className="min-w-0"
-            aria-label="Insights financeiros"
-          >
-            <AIInsights />
-          </div>
-        </div>
-
-        <div
-          className="min-w-0"
-          aria-label="Alertas financeiros"
-        >
-          <Alerts
-            alerts={[]}
-            maxVisibleAlerts={4}
+          <AIInsights
+            insights={insights}
           />
         </div>
 
+        <Alerts
+          alerts={alerts}
+          maxVisibleAlerts={4}
+          onAlertAction={
+            handleViewAnalysis
+          }
+        />
+
         <div
           className={cn(
-            "grid min-w-0 grid-cols-1 items-start gap-4",
-            "sm:gap-5",
+            "grid grid-cols-1",
+            "items-start gap-4",
             "xl:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]",
-            "2xl:grid-cols-[minmax(0,3.2fr)_minmax(360px,1fr)]",
-            "2xl:gap-6",
           )}
-          aria-label="Transações recentes e ações rápidas"
         >
-          <div className="min-w-0">
-            <TransactionsTable
-              transactions={
-                data.transactions
-              }
-              onViewAll={
-                handleViewAllTransactions
-              }
-            />
-          </div>
+          <TransactionsTable
+            transactions={
+              data.transactions
+            }
+            onViewAll={() => {
+              navigate(
+                "/app/transactions",
+              );
+            }}
+          />
 
-          <div className="min-w-0">
-            <QuickActions
-              onAction={
-                handleQuickAction
-              }
-            />
-          </div>
+          <QuickActions
+            onAction={
+              handleQuickAction
+            }
+          />
         </div>
       </section>
 

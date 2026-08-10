@@ -383,8 +383,8 @@ public class TransactionController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "409",
-                    description = "Transaction could not be updated because of a business conflict",
+                    responseCode = "422",
+                    description = "Transactions older than 30 days cannot be updated.",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiErrorResponse.class)
@@ -442,6 +442,14 @@ public class TransactionController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Transaction not found for the authenticated user",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Transactions older than 30 days cannot be deleted.",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiErrorResponse.class)

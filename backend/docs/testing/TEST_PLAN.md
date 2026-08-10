@@ -25,6 +25,7 @@ The goal is to verify:
 - [x] Reject missing name (400)
 - [x] Reject missing email (400)
 - [x] Reject missing password (400)
+- [x] Reject blank name (400)
 
 ---
 
@@ -40,6 +41,9 @@ The goal is to verify:
 
 - [x] Verify JWT generation (200)
 - [x] Verify protected endpoint using JWT (200)
+- [x] Reject requests without JWT (401)
+- [x] Reject invalid JWT (401)
+- [x] Reject expired JWT (401)
 
 ---
 
@@ -77,29 +81,41 @@ The goal is to verify:
 
 ## Create
 
-- [ ] Create one transaction.
-- [ ] Create multiple transactions.
-- [ ] Verify ML classification.
-- [ ] Verify fallback classification.
+- [x] Create one transaction (201)
+- [x] Create multiple transactions (201)
+- [x] Verify ML classification (201)
+- [x] Verify fallback classification (201)
 
 ---
 
 ## Read
 
-- [ ] List transactions.
-- [ ] Get transaction by id.
+- [x] List transactions (200)
+- [x] Get transaction by id (200)
+- [x] Reject nonexistent transaction (404)
+- [x] Reject access to another user's transaction (404)
 
 ---
 
 ## Update
 
-- [ ] Update transaction.
+- [x] Update transaction (200)
+- [x] Verify ML reclassification after update (200)
+- [x] Reject update for transactions older than 30 days (422)
+- [x] Reject blank description (400)
+- [x] Reject negative value (400)
+- [x] Reject update from another user (404)
+- [ ] Reject invalid transaction type (BUG: returns 500 instead of 400)
 
 ---
 
 ## Delete
 
-- [ ] Delete transaction.
+- [x] Delete transaction (204)
+- [x] Reject nonexistent transaction (404)
+- [x] Reject delete from another user (404)
+- [x] Reject delete for transactions older than 30 days (422)
+- [x] Reject delete without authentication (401)
 
 ---
 
@@ -124,7 +140,7 @@ The goal is to verify:
 
 ## Fallback
 
-- [ ] Verify analysis fallback when ML is unavailable.
+- [x] Verify analysis fallback when ML is unavailable.
 
 ---
 
@@ -134,16 +150,16 @@ The goal is to verify:
 
 - [x] Access protected endpoint without JWT.
 - [x] Access protected endpoint with invalid JWT.
-- [ ] Access protected endpoint with expired JWT (if applicable).
+- [x] Access protected endpoint with expired JWT (401)
 
 ---
 
 ## Authorization
 
-- [ ] User A cannot access User B transactions.
+- [x] User A cannot access User B transactions (404)
 - [ ] User A cannot access User B analyses.
-- [ ] User A cannot delete User B resources.
-- [ ] User A cannot update User B resources.
+- [x] User A cannot delete User B resources (404)
+- [x] User A cannot update User B resources (404)
 
 ---
 

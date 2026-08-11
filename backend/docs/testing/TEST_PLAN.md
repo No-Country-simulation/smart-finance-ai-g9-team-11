@@ -123,19 +123,27 @@ The goal is to verify:
 
 ## Generate
 
-- [ ] Generate financial analysis.
-- [ ] Reject future period.
-- [ ] Reject period without transactions.
-- [ ] Reject period with less than three transactions.
+- [x] Generate financial analysis (200)
+- [x] Reject future period (422)
+- [x] Reject period without transactions (400)
+- [x] Reject period with less than three transactions (422)
 
 ---
 
 ## History
 
-- [ ] List analyses.
-- [ ] Get analysis by id.
-- [ ] Delete analysis.
+- [x] List analyses (200)
+- [x] Get analysis by id (200)
+- [x] Reject nonexistent analysis (404)
+- [x] Reject analysis from another user (404)
 
+---
+
+## Delete
+
+- [x] Delete analysis (204)
+- [x] Reject nonexistent analysis (404)
+- [x] Reject delete from another user (404)
 ---
 
 ## Fallback
@@ -157,7 +165,7 @@ The goal is to verify:
 ## Authorization
 
 - [x] User A cannot access User B transactions (404)
-- [ ] User A cannot access User B analyses.
+- [x] User A cannot access User B analyses (404)
 - [x] User A cannot delete User B resources (404)
 - [x] User A cannot update User B resources (404)
 
@@ -165,11 +173,45 @@ The goal is to verify:
 
 # 6. Error Handling
 
-- [ ] Invalid request returns correct HTTP status.
-- [ ] Validation errors follow ApiErrorResponse.
-- [ ] Resource not found returns 404.
-- [ ] Business errors return expected status.
-- [ ] Unexpected errors return standardized response.
+## Validation
+
+- [x] Reject invalid request body (400)
+- [x] Reject missing required fields (400)
+- [x] Reject invalid field values (400)
+- [x] Validation errors follow ApiErrorResponse format.
+
+---
+
+## Authentication
+
+- [x] Missing JWT returns 401.
+- [x] Invalid JWT returns 401.
+- [x] Expired JWT returns 401.
+
+---
+
+## Resource Not Found
+
+- [x] Transaction not found (404)
+- [x] Financial analysis not found (404)
+- [x] User not found (404)
+
+---
+
+## Business Rules
+
+- [x] Reject duplicate email (409)
+- [x] Reject update of transactions older than 30 days (422)
+- [x] Reject deletion of transactions older than 30 days (422)
+- [x] Reject financial analysis for future periods (422)
+- [x] Reject financial analysis with fewer than three transactions (422)
+
+---
+
+## Unexpected Errors
+
+- [ ] Unexpected exceptions return standardized ApiErrorResponse (500)
+- [x] Internal errors do not expose stack traces or sensitive information.
 
 ---
 
@@ -177,9 +219,9 @@ The goal is to verify:
 
 ## Backend + ML
 
-- [ ] Transaction classification.
-- [ ] Financial analysis.
-- [ ] Fallback execution.
+- [x] Transaction classification.
+- [x] Financial analysis.
+- [x] Fallback execution.
 
 ---
 
@@ -192,7 +234,41 @@ The goal is to verify:
 
 ---
 
-# 8. Automated Tests
+# 8. Machine Learning Validation
+
+The following tests validate the quality and consistency of the Machine Learning models used for transaction classification and financial analysis. Unlike API integration tests, these scenarios focus on verifying whether the predictions and recommendations are coherent with the provided financial data.
+
+## Transaction Classification
+
+- [x] McDonald's → Alimentação
+- [x] Drogasil → Saúde
+- [x] Uber → Trajeto
+- [x] Mercado Livre → Compras
+- [x] Steam → Entretenimento
+- [x] Unknown descriptions → Outros
+- [ ] Salary income → Salário (currently classified as Outros)
+- [ ] Investment transactions → Investimento (currently classified as Alimentação)
+
+---
+
+## Financial Analysis
+
+- [ ] Verify healthy financial profile.
+- [ ] Verify highly indebted financial profile.
+- [ ] Verify recommendations change according to transaction history.
+- [ ] Verify spending summary consistency.
+- [ ] Verify financial profile consistency.
+- [ ] Verify probability consistency.
+
+### Observations and Possible Improvements
+
+- [ ] Income transactions with description "Salário" are currently classified as "Outros", affecting the financial analysis.
+- [ ] Verify whether "Investimento" transactions are being classified correctly, since they were not reflected in the spending summary.
+- [ ] Transactions with description "Investimento" are currently classified as **Alimentação** instead of **Investimento**.
+
+---
+
+# 9. Automated Tests
 
 - [ ] TransactionClassificationService
 - [ ] FinancialProfileService
@@ -201,7 +277,7 @@ The goal is to verify:
 
 ---
 
-# 9. Improvements
+# 10. Improvements
 
 ## Authentication
 
@@ -209,6 +285,10 @@ The goal is to verify:
 - [x] Standardized authentication errors for protected endpoints.
 - [x] Missing JWT now returns `401 Unauthorized` using `ApiErrorResponse`.
 - [x] Invalid JWT now returns `401 Unauthorized` using `ApiErrorResponse`.
+
+## Observations and Possible Improvements
+
+- [ ] Verify the expected behavior when the analysis period includes future dates. Currently, the API returns **200 OK** if `data_inicial` is valid, even when `data_final` is in the future. Confirm whether this is the intended business rule.
 
 # Test Result
 

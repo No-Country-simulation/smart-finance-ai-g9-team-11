@@ -2,7 +2,6 @@ package br.com.financeai.integration.dto.request;
 
 import br.com.financeai.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,7 +11,6 @@ import java.time.LocalDate;
  * ainda sem categoria, que é o que a IA deve determinar.
  */
 public record MlTransactionRequest(
-
 
         String descricao,
 

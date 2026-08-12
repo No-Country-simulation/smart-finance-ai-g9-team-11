@@ -11,8 +11,27 @@ Database schema versioning is managed using **Flyway**, ensuring that every stru
 # Technologies
 
 | Technology      | Description                           |
+|-----------------|---------------------------------------|O banco de dados oficial do projeto foi alterado para **MySQL**.
+
+Abaixo está a documentação atualizada refletindo essa mudança tecnológica, mantendo a estrutura e o nível de detalhes do documento anterior:
+
+---
+
+# Database Documentation
+
+## Overview
+
+The Finance AI platform uses **MySQL** as its primary relational database.
+
+Database schema versioning is managed using **Flyway**, ensuring that every structural change is tracked through versioned SQL migrations.
+
+---
+
+# Technologies
+
+| Technology      | Description                           |
 |-----------------|---------------------------------------|
-| Oracle Database | Relational Database Management System |
+| MySQL           | Relational Database Management System |
 | Spring Data JPA | ORM framework                         |
 | Hibernate       | JPA implementation                    |
 | Flyway          | Database schema versioning            |
@@ -22,7 +41,7 @@ Database schema versioning is managed using **Flyway**, ensuring that every stru
 # Database Architecture
 
 ```
-Spring Boot
+ Spring Boot
 
       │
 
@@ -34,13 +53,14 @@ Spring Data JPA
 
       ▼
 
-Hibernate
+  Hibernate
 
       │
 
       ▼
 
-Oracle Database
+    MySQL
+
 ```
 
 ---
@@ -48,88 +68,109 @@ Oracle Database
 # Entity Relationship Diagram
 
 ```
-+---------------------------+
-|   Financial Analysis      |
-+---------------------------+
-| id                        |
-| renda_mensal              |
-| nivel_endividamento       |
-| frequencia_poupanca       |
-| perfil_financeiro         |
-| probabilidade             |
-| data_analise              |
-+-------------+-------------+
-              |
-              | 1
-              |
-              | N
-              ▼
-+---------------------------+
-|       Transaction         |
-+---------------------------+
-| id                        |
-| descricao                 |
-| valor                     |
-| categoria                 |
-| analysis_id (FK)          |
-+---------------------------+
+                  +---------------------------+
+                  |          AppUser          |
+                  +---------------------------+
+                  | id                        |
+                  | nome                      |
+                  | email                     |
+                  | senha                     |
+                  | ativo                     |
+                  +-------------+-------------+
+                                |
+                                | 1
+                                |
+                                | N
+                                ▼
++---------------------------+       +---------------------------+
+|    Financial Analysis     |       |        Transaction        |
++---------------------------+       +---------------------------+
+| id                        |       | id                        |
+| usuario_id (FK)           |       | descricao                 |
+| perfil_financeiro         |       | valor                     |
+| nivel_endividamento       |       | tipo                      |
+| frequencia_poupanca       |       | categoria                 |
+| probabilidade             |       | data                      |
+| data_analise              |       | origem                    |
+| origem                    |       | usuario_id (FK)           |
++---------------------------+       +---------------------------+
+
 ```
 
 ---
 
 # Tables
 
+## app_user
+
+Stores user accounts and credentials, supporting account status management via soft delete.
+
+| Column | Type         | Description                       |
+|--------|--------------|-----------------------------------|
+| id     | BIGINT       | Primary Key (Auto Increment)      |
+| nome   | VARCHAR(255) | User full name                    |
+| email  | VARCHAR(255) | User email (unique)               |
+| senha  | VARCHAR(255) | Encrypted password hash           |
+| ativo  | BOOLEAN      | Account status flag (Soft Delete) |
+
+---
+
 ## financial_analysis
 
-Stores the result of each financial analysis performed by the user.
+Stores the result of each financial analysis performed or triggered by the user, distinguishing between AI and local fallback origins.
 
-| Column              | Type         | Description                           |
-|---------------------|--------------|---------------------------------------|
-| id                  | NUMBER       | Primary Key                           |
-| renda_mensal        | NUMBER(10,2) | User monthly income                   |
-| nivel_endividamento | NUMBER       | Debt level percentage                 |
-| frequencia_poupanca | VARCHAR2     | Saving frequency                      |
-| perfil_financeiro   | VARCHAR2     | Financial profile predicted by the AI |
-| probabilidade       | NUMBER(5,2)  | Prediction confidence                 |
-| data_analise        | TIMESTAMP    | Analysis date                         |
+| Column              | Type         | Description                               |
+|---------------------|--------------|-------------------------------------------|
+| id                  | BIGINT       | Primary Key (Auto Increment)              |
+| usuario_id          | BIGINT       | Foreign Key to `usuario`                  |
+| perfil_financeiro   | VARCHAR(50)  | Financial profile predicted or calculated |
+| nivel_endividamento | DECIMAL(5,2) | Debt level percentage                     |
+| frequencia_poupanca | VARCHAR(50)  | Saving frequency                          |
+| probabilidade       | DECIMAL(5,2) | Prediction confidence                     |
+| data_analise        | DATE         | Analysis date                             |
+| origem              | VARCHAR(50)  | Source origin (`ML` or `FALLBACK`)        |
 
 ---
 
 ## transactions
 
-Stores all transactions associated with a financial analysis.
+Stores all financial transactions registered by the user.
 
-| Column      | Type          | Description                  |
-|-------------|---------------|------------------------------|
-| id          | NUMBER        | Primary Key                  |
-| descricao   | VARCHAR2(255) | Transaction description      |
-| valor       | NUMBER(10,2)  | Transaction amount           |
-| categoria   | VARCHAR2(50)  | Category predicted by the AI |
-| analysis_id | NUMBER        | Foreign Key                  |
+| Column     | Type          | Description                                |
+|------------|---------------|--------------------------------------------|
+| id         | BIGINT        | Primary Key (Auto Increment)               |
+| descricao  | VARCHAR(255)  | Transaction description                    |
+| valor      | DECIMAL(10,2) | Transaction amount                         |
+| tipo       | VARCHAR(50)   | Transaction type (`RECEITA` or `DESPESA`)  |
+| categoria  | VARCHAR(50)   | Category predicted by AI or local fallback |
+| data       | DATE          | Transaction date                           |
+| origem     | VARCHAR(50)   | Source origin (`ML` or `FALLBACK`)         |
+| usuario_id | BIGINT        | Foreign Key to `usuario`                   |
 
 ---
 
 # Relationships
 
 ```
-FinancialAnalysis
+AppUser
 
         1
 
         │
 
-        │
+        ├──────────────────────────┐
 
-        ▼
+        ▼                          ▼
 
-Transaction
+FinancialAnalysis           Transaction
 
-        N
+        N                          N
+
 ```
 
-One financial analysis may contain multiple transactions.
+One user may have multiple financial analyses and multiple transactions.
 
-Each transaction belongs to only one financial analysis.
+Each financial analysis and transaction belongs to a single user.
 
 ---
 
@@ -147,6 +188,7 @@ BAIXA
 MEDIA
 
 ALTA
+
 ```
 
 ---
@@ -158,7 +200,30 @@ SAUDAVEL
 
 EM_OBSERVACAO
 
-ENDIVIDADO
+EM_RISCO
+
+```
+
+---
+
+## TransactionType
+
+```
+RECEITA
+
+DESPESA
+
+```
+
+---
+
+## Source
+
+```
+ML
+
+FALLBACK
+
 ```
 
 ---
@@ -168,19 +233,24 @@ ENDIVIDADO
 ```
 ALIMENTACAO
 
-TRANSPORTE
-
 MORADIA
+
+UTILITARIOS
+
+INVESTIMENTO
+
+COMPRAS
 
 SAUDE
 
-EDUCACAO
-
 ENTRETENIMENTO
 
-LAZER
+TRAJETO
+
+SALARIO
 
 OUTROS
+
 ```
 
 ---
@@ -192,54 +262,72 @@ Every table uses a surrogate primary key.
 Example:
 
 ```
-id NUMBER
+id BIGINT AUTO_INCREMENT
+
 ```
 
-Generated by JPA.
+Generated by JPA/MySQL.
 
 ---
 
 # Foreign Keys
 
-Transaction
+Financial Analysis
 
 ```
-analysis_id
+usuario_id
 
 ↓
 
-financial_analysis.id
+usuario.id
+
 ```
 
-This relationship guarantees referential integrity.
+Transaction
+
+```
+usuario_id
+
+↓
+
+usuario.id
+
+```
+
+These relationships guarantee referential integrity and data isolation per user.
 
 ---
 
 # Indexes
 
-Initially, the following indexes are recommended.
+Recommended and implemented indexes to optimize multi-tenant lookups, periods, and ownership filtering:
+
+App User
+
+```
+email
+
+```
 
 Financial Analysis
 
 ```
-perfil_financeiro
-```
+usuario_id
 
-```
 data_analise
+
 ```
 
 Transaction
 
 ```
-categoria
-```
+usuario_id
+
+data
+
+usuario_id, data
 
 ```
-analysis_id
-```
-
-Additional indexes may be added as the application evolves.
 
 ---
 
@@ -251,18 +339,7 @@ Migration files are located at:
 
 ```
 backend/src/main/resources/db/migration
-```
 
-Naming convention:
-
-```
-V1__create_financial_analysis_table.sql
-
-V2__create_transaction_table.sql
-
-V3__create_indexes.sql
-
-V4__add_constraints.sql
 ```
 
 Every database modification must be implemented through a new migration.
@@ -275,13 +352,7 @@ Existing migrations must never be modified after being applied.
 
 ## Tables
 
-Plural form.
-
-Example
-
-```
-transactions
-```
+Plural or singular form based on domain entities mapped in Spring Data JPA.
 
 ---
 
@@ -292,11 +363,12 @@ Snake case.
 Example
 
 ```
-renda_mensal
-
 perfil_financeiro
 
 nivel_endividamento
+
+usuario_id
+
 ```
 
 ---
@@ -305,6 +377,7 @@ nivel_endividamento
 
 ```
 id
+
 ```
 
 ---
@@ -312,21 +385,22 @@ id
 ## Foreign Keys
 
 ```
-analysis_id
+usuario_id
+
 ```
 
 ---
 
 # Data Integrity
 
-The application relies on Bean Validation before persisting data.
+The application relies on Bean Validation and domain service rules before persisting data.
 
 Examples:
 
-- Monthly income cannot be negative.
-- Debt level cannot be negative.
-- Transaction value cannot be negative.
-- Required fields cannot be null.
+* Account emails must be unique.
+* Transactions have a strict 30-day editable/deletable window constraint.
+* Duplicate transaction checks occur prior to insertion based on user, description, value, and date.
+* Required fields cannot be null.
 
 Database constraints complement application-level validation.
 
@@ -335,25 +409,26 @@ Database constraints complement application-level validation.
 # Persistence Flow
 
 ```
-Controller
+  Controller
 
       │
 
       ▼
 
-Service
+   Service
 
       │
 
       ▼
 
-Repository
+  Repository
 
       │
 
       ▼
 
-Oracle Database
+    MySQL
+
 ```
 
 The Repository layer is solely responsible for data persistence.
@@ -362,7 +437,7 @@ The Repository layer is solely responsible for data persistence.
 
 # Backup Strategy
 
-Production environments should rely on Oracle Cloud backup mechanisms.
+Production environments should rely on standard MySQL backup mechanisms (such as mysqldump or cloud-managed database snapshots).
 
 Local development databases may be recreated using Flyway migrations.
 
@@ -370,44 +445,26 @@ Local development databases may be recreated using Flyway migrations.
 
 # Future Database Evolution
 
-The following tables are planned for future versions.
+The following features or capabilities are planned for future versions:
 
-## users
-
-Stores user accounts.
-
----
-
-## financial_goals
-
-Stores user financial goals.
-
----
-
-## analysis_history
-
-Stores historical financial analyses.
-
----
-
-## notifications
-
-Stores notification history.
-
----
-
-## audit_log
-
-Stores audit information for important operations.
+* Financial goals tracking
+* Extended budgeting features
+* Advanced investment suggestions
+* Automatic debt-level calculations
+* Audit logging for administrative activities
 
 ---
 
 # Design Decisions
 
-- Oracle Database is the official relational database.
-- Flyway is mandatory for schema evolution.
-- Spring Data JPA is the persistence layer.
-- Hibernate is the JPA implementation.
-- Java Enums are persisted as strings for better readability.
-- Recommendations are **not persisted** in the current version.
-- Transaction categories are generated by the Machine Learning service before persistence.
+* MySQL is the official relational database.
+* Flyway is mandatory for schema evolution.
+* Spring Data JPA is the persistence layer.
+* Hibernate is the JPA implementation.
+* Java Enums are persisted as strings for better readability.
+* Recommendations are **not persisted** in the current version.
+* Transaction categorization and analysis generation support both active ML integration and graceful local fallbacks (`FALLBACK`), recorded via source tracking flags.
+| Oracle Database | Relational Database Management System |
+| Spring Data JPA | ORM framework                         |
+| Hibernate       | JPA implementation                    |
+| Flyway          | Database schema versioning            |

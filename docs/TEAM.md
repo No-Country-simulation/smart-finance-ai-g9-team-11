@@ -16,16 +16,16 @@ Each team member was responsible for a specific set of tasks while collaborating
 
 # Team Members
 
-| Member   | Role                      | Responsibilities                                        |
-|----------|---------------------------|---------------------------------------------------------|
-| Gabriel  | Backend Developer         | Business rules, ML integration, database, services      |
-| Amanda   | Backend Developer         | REST controllers, Swagger/OpenAPI documentation         |
-| Leilanny | Backend Developer         | DTOs, Bean Validation, User CRUD, JWT authentication    |
+| Member   | Role                      | Responsibilities                                                            |
+|----------|---------------------------|-----------------------------------------------------------------------------|
+| Gabriel  | Backend Developer         | Services and Business rules, ML integration, database, Docker configuration |
+| Amanda   | Backend Developer         | REST controllers, Swagger/OpenAPI documentation                             |
+| Leilanny | Backend Developer         | DTOs, Bean Validation, User CRUD, JWT authentication                        |
          |
-| Member   | Backend Developer         | --------------------------------                        |
-| Gean     | Frontend Developer        | React application, UI/UX, API integration               |
-| Luciano  | Machine Learning Engineer | Model training, data preprocessing, prediction pipeline |
-| Vitor    | Machine Learning Engineer | FastAPI service, model deployment, inference            |
+| Fred     | Backend Developer         | Financial Analysis CRUD                                                     |
+| Gean     | Frontend Developer        | React application, UI/UX, API integration                                   |
+| Luciano  | Machine Learning Engineer | Model training, data preprocessing, prediction pipeline                     |
+| Vitor    | Machine Learning Engineer | FastAPI service, model deployment, inference                                |
 
 ---
 
@@ -64,7 +64,7 @@ Responsible for:
 - Business rules implementation
 - Request validation
 - Database modeling
-- Oracle Database integration
+- MySQL Database integration
 - Flyway migrations
 - Machine Learning integration
 - API documentation

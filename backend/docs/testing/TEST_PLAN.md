@@ -246,8 +246,8 @@ The following tests validate the quality and consistency of the Machine Learning
 - [x] Mercado Livre → Compras
 - [x] Steam → Entretenimento
 - [x] Unknown descriptions → Outros
-- [ ] Salary income → Salário (currently classified as Outros)
-- [ ] Investment transactions → Investimento (currently classified as Alimentação)
+- [x] Generic salary descriptions are classified correctly.
+- [x] Generic investment descriptions are classified correctly.
 
 ---
 
@@ -255,20 +255,31 @@ The following tests validate the quality and consistency of the Machine Learning
 
 - [ ] Verify healthy financial profile.
 - [ ] Verify highly indebted financial profile.
-- [ ] Verify recommendations change according to transaction history.
+- [x] Verify recommendations change according to transaction history.
 - [ ] Verify spending summary consistency.
 - [ ] Verify financial profile consistency.
 - [ ] Verify probability consistency.
 
 ### Observations and Possible Improvements
 
-- [ ] Income transactions with description "Salário" are currently classified as "Outros", affecting the financial analysis.
-- [ ] Verify whether "Investimento" transactions are being classified correctly, since they were not reflected in the spending summary.
-- [ ] Transactions with description "Investimento" are currently classified as **Alimentação** instead of **Investimento**.
+- [x] Income transactions with description "Salário" are currently classified as "Outros", affecting the financial analysis.
+- [x] Verify whether "Investimento" transactions are being classified correctly, since they were not reflected in the spending summary.
+- [x] Transactions with description "Investimento" are currently classified as **Alimentação** instead of **Investimento**.
 
 ---
 
-# 9. Automated Tests
+# 9. Deployment Validation
+
+- [ ] Docker Compose
+- [ ] Backend container
+- [ ] ML container
+- [ ] Frontend container
+- [ ] Database container
+- [ ] End-to-end validation using Docker
+
+---
+
+# 10. Automated Tests
 
 - [ ] TransactionClassificationService
 - [ ] FinancialProfileService
@@ -277,7 +288,7 @@ The following tests validate the quality and consistency of the Machine Learning
 
 ---
 
-# 10. Improvements
+# 11. Improvements
 
 ## Authentication
 
@@ -292,8 +303,9 @@ The following tests validate the quality and consistency of the Machine Learning
 
 # Test Result
 
-Status:
+Status
 
+- [ ] In Progress
 - [ ] Passed
 - [ ] Failed
 

@@ -1,8 +1,11 @@
 package br.com.financeai.enums;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Categoria atribuída a uma transação — sempre definida pela classificação
+ * automática (IA ou fallback local), nunca informada pelo usuário.
+ */
 public enum TransactionCategory {
 
     ALIMENTACAO("Alimentação"),

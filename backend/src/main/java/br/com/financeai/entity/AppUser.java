@@ -20,6 +20,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
+/**
+ * Representa um usuário do sistema.
+ *
+ * Implementa {@link UserDetails} para ser usada diretamente como principal
+ * de autenticação do Spring Security. O campo {@code ativo} controla se a
+ * conta pode autenticar — uma conta desativada (soft delete) tem
+ * {@link #isEnabled()} retornando {@code false}, bloqueando login e
+ * revogando o acesso de tokens JWT já emitidos.
+ */
 @Entity
 @Table(name = "usuarios")
 @Getter

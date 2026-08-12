@@ -30,27 +30,101 @@ TIPO_TRANSACAO_BR = {
     'Expense': 'Despesa'
 }
 
+# 1. Vocabulário Expandido com Termos Reais do Mercado Financeiro/Bancário BR
 PALAVRAS_REAIS = {
-    'Alimentação': ['ifood', 'restaurante', 'padaria', 'mcdonalds', 'outback', 'hortifruti', 'uber eats', 'rappi delivery'],
-    'Utilitários': ['conta luz enel', 'conta agua sabesp', 'internet claro', 'fatura vivo', 'gas comgas'],
-    'Moradia': ['pagamento aluguel', 'quinto andar', 'imobiliaria', 'condominio mensal', 'taxa seguro incendio'],
-    'Investimento': ['tesouro direto', 'aporte rico corretora', 'investimento xp', 'compra acao b3', 'cdb nubank'],
-    'Compras': ['amazon brasil', 'mercado livre', 'magalu', 'zara compras', 'shopee pagamento', 'aliexpress'],
-    'Outros': ['transferencia pix', 'tarifa bancaria', 'saque caixa eletronico', 'diversos', 'reembolso'],
-    'Entretenimento': ['netflix', 'spotify', 'cinema', 'steam', 'show'],
-    'Saúde': ['farmacia droga raia', 'consulta medica', 'exame laboratorio', 'drogalis', 'plano saude'],
-    'Salário': ['deposito salario', 'pagamento empresa', 'holerite mensal', 'transferencia proventos'],
-    'Trajeto': ['uber', '99app corrida', 'posto shell combustivel', 'estapar estacionamento', 'recarga bilhete unico']
+    'Alimentação': [
+        'ifood', 'restaurante', 'padaria', 'mcdonalds', 'outback', 'hortifruti', 
+        'uber eats', 'ubereats', 'rappi delivery', 'burger king', 'supermercado', 
+        'açougue', 'feira', 'cafeteria', 'starbucks', 'coco bambu', 'habibs',
+        'chocolate', 'doce', 'confeitaria', 'sorveteria', 'snack', 'bistro',
+        'churrascaria', 'pizzaria', 'sushi', 'temakeria', 'spoleto', 'ragazzo',
+        'lanchonete', 'marmintex', 'marmita', 'buffet', 'self service'
+    ],
+    'Utilitários': [
+        'conta luz enel', 'conta agua sabesp', 'internet claro', 'fatura vivo', 
+        'gas comgas', 'tim celular', 'energia cpfl', 'sanepar agua', 'algar telecom',
+        'light energia', 'cemig', 'copel', 'oi fibra', 'fatura celular', 'taxa lixo',
+        'conta de luz', 'conta de agua', 'net claro', 'sky tv', 'directv go'
+    ],
+    'Moradia': [
+        'pagamento aluguel', 'quinto andar', 'imobiliaria', 'condominio mensal', 
+        'taxa seguro incendio', 'lofts aluguel', 'iptu prefeitura', 'aluguel',
+        'condominio', 'iptu', 'seguro residencia', 'reforma', 'material construcao',
+        'leroy merlin', 'camicado', 'tokstok', 'mobly', 'diatide', 'manutencao casa'
+    ],
+    'Investimento': [
+        'investimento', 'investir', 'aporte', 'aporte mensal', 'aporte investimento',
+        'aplicacao', 'aplicação', 'aplicar', 'tesouro direto', 'tesouro', 'tesouro selic',
+        'cdb', 'cdb nubank', 'lci', 'lca', 'rdb', 'poupanca', 'poupança',
+        'fundo imobiliario', 'fundo imobiliário', 'fii', 'acao', 'ações',
+        'compra acao', 'compra ação', 'b3', 'bolsa', 'bolsa de valores',
+        'xp', 'xp investimentos', 'rico', 'rico corretora', 'inter investimentos',
+        'nubank investimentos', 'nuinvest', 'clear', 'clear corretora',
+        'binance', 'bitcoin', 'ethereum', 'cripto', 'criptomoeda', 'criptoativos'
+    ],
+    'Compras': [
+        'amazon brasil', 'mercado livre', 'magalu', 'zara compras', 'shopee pagamento', 
+        'aliexpress', 'mercado', 'carrefour', 'pao de acucar', 'kabum', 'shein brasil',
+        'renner', 'riachuelo', 'c&a', 'ponto frio', 'casas bahia', 'fast shop',
+        'assai', 'atacadão', 'pague menos', 'lojas americanas', 'centauro',
+        'decathlon', 'netshoes', 'boticario', 'sephora'
+    ],
+    'Outros': [
+        'transferencia pix', 'tarifa bancaria', 'saque caixa eletronico', 'diversos', 
+        'reembolso', 'iof imposto', 'anuidade cartao', 'pix enviado', 'pix recebido',
+        'ted enviada', 'doc enviado', 'tarifa manutencao', 'imposto', 'taxa servico',
+        'doacao', 'multa', 'juros de mora', 'cartorio'
+    ],
+    'Entretenimento': [
+        'netflix', 'spotify', 'cinema', 'steam', 'show', 'prime video', 
+        'hbo max', 'playstation store', 'xbox live', 'ingressos com',
+        'xbox', 'playstation', 'nintendo', 'game', 'jogos', 'pass', 'disney plus',
+        'deezer', 'crunchyroll', 'kinoplex', 'uci cinemas', 'outback happy hour',
+        'balada', 'teatro', 'evento', 'sympla', 'eventim'
+    ],
+    'Saúde': [
+        'farmacia droga raia', 'consulta medica', 'exame laboratorio', 'drogalis', 
+        'plano saude', 'drogasil', 'pague menos', 'fleury exames', 'smart fit',
+        'bluefit', 'bio ritmo', 'extrafarma', 'farmacia de manipualcao',
+        'dentista', 'psicologo', 'fisioterapia', 'hospital', 'drogaria sao paulo',
+        'unimed', 'bradesco saude', 'sulamerica', 'notredame intermedica'
+    ],
+    'Salário': [
+        'salario', 'salário', 'deposito salario', 'depósito salário', 'deposito',
+        'pagamento salario', 'pagamento empresa', 'pagamento', 'holerite',
+        'holerite mensal', 'proventos', 'remuneracao', 'remuneração',
+        'adiantamento salarial', 'adiantamento', 'folha de pagamento', 'folha',
+        'credito salario', 'crédito salário', 'pagamento mensal', 'recebimento salario',
+        'recebimento', 'salario empresa', 'salario mensal', 'vencimentos',
+        'ordenado', 'contra cheque', 'contracheque', 'bonus', 'bônus',
+        'participacao nos lucros', 'plr', 'comissao', 'comissão'
+    ],
+    'Trajeto': [
+        'uber', 'corrida uber', '99app corrida', 'posto shell combustivel', 
+        'estapar estacionamento', 'recarga bilhete unico', 'sem parar pedagio', 
+        'veloe pedagios', 'ipva detran', 'cabify', 'inDrive', 'posto ipiranga',
+        'posto br', 'combustivel', 'gasolina', 'etanol', 'mecanica', 'autozone',
+        'troca de oleo', 'uber vip', 'top sp', 'metro', 'cptm', 'passagem aerea',
+        'azul linhas aereas', 'gol linhas aereas', 'latam'
+    ],
 }
+
+# 2. Stopwords em português para filtrar conectivos genéricos
+STOP_WORDS_PT = [
+    'de', 'da', 'do', 'das', 'dos', 'em', 'no', 'na', 'nos', 'nas', 
+    'para', 'por', 'com', 'um', 'uma', 'uns', 'umas', 'e', 'a', 'o'
+]
 
 
 def limpar_texto(texto: str) -> str:
-    """Aplica limpeza de texto via Regex e remoção de acentos."""
+    """Aplica limpeza de texto via Regex, remoção de acentos e dígitos isolados."""
     if not isinstance(texto, str):
         return ""
     texto = texto.lower()
     texto = unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('utf-8')
-    texto = re.sub(r'[^\w\s]', '', texto)
+    # Remove caracteres especiais e números isolados mantendo o texto limpo
+    texto = re.sub(r'[^a-z\s]', ' ', texto)
+    texto = re.sub(r'\s+', ' ', texto)
     return texto.strip()
 
 
@@ -80,18 +154,13 @@ def carregar_e_tratar_dados(caminho_csv: str) -> pd.DataFrame:
 
 
 def treinar_modelo():
-    # 1. Definir caminhos apontando explicitamente para a pasta 'ml'
     diretorio_atual = os.path.dirname(os.path.abspath(__file__))
-    
-    # Navega até o diretório 'ml'
     diretorio_ml = os.path.abspath(os.path.join(diretorio_atual, "..", ".."))
 
-    # Ajusta o caminho do CSV para ficar dentro de ml/data/raw/
     caminho_csv = os.path.join(diretorio_ml, "data", "raw", "Financial_Transactions_By_User.csv")
     pasta_modelos = os.path.join(diretorio_ml, "models")
     caminho_modelo_saida = os.path.join(pasta_modelos, "transaction_classifier.pkl")
 
-    # 2. Processar Dados
     df = carregar_e_tratar_dados(caminho_csv)
 
     X = df['Transaction Description']
@@ -101,28 +170,31 @@ def treinar_modelo():
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    # 3. Construir Pipeline
-    print("Treinando modelo (TF-IDF + Random Forest)...")
+    print("Treinando modelo otimizado (TF-IDF + Random Forest Tuning)...")
     pipeline = Pipeline([
         ('vetorizador', TfidfVectorizer(
             analyzer='word',
-            ngram_range=(1, 2),
-            sublinear_tf=True
+            ngram_range=(1, 3),        # Captura unigramas, bigramas e trigramas (ex: 'fatura', 'vivo', 'fatura vivo')
+            sublinear_tf=True,         # Suaviza termos com alta frequência (1 + log(tf))
+            stop_words=STOP_WORDS_PT,  # Remove conectivos sem valor semântico
+            min_df=1,                  # Mantém termos raros relevantes
+            norm='l2'                  # Normaliza vetores pelo comprimento L2
         )),
         ('classificador', RandomForestClassifier(
-            class_weight='balanced',
-            random_state=42
-        ))
+        n_estimators=200,
+        max_depth=None,           # Permite que palavras exatas tenham 100% de probabilidade
+        class_weight='balanced',
+        random_state=42,
+        n_jobs=-1
+    ))
     ])
 
     pipeline.fit(X_train, y_train)
 
-    # 4. Avaliar Modelo
     y_pred = pipeline.predict(X_test)
     print("\n--- RELATÓRIO DE CLASSIFICAÇÃO ---")
     print(classification_report(y_test, y_pred))
 
-    # 5. Salvar Artefato (.pkl)
     os.makedirs(pasta_modelos, exist_ok=True)
     joblib.dump(pipeline, caminho_modelo_saida)
     print(f"Modelo salvo com sucesso em: {caminho_modelo_saida}")

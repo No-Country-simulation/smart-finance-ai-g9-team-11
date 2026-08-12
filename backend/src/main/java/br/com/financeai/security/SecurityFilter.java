@@ -14,6 +14,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filtro executado em toda requisição, responsável por extrair e validar
+ * o token JWT do header {@code Authorization}, carregar o usuário
+ * correspondente e popular o contexto de segurança.
+ * <p>
+ * Contas desativadas ({@link AppUser#isEnabled()} retornando {@code false})
+ * não são autenticadas aqui, mesmo com um token ainda não expirado —
+ * garante que a desativação de conta tenha efeito imediato.
+ */
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 

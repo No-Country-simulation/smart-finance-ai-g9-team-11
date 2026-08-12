@@ -3,11 +3,14 @@ package br.com.financeai.integration.dto.response;
 import br.com.financeai.enums.TransactionCategory;
 import br.com.financeai.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Resposta do endpoint de classificação: os dados originais da
+ * transação acrescidos da categoria determinada.
+ */
 public record MlTransactionResponse(
 
         String descricao,

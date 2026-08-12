@@ -8,7 +8,6 @@ import br.com.financeai.enums.FinancialProfile;
 import br.com.financeai.enums.SavingFrequency;
 import br.com.financeai.enums.TransactionCategory;
 import br.com.financeai.enums.TransactionType;
-import br.com.financeai.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,11 +17,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Responsável pela geração local (fallback) de análises financeiras,
+ * usada quando o serviço de Machine Learning está indisponível.
+ * <p>
+ * Calcula o perfil financeiro, nível de endividamento e frequência de
+ * poupança através de regras determinísticas simples sobre o total de
+ * receitas e despesas do período — não substitui a precisão do modelo
+ * de IA, mas evita que a funcionalidade fique completamente indisponível.
+ */
 @Service
 public class FinancialProfileService {
 
     private static final BigDecimal ALTA = BigDecimal.valueOf(40);
     private static final BigDecimal MEDIA = BigDecimal.valueOf(20);
+    private static final BigDecimal BAIXA = BigDecimal.valueOf(10);
 
     /**
      * Gera uma análise simplificada baseada em regras determinísticas,
@@ -39,9 +48,8 @@ public class FinancialProfileService {
 
         BigDecimal nivelEndividamento = totalReceitas.compareTo(BigDecimal.ZERO) == 0
                 ? BigDecimal.ZERO
-                : totalDespesas
-                .divide(totalReceitas, 2, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
+                : totalDespesas.multiply(BigDecimal.valueOf(100))
+                .divide(totalReceitas, 2, RoundingMode.HALF_UP);
 
         SavingFrequency frequenciaPoupanca = getSavingFrequency(totalReceitas, totalDespesas);
 
@@ -68,18 +76,23 @@ public class FinancialProfileService {
         if (totalReceitas.compareTo(BigDecimal.ZERO) == 0){
            percentualSobra = BigDecimal.ZERO;
         } else {
-            percentualSobra = sobra.divide(totalReceitas, 2, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+            percentualSobra = sobra.multiply(BigDecimal.valueOf(100))
+                    .divide(totalReceitas, 2, RoundingMode.HALF_UP);
         }
 
         SavingFrequency frequenciaPoupanca;
 
-        if (percentualSobra.compareTo(ALTA) >= 0){
+        if (sobra.compareTo(BigDecimal.ZERO) <= 0) {
+            return SavingFrequency.NENHUMA;
+        }
+        else if (percentualSobra.compareTo(ALTA) >= 0){
              frequenciaPoupanca = SavingFrequency.ALTA;
         } else if (percentualSobra.compareTo(MEDIA) >= 0) {
              frequenciaPoupanca = SavingFrequency.MEDIA;
-        } else {
+        } else if (percentualSobra.compareTo(BAIXA) >= 0){
              frequenciaPoupanca = SavingFrequency.BAIXA;
+        } else {
+            frequenciaPoupanca = SavingFrequency.NENHUMA;
         }
         return frequenciaPoupanca;
     }

@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum SavingFrequency {
 
+    NENHUMA("Nenhuma"),
+
     BAIXA("Baixa"),
 
     MEDIA("Média"),

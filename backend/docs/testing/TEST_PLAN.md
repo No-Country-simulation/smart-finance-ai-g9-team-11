@@ -253,18 +253,25 @@ The following tests validate the quality and consistency of the Machine Learning
 
 ## Financial Analysis
 
-- [ ] Verify healthy financial profile.
-- [ ] Verify highly indebted financial profile.
+- [x] Verify healthy financial profile.
+- [x] Verify highly indebted financial profile.
 - [x] Verify recommendations change according to transaction history.
-- [ ] Verify spending summary consistency.
-- [ ] Verify financial profile consistency.
-- [ ] Verify probability consistency.
+- [x] Verify spending summary consistency.
+- [x] Verify financial profile consistency.
+- [x] Verify probability consistency.
 
 ### Observations and Possible Improvements
 
-- [x] Income transactions with description "Salário" are currently classified as "Outros", affecting the financial analysis.
-- [x] Verify whether "Investimento" transactions are being classified correctly, since they were not reflected in the spending summary.
-- [x] Transactions with description "Investimento" are currently classified as **Alimentação** instead of **Investimento**.
+- [x] Income transactions with description "Salário" were validated in the spending summary.
+- [x] Investment transactions were validated in the spending summary.
+- [x] The 35% threshold rule correctly identified dominant spending categories.
+- [ ] Observation: the 35% rule may generate recommendations even for healthy profiles with low total expenses, because one category can dominate when there are few transactions.
+
+### Fixed Issues
+
+- [x] Fixed backend enum to support "Nenhuma" as a valid savings frequency returned by ML.
+- [x] Revalidated "Salário" classification in the financial analysis summary.
+- [x] Revalidated "Investimento" classification in the financial analysis summary.
 
 ---
 

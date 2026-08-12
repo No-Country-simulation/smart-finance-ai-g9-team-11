@@ -35,45 +35,77 @@ PALAVRAS_REAIS = {
     'Alimentação': [
         'ifood', 'restaurante', 'padaria', 'mcdonalds', 'outback', 'hortifruti', 
         'uber eats', 'ubereats', 'rappi delivery', 'burger king', 'supermercado', 
-        'açougue', 'feira', 'cafeteria', 'starbucks', 'coco bambu', 'habibs'
+        'açougue', 'feira', 'cafeteria', 'starbucks', 'coco bambu', 'habibs',
+        'chocolate', 'doce', 'confeitaria', 'sorveteria', 'snack', 'bistro',
+        'churrascaria', 'pizzaria', 'sushi', 'temakeria', 'spoleto', 'ragazzo',
+        'lanchonete', 'marmintex', 'marmita', 'buffet', 'self service'
     ],
     'Utilitários': [
         'conta luz enel', 'conta agua sabesp', 'internet claro', 'fatura vivo', 
-        'gas comgas', 'tim celular', 'energia cpfl', 'sanepar agua', 'algar telecom'
+        'gas comgas', 'tim celular', 'energia cpfl', 'sanepar agua', 'algar telecom',
+        'light energia', 'cemig', 'copel', 'oi fibra', 'fatura celular', 'taxa lixo',
+        'conta de luz', 'conta de agua', 'net claro', 'sky tv', 'directv go'
     ],
     'Moradia': [
         'pagamento aluguel', 'quinto andar', 'imobiliaria', 'condominio mensal', 
-        'taxa seguro incendio', 'lofts aluguel', 'iptu prefeitura'
+        'taxa seguro incendio', 'lofts aluguel', 'iptu prefeitura', 'aluguel',
+        'condominio', 'iptu', 'seguro residencia', 'reforma', 'material construcao',
+        'leroy merlin', 'camicado', 'tokstok', 'mobly', 'diatide', 'manutencao casa'
     ],
     'Investimento': [
-        'tesouro direto', 'aporte rico corretora', 'investimento xp', 'compra acao b3', 
-        'cdb nubank', 'b3 SA', 'cripto binance', 'fii fundo imobiliario', 'inter investimentos'
+        'investimento', 'investir', 'aporte', 'aporte mensal', 'aporte investimento',
+        'aplicacao', 'aplicação', 'aplicar', 'tesouro direto', 'tesouro', 'tesouro selic',
+        'cdb', 'cdb nubank', 'lci', 'lca', 'rdb', 'poupanca', 'poupança',
+        'fundo imobiliario', 'fundo imobiliário', 'fii', 'acao', 'ações',
+        'compra acao', 'compra ação', 'b3', 'bolsa', 'bolsa de valores',
+        'xp', 'xp investimentos', 'rico', 'rico corretora', 'inter investimentos',
+        'nubank investimentos', 'nuinvest', 'clear', 'clear corretora',
+        'binance', 'bitcoin', 'ethereum', 'cripto', 'criptomoeda', 'criptoativos'
     ],
     'Compras': [
         'amazon brasil', 'mercado livre', 'magalu', 'zara compras', 'shopee pagamento', 
-        'aliexpress', 'mercado', 'carrefour', 'pao de acucar', 'kabum', 'shein brasil'
+        'aliexpress', 'mercado', 'carrefour', 'pao de acucar', 'kabum', 'shein brasil',
+        'renner', 'riachuelo', 'c&a', 'ponto frio', 'casas bahia', 'fast shop',
+        'assai', 'atacadão', 'pague menos', 'lojas americanas', 'centauro',
+        'decathlon', 'netshoes', 'boticario', 'sephora'
     ],
     'Outros': [
         'transferencia pix', 'tarifa bancaria', 'saque caixa eletronico', 'diversos', 
-        'reembolso', 'iof imposto', 'anuidade cartao'
+        'reembolso', 'iof imposto', 'anuidade cartao', 'pix enviado', 'pix recebido',
+        'ted enviada', 'doc enviado', 'tarifa manutencao', 'imposto', 'taxa servico',
+        'doacao', 'multa', 'juros de mora', 'cartorio'
     ],
     'Entretenimento': [
         'netflix', 'spotify', 'cinema', 'steam', 'show', 'prime video', 
         'hbo max', 'playstation store', 'xbox live', 'ingressos com',
-        'xbox', 'playstation', 'nintendo', 'game', 'jogos', 'pass' # <--- Adicionados aqui
+        'xbox', 'playstation', 'nintendo', 'game', 'jogos', 'pass', 'disney plus',
+        'deezer', 'crunchyroll', 'kinoplex', 'uci cinemas', 'outback happy hour',
+        'balada', 'teatro', 'evento', 'sympla', 'eventim'
     ],
     'Saúde': [
         'farmacia droga raia', 'consulta medica', 'exame laboratorio', 'drogalis', 
-        'plano saude', 'drogasil', 'pague menos', 'fleury exames', 'smart fit'
+        'plano saude', 'drogasil', 'pague menos', 'fleury exames', 'smart fit',
+        'bluefit', 'bio ritmo', 'extrafarma', 'farmacia de manipualcao',
+        'dentista', 'psicologo', 'fisioterapia', 'hospital', 'drogaria sao paulo',
+        'unimed', 'bradesco saude', 'sulamerica', 'notredame intermedica'
     ],
     'Salário': [
-        'deposito salario', 'pagamento empresa', 'holerite mensal', 
-        'transferencia proventos', 'rendimento quinzenal', 'adiantamento salarial'
+        'salario', 'salário', 'deposito salario', 'depósito salário', 'deposito',
+        'pagamento salario', 'pagamento empresa', 'pagamento', 'holerite',
+        'holerite mensal', 'proventos', 'remuneracao', 'remuneração',
+        'adiantamento salarial', 'adiantamento', 'folha de pagamento', 'folha',
+        'credito salario', 'crédito salário', 'pagamento mensal', 'recebimento salario',
+        'recebimento', 'salario empresa', 'salario mensal', 'vencimentos',
+        'ordenado', 'contra cheque', 'contracheque', 'bonus', 'bônus',
+        'participacao nos lucros', 'plr', 'comissao', 'comissão'
     ],
     'Trajeto': [
         'uber', 'corrida uber', '99app corrida', 'posto shell combustivel', 
         'estapar estacionamento', 'recarga bilhete unico', 'sem parar pedagio', 
-        'veloe pedagios', 'ipva detran'
+        'veloe pedagios', 'ipva detran', 'cabify', 'inDrive', 'posto ipiranga',
+        'posto br', 'combustivel', 'gasolina', 'etanol', 'mecanica', 'autozone',
+        'troca de oleo', 'uber vip', 'top sp', 'metro', 'cptm', 'passagem aerea',
+        'azul linhas aereas', 'gol linhas aereas', 'latam'
     ],
 }
 

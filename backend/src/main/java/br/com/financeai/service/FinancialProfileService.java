@@ -83,7 +83,7 @@ public class FinancialProfileService {
         SavingFrequency frequenciaPoupanca;
 
         if (sobra.compareTo(BigDecimal.ZERO) <= 0) {
-            return SavingFrequency.NENHUM;
+            return SavingFrequency.NENHUMA;
         }
         else if (percentualSobra.compareTo(ALTA) >= 0){
              frequenciaPoupanca = SavingFrequency.ALTA;
@@ -92,7 +92,7 @@ public class FinancialProfileService {
         } else if (percentualSobra.compareTo(BAIXA) >= 0){
              frequenciaPoupanca = SavingFrequency.BAIXA;
         } else {
-            frequenciaPoupanca = SavingFrequency.NENHUM;
+            frequenciaPoupanca = SavingFrequency.NENHUMA;
         }
         return frequenciaPoupanca;
     }

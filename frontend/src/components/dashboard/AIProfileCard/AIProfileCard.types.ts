@@ -25,7 +25,7 @@ export interface AIFinancialProfile {
 export interface AIProfileCardProps {
   title?: string;
   description?: string;
-  profile?: AIFinancialProfile;
+  profile?: AIFinancialProfile | null;
   onViewDetails?: () => void;
 }
 

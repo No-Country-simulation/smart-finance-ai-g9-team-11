@@ -83,7 +83,7 @@ public class FinancialAnalysisController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid request data",
+                    description = "Invalid request or no transactions found for the selected period",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(
@@ -99,6 +99,14 @@ public class FinancialAnalysisController {
                             schema = @Schema(
                                     implementation = ApiErrorResponse.class
                             )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Business rule violation",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             )
     })
@@ -268,6 +276,14 @@ public class FinancialAnalysisController {
                             schema = @Schema(
                                     implementation = ApiErrorResponse.class
                             )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Business rule violation",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             )
     })

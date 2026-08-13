@@ -78,7 +78,7 @@ public class TransactionClassificationService {
                 || texto.contains("internet")
                 || texto.contains("telefone")
                 || texto.contains("celular")
-                || texto.contains("gas")) {
+                || texto.matches(".*\\bgas\\b.*")) {
             return TransactionCategory.UTILITARIOS;
         }
 

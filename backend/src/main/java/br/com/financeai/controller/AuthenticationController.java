@@ -28,8 +28,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * Únicos endpoints públicos da API, junto com a documentação Swagger.
  */
 @Tag(
-        name="Authentication",
-        description = "Public endpoints for user registration and authentication"
+        name = "Authentication",
+        description = "Public endpoints for user authentication and account reactivation."
 )
 @RestController
 @RequestMapping("/auth")
@@ -78,7 +78,7 @@ public class AuthenticationController {
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Invalid email or password",
+                    description = "Authentication failed due to invalid credentials or inactive account",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiErrorResponse.class)
@@ -157,7 +157,7 @@ public class AuthenticationController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "409",
+                    responseCode = "422",
                     description = "User account is already active",
                     content = @Content(
                             mediaType = "application/json",

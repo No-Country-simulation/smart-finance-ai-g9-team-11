@@ -105,7 +105,6 @@ The goal is to verify:
 - [x] Reject blank description (400)
 - [x] Reject negative value (400)
 - [x] Reject update from another user (404)
-- [ ] Reject invalid transaction type (BUG: returns 500 instead of 400)
 
 ---
 
@@ -210,8 +209,10 @@ The goal is to verify:
 
 ## Unexpected Errors
 
-- [ ] Unexpected exceptions return standardized ApiErrorResponse (500)
-- [x] Internal errors do not expose stack traces or sensitive information.
+- Internal errors do not expose stack traces or sensitive information.
+- Unexpected exception standardization was partially validated.
+- Invalid transaction type currently returns `500 Internal Server Error` instead of the expected `400 Bad Request`.
+- This behavior was documented as a known issue for future correction.
 
 ---
 
@@ -231,6 +232,11 @@ The goal is to verify:
 - [ ] Dashboard.
 - [ ] Transactions.
 - [ ] Financial analysis.
+
+### Observation
+
+- Frontend integration tests are pending because the frontend integration is still in progress.
+- Backend endpoints were validated independently through manual API tests, Docker deployment validation and automated unit tests.
 
 ---
 
@@ -265,7 +271,8 @@ The following tests validate the quality and consistency of the Machine Learning
 - [x] Income transactions with description "Salário" were validated in the spending summary.
 - [x] Investment transactions were validated in the spending summary.
 - [x] The 35% threshold rule correctly identified dominant spending categories.
-- [ ] Observation: the 35% rule may generate recommendations even for healthy profiles with low total expenses, because one category can dominate when there are few transactions.
+- Observation: the 35% rule may generate recommendations even for healthy profiles with low total expenses, because one category can dominate when there are few transactions.
+- Observation: "Mercado Extra" was classified as "Compras" instead of "Alimentação", which may require future ML/category rule review.
 
 ### Fixed Issues
 
@@ -277,23 +284,28 @@ The following tests validate the quality and consistency of the Machine Learning
 
 # 9. Deployment Validation
 
-- [ ] Docker Compose
-- [ ] Backend container
-- [ ] ML container
-- [ ] Frontend container
-- [ ] Database container
-- [ ] End-to-end validation using Docker
+- [x] Docker Compose
+- [x] Backend container
+- [x] ML container
+- [x] Frontend container
+- [x] Database container
+- [x] End-to-end validation using Docker
 
 ---
 
 # 10. Automated Tests
 
-- [ ] TransactionClassificationService
-- [ ] FinancialProfileService
-- [ ] FinancialAnalysisService
-- [ ] UserService
+- [x] TransactionClassificationService
+- [x] FinancialProfileService
+- [x] FinancialAnalysisService
+- [x] UserService
 
----
+## Automated Test Result
+
+- [x] 24 automated tests executed successfully.
+- [x] 0 failures.
+- [x] 0 errors.
+- [x] 1 skipped test: `FinanceAiApiApplicationTests`, disabled because unit tests should not depend on the real database.
 
 # 11. Improvements
 
@@ -308,18 +320,37 @@ The following tests validate the quality and consistency of the Machine Learning
 
 - [ ] Verify the expected behavior when the analysis period includes future dates. Currently, the API returns **200 OK** if `data_inicial` is valid, even when `data_final` is in the future. Confirm whether this is the intended business rule.
 
+# 12. Known Issues
+
+- Invalid transaction type currently returns `500 Internal Server Error` instead of `400 Bad Request`.
+- The API currently returns `200 OK` when `data_inicial` is valid but `data_final` is in the future. This behavior should be confirmed as an intended business rule.
+- The 35% recommendation threshold may generate recommendations for healthy profiles with low total expenses.
+- "Mercado Extra" was classified as "Compras" instead of "Alimentação", which may require future ML/category rule review.
+
 # Test Result
 
 Status
 
-- [ ] In Progress
-- [ ] Passed
+- [x] Backend validation completed
+- [ ] Frontend integration validation pending
 - [ ] Failed
 
 Comments:
 
-```
-```
+```text
+Backend validation completed successfully.
+
+Manual API tests, Machine Learning validation, Docker deployment validation and automated unit tests were executed.
+
+Automated tests:
+- 24 tests executed
+- 0 failures
+- 0 errors
+- 1 skipped context load test
+
+Frontend integration tests are pending because the frontend integration is still in progress.
+
+Known issues and improvement points were documented for future review.
 
 
 

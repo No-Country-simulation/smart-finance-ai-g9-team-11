@@ -110,13 +110,13 @@ public class FinancialProfileService {
         return new ExpenseSummaryResponse(
                 porCategoria.getOrDefault(TransactionCategory.ALIMENTACAO, BigDecimal.ZERO),
                 porCategoria.getOrDefault(TransactionCategory.MORADIA, BigDecimal.ZERO),
-                porCategoria.getOrDefault(TransactionCategory.UTILITARIOS, BigDecimal.ZERO),
-                porCategoria.getOrDefault(TransactionCategory.INVESTIMENTO, BigDecimal.ZERO),
                 porCategoria.getOrDefault(TransactionCategory.COMPRAS, BigDecimal.ZERO),
-                porCategoria.getOrDefault(TransactionCategory.SAUDE, BigDecimal.ZERO),
                 porCategoria.getOrDefault(TransactionCategory.ENTRETENIMENTO, BigDecimal.ZERO),
-                porCategoria.getOrDefault(TransactionCategory.TRAJETO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.INVESTIMENTO, BigDecimal.ZERO),
                 porCategoria.getOrDefault(TransactionCategory.SALARIO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.SAUDE, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.TRAJETO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.UTILITARIOS, BigDecimal.ZERO),
                 porCategoria.getOrDefault(TransactionCategory.OUTROS, BigDecimal.ZERO)
         );
     }

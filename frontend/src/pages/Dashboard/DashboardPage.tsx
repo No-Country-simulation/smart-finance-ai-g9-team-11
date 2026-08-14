@@ -97,6 +97,7 @@ export function DashboardPage() {
           <AlertTriangle
             size={24}
             className="mx-auto text-danger"
+            aria-hidden="true"
           />
 
           <h2 className="mt-4 text-sm font-semibold text-text">
@@ -120,10 +121,16 @@ export function DashboardPage() {
               "bg-primary px-4",
               "text-xs font-semibold",
               "text-white",
+              "transition-opacity",
+              "hover:opacity-90",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary/40",
             )}
           >
             <RefreshCw
               size={14}
+              aria-hidden="true"
             />
 
             Tentar novamente

@@ -1,0 +1,465 @@
+﻿================================================================================
+RELATORIO GERAL - MERGE DEVELOP -> FEATURE/FRONTEND-BACKEND-INTEGRATION
+================================================================================
+
+Data: 12/08/2026 21:20:40
+Branch atual: feature/frontend-backend-integration
+Commit antes do merge: ed88095cc643c3c17b17578b7d834b8efbd91324
+Develop incorporada: 0a9f05c581e0d8921ad077503a91e3709b67c849
+Commit apos merge: 74828e62c414f6a12a9bbc7936cf1183b278d528
+
+================================================================================
+COMMITS DA DEVELOP INCORPORADOS
+================================================================================
+0a9f05c | 2026-08-12 | GABRIEL DE SOUZA GUIMAR├âES | fix: fix enum field from "NENHUM" to "NENHUMA"
+ec02c45 | 2026-08-12 | Gabriel de Souza Guimar├úes | Merge pull request #45 from No-Country-simulation/refactor/backend-enum-fallback
+5364954 | 2026-08-12 | GABRIEL DE SOUZA GUIMAR├âES | refactor: align saving frequency enum with ML service and refine fallback precision
+182c091 | 2026-08-11 | Vitor Silva | Merge branch 'develop' of https://github.com/No-Country-simulation/smart-finance-ai-g9-team-11 into develop
+48a6efc | 2026-08-11 | Vitor Silva | expading nlp model vocabulary for 100 new words
+85eb04b | 2026-08-11 | Luciano Sena | "test: adiciona testes E2E simulados do fluxo de analise-financeira" -m "7/7 testes passando: payload valido, transacoes vazias, campo faltante, tipo invalido, data invalida, endividamento alto, muitas transacoes."
+8b2aa70 | 2026-08-09 | Vitor Silva | Merge branch 'develop' of https://github.com/No-Country-simulation/smart-finance-ai-g9-team-11 into develop
+f9193b4 | 2026-08-09 | Vitor Silva | refactor: update prediction rules and model vocabulary
+3af18d9 | 2026-08-08 | GABRIEL DE SOUZA GUIMAR├âES | Merge branch 'develop' of https://github.com/No-Country-simulation/smart-finance-ai-g9-team-11 into develop
+16b3b6b | 2026-08-08 | GABRIEL DE SOUZA GUIMAR├âES | fix: Added adjustments to Docker settings
+5b9c3b4 | 2026-08-08 | Luciano Sena | Merge branch 'develop' of https://github.com/No-Country-simulation/smart-finance-ai-g9-team-11 into develop
+78a1372 | 2026-08-08 | Luciano Sena | Adicionados testes de estresse, integra├º├úo e recomenda├º├Áes + relat├│rio de valida├º├úo (Sprint 4/5).
+5f5b6ae | 2026-08-08 | Gabriel de Souza Guimar├úes | Merge pull request #43 from No-Country-simulation/feature/backend-docker-implementation
+4f493fc | 2026-08-08 | GABRIEL DE SOUZA GUIMAR├âES | chore: add complete docker-compose and container configurations"
+d265d48 | 2026-08-08 | mands | Merge pull request #41 from No-Country-simulation/fix/ml-integration-date
+8faac3c | 2026-08-08 | mands | fix: serialize LocalDate as string in ML transaction request
+03ad07d | 2026-08-08 | Gabriel de Souza Guimar├úes | Merge pull request #40 from No-Country-simulation/feature/backend-javadoc
+a82adb9 | 2026-08-08 | GABRIEL DE SOUZA GUIMAR├âES | docs: add Javadoc across the backend + rename classes to English
+af7c6ee | 2026-08-08 | GABRIEL DE SOUZA GUIMAR├âES | Revert "docs: add Javadoc across the entire backend, rename Autenticacao* to English"
+3349192 | 2026-08-08 | GABRIEL DE SOUZA GUIMAR├âES | docs: add Javadoc across the entire backend, rename Autenticacao* to English
+
+
+================================================================================
+RESUMO DAS ALTERACOES INTRODUZIDAS
+================================================================================
+ assets/style.css                                   | 319 +++++++++
+ backend/relatorio-backend-crud.txt                 |  10 +-
+ .../br/com/financeai/FinanceAiApiApplication.java  |   3 +
+ .../br/com/financeai/config/OpenApiConfig.java     |   5 +
+ .../br/com/financeai/config/RestClientConfig.java  |   5 +
+ ...ntroller.java => AuthenticationController.java} |  25 +-
+ .../controller/FinancialAnalysisController.java    |   7 +
+ .../controller/TransactionController.java          |  10 +-
+ .../com/financeai/controller/UserController.java   |   8 +-
+ ...utenticacao.java => AuthenticationRequest.java} |   3 +-
+ .../dto/request/FinancialAnalysisRequest.java      |   2 +-
+ .../com/financeai/dto/request/UserRegisterDto.java |   1 +
+ .../com/financeai/dto/request/UserUpdateDto.java   |   1 +
+ .../dto/response/AuthenticationResponse.java       |   6 +
+ .../com/financeai/dto/response/DadosTokenJWT.java  |   5 -
+ .../dto/response/ExpenseSummaryResponse.java       |   1 +
+ .../response/FinancialAnalysisHistoryResponse.java |   1 +
+ .../dto/response/FinancialAnalysisResponse.java    |   1 +
+ .../financeai/dto/response/UserResponseDto.java    |   1 +
+ .../main/java/br/com/financeai/entity/AppUser.java |  10 +
+ .../br/com/financeai/entity/FinancialAnalysis.java |  13 +-
+ .../java/br/com/financeai/entity/Transaction.java  |   8 +
+ .../br/com/financeai/enums/FinancialProfile.java   |   4 +
+ .../br/com/financeai/enums/SavingFrequency.java    |   6 +
+ .../main/java/br/com/financeai/enums/Source.java   |   6 +
+ .../com/financeai/enums/TransactionCategory.java   |   5 +-
+ .../br/com/financeai/enums/TransactionType.java    |   2 +-
+ .../com/financeai/exception/ApiErrorResponse.java  |   3 +
+ .../exception/AuthenticationException.java         |   5 +
+ .../com/financeai/exception/BusinessException.java |   6 +
+ .../com/financeai/exception/DatabaseException.java |   5 +
+ .../exception/ExternalServiceException.java        |   4 +
+ .../exception/GlobalExceptionHandler.java          |   6 +
+ .../exception/InvalidRequestException.java         |   4 +
+ .../exception/ResourceNotFoundException.java       |   5 +
+ .../exception/UserAlreadyExistsException.java      |   4 +
+ .../financeai/exception/UserNotFoundException.java |   4 +
+ .../com/financeai/integration/client/MlClient.java |  17 +-
+ .../{MlRequest.java => MlAnalysisRequest.java}     |   6 +-
+ .../dto/request/MlTransactionRequest.java          |   8 +-
+ .../{MlResponse.java => MlAnalysisResponse.java}   |   7 +-
+ .../dto/response/MlTransactionResponse.java        |   5 +-
+ .../repository/FinancialAnalysisRepository.java    |  21 +-
+ .../repository/TransactionRepository.java          |  17 +-
+ .../com/financeai/repository/UserRepository.java   |  12 +-
+ .../financeai/security/SecurityConfigurations.java |   8 +
+ .../br/com/financeai/security/SecurityFilter.java  |   9 +
+ .../br/com/financeai/security/TokenService.java    |   6 +
+ ...acaoService.java => AuthenticationService.java} |   7 +-
+ .../service/FinancialAnalysisService.java          |  43 +-
+ .../financeai/service/FinancialProfileService.java |  29 +-
+ .../service/TransactionClassificationService.java  |   9 +
+ .../com/financeai/service/TransactionService.java  |  17 +-
+ .../java/br/com/financeai/service/UserService.java |  61 +-
+ backend/src/main/resources/application.properties  |   6 +-
+ .../V5__fix_nivel_endividamento_precision.sql      |   2 +
+ docker-compose.yml                                 |  37 +-
+ docker/backend.Dockerfile                          |   2 +-
+ docker/frontend.Dockerfile                         |  15 +-
+ docker/ml-mock.Dockerfile                          |   7 -
+ docker/ml.Dockerfile                               |  18 +
+ frontend/package-lock.json                         |  56 +-
+ ml/models/transaction_classifier.pkl               | Bin 1447402 -> 11284973 bytes
+ ml/requirements.txt                                |   3 +-
+ ml/scripts/algorithm1/predict.py                   |   8 +-
+ ml/scripts/algorithm1/train.py                     | 124 +++-
+ ml/tests/test_api_integration.py                   |  55 +-
+ ml/tests/test_estresse_backend.py                  | 119 ++++
+ ml/tests/test_fluxo_e2e_simulado.py                | 174 +++++
+ ml/tests/test_recomendacoes_engine.py              | 134 ++++
+ relatorio_e2e_simulado.html                        | 773 +++++++++++++++++++++
+ relatorio_testes.html                              | 773 +++++++++++++++++++++
+ resultado_testes.txt                               | Bin 0 -> 8388 bytes
+ 73 files changed, 2899 insertions(+), 203 deletions(-)
+
+================================================================================
+TODOS OS ARQUIVOS ALTERADOS
+================================================================================
+A	assets/style.css
+M	backend/relatorio-backend-crud.txt
+M	backend/src/main/java/br/com/financeai/FinanceAiApiApplication.java
+M	backend/src/main/java/br/com/financeai/config/OpenApiConfig.java
+M	backend/src/main/java/br/com/financeai/config/RestClientConfig.java
+R090	backend/src/main/java/br/com/financeai/controller/AutenticacaoController.java	backend/src/main/java/br/com/financeai/controller/AuthenticationController.java
+M	backend/src/main/java/br/com/financeai/controller/FinancialAnalysisController.java
+M	backend/src/main/java/br/com/financeai/controller/TransactionController.java
+M	backend/src/main/java/br/com/financeai/controller/UserController.java
+R056	backend/src/main/java/br/com/financeai/dto/request/DadosAutenticacao.java	backend/src/main/java/br/com/financeai/dto/request/AuthenticationRequest.java
+M	backend/src/main/java/br/com/financeai/dto/request/FinancialAnalysisRequest.java
+M	backend/src/main/java/br/com/financeai/dto/request/UserRegisterDto.java
+M	backend/src/main/java/br/com/financeai/dto/request/UserUpdateDto.java
+A	backend/src/main/java/br/com/financeai/dto/response/AuthenticationResponse.java
+D	backend/src/main/java/br/com/financeai/dto/response/DadosTokenJWT.java
+M	backend/src/main/java/br/com/financeai/dto/response/ExpenseSummaryResponse.java
+M	backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisHistoryResponse.java
+M	backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisResponse.java
+M	backend/src/main/java/br/com/financeai/dto/response/UserResponseDto.java
+M	backend/src/main/java/br/com/financeai/entity/AppUser.java
+M	backend/src/main/java/br/com/financeai/entity/FinancialAnalysis.java
+M	backend/src/main/java/br/com/financeai/entity/Transaction.java
+M	backend/src/main/java/br/com/financeai/enums/FinancialProfile.java
+M	backend/src/main/java/br/com/financeai/enums/SavingFrequency.java
+M	backend/src/main/java/br/com/financeai/enums/Source.java
+M	backend/src/main/java/br/com/financeai/enums/TransactionCategory.java
+M	backend/src/main/java/br/com/financeai/enums/TransactionType.java
+M	backend/src/main/java/br/com/financeai/exception/ApiErrorResponse.java
+M	backend/src/main/java/br/com/financeai/exception/AuthenticationException.java
+M	backend/src/main/java/br/com/financeai/exception/BusinessException.java
+M	backend/src/main/java/br/com/financeai/exception/DatabaseException.java
+M	backend/src/main/java/br/com/financeai/exception/ExternalServiceException.java
+M	backend/src/main/java/br/com/financeai/exception/GlobalExceptionHandler.java
+M	backend/src/main/java/br/com/financeai/exception/InvalidRequestException.java
+M	backend/src/main/java/br/com/financeai/exception/ResourceNotFoundException.java
+M	backend/src/main/java/br/com/financeai/exception/UserAlreadyExistsException.java
+M	backend/src/main/java/br/com/financeai/exception/UserNotFoundException.java
+M	backend/src/main/java/br/com/financeai/integration/client/MlClient.java
+R052	backend/src/main/java/br/com/financeai/integration/dto/request/MlRequest.java	backend/src/main/java/br/com/financeai/integration/dto/request/MlAnalysisRequest.java
+M	backend/src/main/java/br/com/financeai/integration/dto/request/MlTransactionRequest.java
+R078	backend/src/main/java/br/com/financeai/integration/dto/response/MlResponse.java	backend/src/main/java/br/com/financeai/integration/dto/response/MlAnalysisResponse.java
+M	backend/src/main/java/br/com/financeai/integration/dto/response/MlTransactionResponse.java
+M	backend/src/main/java/br/com/financeai/repository/FinancialAnalysisRepository.java
+M	backend/src/main/java/br/com/financeai/repository/TransactionRepository.java
+M	backend/src/main/java/br/com/financeai/repository/UserRepository.java
+M	backend/src/main/java/br/com/financeai/security/SecurityConfigurations.java
+M	backend/src/main/java/br/com/financeai/security/SecurityFilter.java
+M	backend/src/main/java/br/com/financeai/security/TokenService.java
+R075	backend/src/main/java/br/com/financeai/service/AutenticacaoService.java	backend/src/main/java/br/com/financeai/service/AuthenticationService.java
+M	backend/src/main/java/br/com/financeai/service/FinancialAnalysisService.java
+M	backend/src/main/java/br/com/financeai/service/FinancialProfileService.java
+M	backend/src/main/java/br/com/financeai/service/TransactionClassificationService.java
+M	backend/src/main/java/br/com/financeai/service/TransactionService.java
+M	backend/src/main/java/br/com/financeai/service/UserService.java
+M	backend/src/main/resources/application.properties
+A	backend/src/main/resources/db/migration/V5__fix_nivel_endividamento_precision.sql
+M	docker-compose.yml
+M	docker/backend.Dockerfile
+M	docker/frontend.Dockerfile
+D	docker/ml-mock.Dockerfile
+A	docker/ml.Dockerfile
+M	frontend/package-lock.json
+M	ml/models/transaction_classifier.pkl
+M	ml/requirements.txt
+M	ml/scripts/algorithm1/predict.py
+M	ml/scripts/algorithm1/train.py
+M	ml/tests/test_api_integration.py
+A	ml/tests/test_estresse_backend.py
+A	ml/tests/test_fluxo_e2e_simulado.py
+A	ml/tests/test_recomendacoes_engine.py
+A	relatorio_e2e_simulado.html
+A	relatorio_testes.html
+A	resultado_testes.txt
+
+================================================================================
+BACKEND
+================================================================================
+M	backend/relatorio-backend-crud.txt
+M	backend/src/main/java/br/com/financeai/FinanceAiApiApplication.java
+M	backend/src/main/java/br/com/financeai/config/OpenApiConfig.java
+M	backend/src/main/java/br/com/financeai/config/RestClientConfig.java
+R090	backend/src/main/java/br/com/financeai/controller/AutenticacaoController.java	backend/src/main/java/br/com/financeai/controller/AuthenticationController.java
+M	backend/src/main/java/br/com/financeai/controller/FinancialAnalysisController.java
+M	backend/src/main/java/br/com/financeai/controller/TransactionController.java
+M	backend/src/main/java/br/com/financeai/controller/UserController.java
+R056	backend/src/main/java/br/com/financeai/dto/request/DadosAutenticacao.java	backend/src/main/java/br/com/financeai/dto/request/AuthenticationRequest.java
+M	backend/src/main/java/br/com/financeai/dto/request/FinancialAnalysisRequest.java
+M	backend/src/main/java/br/com/financeai/dto/request/UserRegisterDto.java
+M	backend/src/main/java/br/com/financeai/dto/request/UserUpdateDto.java
+A	backend/src/main/java/br/com/financeai/dto/response/AuthenticationResponse.java
+D	backend/src/main/java/br/com/financeai/dto/response/DadosTokenJWT.java
+M	backend/src/main/java/br/com/financeai/dto/response/ExpenseSummaryResponse.java
+M	backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisHistoryResponse.java
+M	backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisResponse.java
+M	backend/src/main/java/br/com/financeai/dto/response/UserResponseDto.java
+M	backend/src/main/java/br/com/financeai/entity/AppUser.java
+M	backend/src/main/java/br/com/financeai/entity/FinancialAnalysis.java
+M	backend/src/main/java/br/com/financeai/entity/Transaction.java
+M	backend/src/main/java/br/com/financeai/enums/FinancialProfile.java
+M	backend/src/main/java/br/com/financeai/enums/SavingFrequency.java
+M	backend/src/main/java/br/com/financeai/enums/Source.java
+M	backend/src/main/java/br/com/financeai/enums/TransactionCategory.java
+M	backend/src/main/java/br/com/financeai/enums/TransactionType.java
+M	backend/src/main/java/br/com/financeai/exception/ApiErrorResponse.java
+M	backend/src/main/java/br/com/financeai/exception/AuthenticationException.java
+M	backend/src/main/java/br/com/financeai/exception/BusinessException.java
+M	backend/src/main/java/br/com/financeai/exception/DatabaseException.java
+M	backend/src/main/java/br/com/financeai/exception/ExternalServiceException.java
+M	backend/src/main/java/br/com/financeai/exception/GlobalExceptionHandler.java
+M	backend/src/main/java/br/com/financeai/exception/InvalidRequestException.java
+M	backend/src/main/java/br/com/financeai/exception/ResourceNotFoundException.java
+M	backend/src/main/java/br/com/financeai/exception/UserAlreadyExistsException.java
+M	backend/src/main/java/br/com/financeai/exception/UserNotFoundException.java
+M	backend/src/main/java/br/com/financeai/integration/client/MlClient.java
+R052	backend/src/main/java/br/com/financeai/integration/dto/request/MlRequest.java	backend/src/main/java/br/com/financeai/integration/dto/request/MlAnalysisRequest.java
+M	backend/src/main/java/br/com/financeai/integration/dto/request/MlTransactionRequest.java
+R078	backend/src/main/java/br/com/financeai/integration/dto/response/MlResponse.java	backend/src/main/java/br/com/financeai/integration/dto/response/MlAnalysisResponse.java
+M	backend/src/main/java/br/com/financeai/integration/dto/response/MlTransactionResponse.java
+M	backend/src/main/java/br/com/financeai/repository/FinancialAnalysisRepository.java
+M	backend/src/main/java/br/com/financeai/repository/TransactionRepository.java
+M	backend/src/main/java/br/com/financeai/repository/UserRepository.java
+M	backend/src/main/java/br/com/financeai/security/SecurityConfigurations.java
+M	backend/src/main/java/br/com/financeai/security/SecurityFilter.java
+M	backend/src/main/java/br/com/financeai/security/TokenService.java
+R075	backend/src/main/java/br/com/financeai/service/AutenticacaoService.java	backend/src/main/java/br/com/financeai/service/AuthenticationService.java
+M	backend/src/main/java/br/com/financeai/service/FinancialAnalysisService.java
+M	backend/src/main/java/br/com/financeai/service/FinancialProfileService.java
+M	backend/src/main/java/br/com/financeai/service/TransactionClassificationService.java
+M	backend/src/main/java/br/com/financeai/service/TransactionService.java
+M	backend/src/main/java/br/com/financeai/service/UserService.java
+M	backend/src/main/resources/application.properties
+A	backend/src/main/resources/db/migration/V5__fix_nivel_endividamento_precision.sql
+
+--- ESTATISTICAS BACKEND ---
+ backend/relatorio-backend-crud.txt                 | 10 ++--
+ .../br/com/financeai/FinanceAiApiApplication.java  |  3 ++
+ .../br/com/financeai/config/OpenApiConfig.java     |  5 ++
+ .../br/com/financeai/config/RestClientConfig.java  |  5 ++
+ ...ntroller.java => AuthenticationController.java} | 25 ++++-----
+ .../controller/FinancialAnalysisController.java    |  7 +++
+ .../controller/TransactionController.java          | 10 +++-
+ .../com/financeai/controller/UserController.java   |  8 ++-
+ ...utenticacao.java => AuthenticationRequest.java} |  3 +-
+ .../dto/request/FinancialAnalysisRequest.java      |  2 +-
+ .../com/financeai/dto/request/UserRegisterDto.java |  1 +
+ .../com/financeai/dto/request/UserUpdateDto.java   |  1 +
+ .../dto/response/AuthenticationResponse.java       |  6 +++
+ .../com/financeai/dto/response/DadosTokenJWT.java  |  5 --
+ .../dto/response/ExpenseSummaryResponse.java       |  1 +
+ .../response/FinancialAnalysisHistoryResponse.java |  1 +
+ .../dto/response/FinancialAnalysisResponse.java    |  1 +
+ .../financeai/dto/response/UserResponseDto.java    |  1 +
+ .../main/java/br/com/financeai/entity/AppUser.java | 10 ++++
+ .../br/com/financeai/entity/FinancialAnalysis.java | 13 ++++-
+ .../java/br/com/financeai/entity/Transaction.java  |  8 +++
+ .../br/com/financeai/enums/FinancialProfile.java   |  4 ++
+ .../br/com/financeai/enums/SavingFrequency.java    |  6 +++
+ .../main/java/br/com/financeai/enums/Source.java   |  6 +++
+ .../com/financeai/enums/TransactionCategory.java   |  5 +-
+ .../br/com/financeai/enums/TransactionType.java    |  2 +-
+ .../com/financeai/exception/ApiErrorResponse.java  |  3 ++
+ .../exception/AuthenticationException.java         |  5 ++
+ .../com/financeai/exception/BusinessException.java |  6 +++
+ .../com/financeai/exception/DatabaseException.java |  5 ++
+ .../exception/ExternalServiceException.java        |  4 ++
+ .../exception/GlobalExceptionHandler.java          |  6 +++
+ .../exception/InvalidRequestException.java         |  4 ++
+ .../exception/ResourceNotFoundException.java       |  5 ++
+ .../exception/UserAlreadyExistsException.java      |  4 ++
+ .../financeai/exception/UserNotFoundException.java |  4 ++
+ .../com/financeai/integration/client/MlClient.java | 17 +++---
+ .../{MlRequest.java => MlAnalysisRequest.java}     |  6 ++-
+ .../dto/request/MlTransactionRequest.java          |  8 ++-
+ .../{MlResponse.java => MlAnalysisResponse.java}   |  7 ++-
+ .../dto/response/MlTransactionResponse.java        |  5 +-
+ .../repository/FinancialAnalysisRepository.java    | 21 ++++----
+ .../repository/TransactionRepository.java          | 17 ++++--
+ .../com/financeai/repository/UserRepository.java   | 12 ++++-
+ .../financeai/security/SecurityConfigurations.java |  8 +++
+ .../br/com/financeai/security/SecurityFilter.java  |  9 ++++
+ .../br/com/financeai/security/TokenService.java    |  6 +++
+ ...acaoService.java => AuthenticationService.java} |  7 ++-
+ .../service/FinancialAnalysisService.java          | 43 +++++++++------
+ .../financeai/service/FinancialProfileService.java | 29 +++++++---
+ .../service/TransactionClassificationService.java  |  9 ++++
+ .../com/financeai/service/TransactionService.java  | 17 +++---
+ .../java/br/com/financeai/service/UserService.java | 61 ++++++++++++++++++++--
+ backend/src/main/resources/application.properties  |  6 ++-
+ .../V5__fix_nivel_endividamento_precision.sql      |  2 +
+ 55 files changed, 387 insertions(+), 98 deletions(-)
+
+================================================================================
+FRONTEND
+================================================================================
+M	frontend/package-lock.json
+
+================================================================================
+CONTROLLERS
+================================================================================
+R090	backend/src/main/java/br/com/financeai/controller/AutenticacaoController.java	backend/src/main/java/br/com/financeai/controller/AuthenticationController.java
+M	backend/src/main/java/br/com/financeai/controller/FinancialAnalysisController.java
+M	backend/src/main/java/br/com/financeai/controller/TransactionController.java
+M	backend/src/main/java/br/com/financeai/controller/UserController.java
+
+================================================================================
+SERVICES
+================================================================================
+R075	backend/src/main/java/br/com/financeai/service/AutenticacaoService.java	backend/src/main/java/br/com/financeai/service/AuthenticationService.java
+M	backend/src/main/java/br/com/financeai/service/FinancialAnalysisService.java
+M	backend/src/main/java/br/com/financeai/service/FinancialProfileService.java
+M	backend/src/main/java/br/com/financeai/service/TransactionClassificationService.java
+M	backend/src/main/java/br/com/financeai/service/TransactionService.java
+M	backend/src/main/java/br/com/financeai/service/UserService.java
+
+================================================================================
+DTOS
+================================================================================
+R056	backend/src/main/java/br/com/financeai/dto/request/DadosAutenticacao.java	backend/src/main/java/br/com/financeai/dto/request/AuthenticationRequest.java
+M	backend/src/main/java/br/com/financeai/dto/request/FinancialAnalysisRequest.java
+M	backend/src/main/java/br/com/financeai/dto/request/UserRegisterDto.java
+M	backend/src/main/java/br/com/financeai/dto/request/UserUpdateDto.java
+A	backend/src/main/java/br/com/financeai/dto/response/AuthenticationResponse.java
+D	backend/src/main/java/br/com/financeai/dto/response/DadosTokenJWT.java
+M	backend/src/main/java/br/com/financeai/dto/response/ExpenseSummaryResponse.java
+M	backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisHistoryResponse.java
+M	backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisResponse.java
+M	backend/src/main/java/br/com/financeai/dto/response/UserResponseDto.java
+
+================================================================================
+ENUMS
+================================================================================
+M	backend/src/main/java/br/com/financeai/enums/FinancialProfile.java
+M	backend/src/main/java/br/com/financeai/enums/SavingFrequency.java
+M	backend/src/main/java/br/com/financeai/enums/Source.java
+M	backend/src/main/java/br/com/financeai/enums/TransactionCategory.java
+M	backend/src/main/java/br/com/financeai/enums/TransactionType.java
+
+================================================================================
+INTEGRACAO ML
+================================================================================
+M	backend/src/main/java/br/com/financeai/integration/client/MlClient.java
+R052	backend/src/main/java/br/com/financeai/integration/dto/request/MlRequest.java	backend/src/main/java/br/com/financeai/integration/dto/request/MlAnalysisRequest.java
+M	backend/src/main/java/br/com/financeai/integration/dto/request/MlTransactionRequest.java
+R078	backend/src/main/java/br/com/financeai/integration/dto/response/MlResponse.java	backend/src/main/java/br/com/financeai/integration/dto/response/MlAnalysisResponse.java
+M	backend/src/main/java/br/com/financeai/integration/dto/response/MlTransactionResponse.java
+
+================================================================================
+BANCO E MIGRATIONS
+================================================================================
+M	backend/src/main/resources/application.properties
+A	backend/src/main/resources/db/migration/V5__fix_nivel_endividamento_precision.sql
+
+================================================================================
+DOCKER
+================================================================================
+M	docker-compose.yml
+M	docker/backend.Dockerfile
+M	docker/frontend.Dockerfile
+D	docker/ml-mock.Dockerfile
+A	docker/ml.Dockerfile
+
+================================================================================
+LINHAS ADICIONADAS / REMOVIDAS
+================================================================================
+319	0	assets/style.css
+5	5	backend/relatorio-backend-crud.txt
+3	0	backend/src/main/java/br/com/financeai/FinanceAiApiApplication.java
+5	0	backend/src/main/java/br/com/financeai/config/OpenApiConfig.java
+5	0	backend/src/main/java/br/com/financeai/config/RestClientConfig.java
+13	12	backend/src/main/java/br/com/financeai/controller/{AutenticacaoController.java => AuthenticationController.java}
+7	0	backend/src/main/java/br/com/financeai/controller/FinancialAnalysisController.java
+8	2	backend/src/main/java/br/com/financeai/controller/TransactionController.java
+6	2	backend/src/main/java/br/com/financeai/controller/UserController.java
+2	1	backend/src/main/java/br/com/financeai/dto/request/{DadosAutenticacao.java => AuthenticationRequest.java}
+1	1	backend/src/main/java/br/com/financeai/dto/request/FinancialAnalysisRequest.java
+1	0	backend/src/main/java/br/com/financeai/dto/request/UserRegisterDto.java
+1	0	backend/src/main/java/br/com/financeai/dto/request/UserUpdateDto.java
+6	0	backend/src/main/java/br/com/financeai/dto/response/AuthenticationResponse.java
+0	5	backend/src/main/java/br/com/financeai/dto/response/DadosTokenJWT.java
+1	0	backend/src/main/java/br/com/financeai/dto/response/ExpenseSummaryResponse.java
+1	0	backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisHistoryResponse.java
+1	0	backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisResponse.java
+1	0	backend/src/main/java/br/com/financeai/dto/response/UserResponseDto.java
+10	0	backend/src/main/java/br/com/financeai/entity/AppUser.java
+12	1	backend/src/main/java/br/com/financeai/entity/FinancialAnalysis.java
+8	0	backend/src/main/java/br/com/financeai/entity/Transaction.java
+4	0	backend/src/main/java/br/com/financeai/enums/FinancialProfile.java
+6	0	backend/src/main/java/br/com/financeai/enums/SavingFrequency.java
+6	0	backend/src/main/java/br/com/financeai/enums/Source.java
+4	1	backend/src/main/java/br/com/financeai/enums/TransactionCategory.java
+1	1	backend/src/main/java/br/com/financeai/enums/TransactionType.java
+3	0	backend/src/main/java/br/com/financeai/exception/ApiErrorResponse.java
+5	0	backend/src/main/java/br/com/financeai/exception/AuthenticationException.java
+6	0	backend/src/main/java/br/com/financeai/exception/BusinessException.java
+5	0	backend/src/main/java/br/com/financeai/exception/DatabaseException.java
+4	0	backend/src/main/java/br/com/financeai/exception/ExternalServiceException.java
+6	0	backend/src/main/java/br/com/financeai/exception/GlobalExceptionHandler.java
+4	0	backend/src/main/java/br/com/financeai/exception/InvalidRequestException.java
+5	0	backend/src/main/java/br/com/financeai/exception/ResourceNotFoundException.java
+4	0	backend/src/main/java/br/com/financeai/exception/UserAlreadyExistsException.java
+4	0	backend/src/main/java/br/com/financeai/exception/UserNotFoundException.java
+9	8	backend/src/main/java/br/com/financeai/integration/client/MlClient.java
+5	1	backend/src/main/java/br/com/financeai/integration/dto/request/{MlRequest.java => MlAnalysisRequest.java}
+6	2	backend/src/main/java/br/com/financeai/integration/dto/request/MlTransactionRequest.java
+6	1	backend/src/main/java/br/com/financeai/integration/dto/response/{MlResponse.java => MlAnalysisResponse.java}
+4	1	backend/src/main/java/br/com/financeai/integration/dto/response/MlTransactionResponse.java
+12	9	backend/src/main/java/br/com/financeai/repository/FinancialAnalysisRepository.java
+14	3	backend/src/main/java/br/com/financeai/repository/TransactionRepository.java
+11	1	backend/src/main/java/br/com/financeai/repository/UserRepository.java
+8	0	backend/src/main/java/br/com/financeai/security/SecurityConfigurations.java
+9	0	backend/src/main/java/br/com/financeai/security/SecurityFilter.java
+6	0	backend/src/main/java/br/com/financeai/security/TokenService.java
+6	1	backend/src/main/java/br/com/financeai/service/{AutenticacaoService.java => AuthenticationService.java}
+26	17	backend/src/main/java/br/com/financeai/service/FinancialAnalysisService.java
+21	8	backend/src/main/java/br/com/financeai/service/FinancialProfileService.java
+9	0	backend/src/main/java/br/com/financeai/service/TransactionClassificationService.java
+9	8	backend/src/main/java/br/com/financeai/service/TransactionService.java
+56	5	backend/src/main/java/br/com/financeai/service/UserService.java
+4	2	backend/src/main/resources/application.properties
+2	0	backend/src/main/resources/db/migration/V5__fix_nivel_endividamento_precision.sql
+31	6	docker-compose.yml
+1	1	docker/backend.Dockerfile
+12	3	docker/frontend.Dockerfile
+0	7	docker/ml-mock.Dockerfile
+18	0	docker/ml.Dockerfile
+36	20	frontend/package-lock.json
+-	-	ml/models/transaction_classifier.pkl
+2	1	ml/requirements.txt
+3	5	ml/scripts/algorithm1/predict.py
+98	26	ml/scripts/algorithm1/train.py
+19	36	ml/tests/test_api_integration.py
+119	0	ml/tests/test_estresse_backend.py
+174	0	ml/tests/test_fluxo_e2e_simulado.py
+134	0	ml/tests/test_recomendacoes_engine.py
+773	0	relatorio_e2e_simulado.html
+773	0	relatorio_testes.html
+-	-	resultado_testes.txt
+
+================================================================================
+GIT STATUS
+================================================================================
+On branch feature/frontend-backend-integration
+Your branch is up to date with 'origin/feature/frontend-backend-integration'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	RELATORIO_MERGE_DEVELOP_FINAL.txt
+
+nothing added to commit but untracked files present (use "git add" to track)

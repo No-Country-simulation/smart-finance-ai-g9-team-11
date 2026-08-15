@@ -25,7 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 @Tag(
         name = "Users",
-        description = "Protected endpoints for managing the authenticated user's profile."
+        description = "Endpoints for user registration and authenticated profile management."
 )
 @RestController
 @RequestMapping("/users")
@@ -36,20 +36,20 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-  
-   @Operation(
+
+    @Operation(
             summary = "Register a new user",
             description = """
-                Creates a new user account.
-
-                Authentication:
-                This endpoint is public and does not require a JWT token.
-
-                Behavior:
-                Validates the registration data, requires a unique email address
-                and encrypts the password before storing it. The password is never
-                included in the API response.
-                """
+                    Creates a new user account.
+                    
+                    Authentication:
+                    This endpoint is public and does not require a JWT token.
+                    
+                    Behavior:
+                    Validates the registration data, requires a unique email address
+                    and encrypts the password before storing it. The password is never
+                    included in the API response.
+                    """
     )
     @SecurityRequirements
     @ApiResponses({
@@ -89,16 +89,16 @@ public class UserController {
     @Operation(
             summary = "Get authenticated user",
             description = """
-                Returns the profile information of the currently authenticated user.
-
-                Authentication:
-                Requires a valid JWT access token in the Authorization header using
-                the format: Bearer {token}.
-
-                Behavior:
-                Identifies the user from the token and returns their profile data
-                without exposing sensitive information such as the password.
-                """
+                    Returns the profile information of the currently authenticated user.
+                    
+                    Authentication:
+                    Requires a valid JWT access token in the Authorization header using
+                    the format: Bearer {token}.
+                    
+                    Behavior:
+                    Identifies the user from the token and returns their profile data
+                    without exposing sensitive information such as the password.
+                    """
     )
     @ApiResponses({
             @ApiResponse(
@@ -135,17 +135,22 @@ public class UserController {
     @Operation(
             summary = "Update authenticated user",
             description = """
-                Updates the profile information of the currently authenticated user.
-
-                Authentication:
-                Requires a valid JWT access token in the Authorization header using
-                the format: Bearer {token}.
-
-                Behavior:
-                Allows the authenticated user to update their own account information.
-                If the email is changed, the new address must not already belong to
-                another user. A new password is encrypted before being stored.
-                """
+                    Updates the profile information of the currently authenticated user.
+                    
+                    Authentication:
+                    Requires a valid JWT access token in the Authorization header using
+                    the format: Bearer {token}.
+                    
+                    Behavior:
+                    Allows the authenticated user to update their own account information.
+                    Any combination of name, email and password may be updated in a single request.
+                    
+                    If the email is changed, the new address must not already belong to another user.
+                    A new password is encrypted before being stored.
+                    
+                    If the email address is updated, the current JWT becomes invalid and
+                    the user must authenticate again before accessing protected endpoints.
+                    """
     )
     @ApiResponses({
             @ApiResponse(
@@ -200,17 +205,17 @@ public class UserController {
     @Operation(
             summary = "Deactivate authenticated user",
             description = """
-                Deactivates the currently authenticated user's account.
-
-                Authentication:
-                Requires a valid JWT access token in the Authorization header using
-                the format: Bearer {token}.
-
-                Behavior:
-                Performs a logical deletion by marking the account as inactive.
-                The user record remains stored in the database, but the account
-                must no longer be authorized to access protected endpoints.
-                """
+                    Deactivates the currently authenticated user's account.
+                    
+                    Authentication:
+                    Requires a valid JWT access token in the Authorization header using
+                    the format: Bearer {token}.
+                    
+                    Behavior:
+                    Performs a logical deletion by marking the account as inactive.
+                    The user record remains stored in the database, but the account
+                    must no longer be authorized to access protected endpoints.
+                    """
     )
     @ApiResponses({
             @ApiResponse(

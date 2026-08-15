@@ -16,6 +16,7 @@ import {
   type TeamMember,
   type TeamStackGroup,
 } from "@/data/team";
+
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { cn } from "@/lib/utils";
 
@@ -33,19 +34,28 @@ interface StackGroupProps {
   group: TeamStackGroup;
 }
 
-function getInitials(name: string): string {
+function getInitials(
+  name: string,
+): string {
   return name
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
+    .map((part) =>
+      part
+        .charAt(0)
+        .toUpperCase(),
+    )
     .join("");
 }
 
 function TeamAvatar({
   member,
 }: Readonly<TeamAvatarProps>) {
-  const initials = getInitials(member.name);
+  const initials =
+    getInitials(
+      member.name,
+    );
 
   return (
     <div
@@ -63,7 +73,9 @@ function TeamAvatar({
     >
       {member.photoUrl ? (
         <img
-          src={member.photoUrl}
+          src={
+            member.photoUrl
+          }
           alt={`Foto de ${member.name}`}
           className="h-full w-full object-cover"
           loading="lazy"
@@ -174,9 +186,13 @@ function StackGroup({
 
       <div className="mt-3 flex flex-wrap gap-2">
         {group.technologies.map(
-          (technology) => (
+          (
+            technology,
+          ) => (
             <span
-              key={technology}
+              key={
+                technology
+              }
               className={cn(
                 "rounded-full border",
                 "border-primary/15",
@@ -186,7 +202,9 @@ function StackGroup({
                 "text-primary-bright",
               )}
             >
-              {technology}
+              {
+                technology
+              }
             </span>
           ),
         )}
@@ -199,9 +217,12 @@ export function TeamSection() {
   const {
     ref,
     isVisible,
-  } = useScrollReveal<HTMLElement>({
-    threshold: 0.04,
-  });
+  } =
+    useScrollReveal<HTMLElement>(
+      {
+        threshold: 0.04,
+      },
+    );
 
   return (
     <section
@@ -322,55 +343,74 @@ export function TeamSection() {
           >
             {[
               {
-                value: `${teamMembers.length}`,
-                label: "Integrantes",
+                value:
+                  `${teamMembers.length}`,
+                label:
+                  "Integrantes",
               },
               {
-                value: "Full Stack",
-                label: "Arquitetura integrada",
+                value:
+                  "Full Stack",
+                label:
+                  "Arquitetura integrada",
               },
               {
-                value: "IA + Cloud",
-                label: "Tecnologia aplicada",
+                value:
+                  "IA + Cloud",
+                label:
+                  "Tecnologia aplicada",
               },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className={cn(
-                  "rounded-[16px] border",
-                  "border-border-muted",
-                  "bg-surface/55 px-4 py-4",
-                  "backdrop-blur-xl",
-                )}
-              >
-                <strong
+            ].map(
+              (item) => (
+                <div
+                  key={
+                    item.label
+                  }
                   className={cn(
-                    "block text-lg font-bold",
-                    "text-primary-bright",
+                    "rounded-[16px] border",
+                    "border-border-muted",
+                    "bg-surface/55 px-4 py-4",
+                    "backdrop-blur-xl",
                   )}
                 >
-                  {item.value}
-                </strong>
+                  <strong
+                    className={cn(
+                      "block text-lg font-bold",
+                      "text-primary-bright",
+                    )}
+                  >
+                    {
+                      item.value
+                    }
+                  </strong>
 
-                <span
-                  className={cn(
-                    "mt-1 block text-[10px]",
-                    "uppercase tracking-[0.1em]",
-                    "text-text-subtle",
-                  )}
-                >
-                  {item.label}
-                </span>
-              </div>
-            ))}
+                  <span
+                    className={cn(
+                      "mt-1 block text-[10px]",
+                      "uppercase tracking-[0.1em]",
+                      "text-text-subtle",
+                    )}
+                  >
+                    {
+                      item.label
+                    }
+                  </span>
+                </div>
+              ),
+            )}
           </div>
         </div>
 
         <div className="mt-16 grid gap-7 lg:grid-cols-2">
           {teamMembers.map(
-            (member, index) => (
+            (
+              member,
+              index,
+            ) => (
               <article
-                key={member.id}
+                key={
+                  member.id
+                }
                 className={cn(
                   "scroll-reveal",
                   isVisible &&
@@ -379,9 +419,8 @@ export function TeamSection() {
                   "flex min-w-0 flex-col",
                   "overflow-hidden",
                   "rounded-[26px] border",
-                  member.featured
-                    ? "border-primary/35 bg-primary/[0.065]"
-                    : "border-border-muted bg-surface/65",
+                  "border-border-muted",
+                  "bg-surface/65",
                   "p-5 backdrop-blur-xl",
                   "sm:p-7",
                   "transition-[transform,border-color,box-shadow]",
@@ -391,7 +430,8 @@ export function TeamSection() {
                   "hover:shadow-[0_30px_85px_-55px_var(--glow-primary)]",
                 )}
                 style={{
-                  transitionDelay: `${index * 90}ms`,
+                  transitionDelay:
+                    `${index * 90}ms`,
                 }}
               >
                 <div
@@ -400,9 +440,8 @@ export function TeamSection() {
                     "absolute inset-x-0 top-0",
                     "h-40",
                     "bg-gradient-to-b",
-                    member.featured
-                      ? "from-primary/10 to-transparent"
-                      : "from-surface-elevated/45 to-transparent",
+                    "from-surface-elevated/45",
+                    "to-transparent",
                   )}
                   aria-hidden="true"
                 />
@@ -451,7 +490,9 @@ export function TeamSection() {
                   )}
                 >
                   <TeamAvatar
-                    member={member}
+                    member={
+                      member
+                    }
                   />
 
                   <div className="min-w-0 flex-1">
@@ -462,7 +503,9 @@ export function TeamSection() {
                         "text-text-subtle",
                       )}
                     >
-                      {member.area}
+                      {
+                        member.area
+                      }
                     </span>
 
                     <h3
@@ -472,7 +515,9 @@ export function TeamSection() {
                         "text-text",
                       )}
                     >
-                      {member.name}
+                      {
+                        member.name
+                      }
                     </h3>
 
                     <p
@@ -481,7 +526,9 @@ export function TeamSection() {
                         "text-primary-bright",
                       )}
                     >
-                      {member.role}
+                      {
+                        member.role
+                      }
                     </p>
 
                     <p
@@ -490,7 +537,9 @@ export function TeamSection() {
                         "text-text-muted",
                       )}
                     >
-                      {member.summary}
+                      {
+                        member.summary
+                      }
                     </p>
                   </div>
                 </div>
@@ -516,9 +565,13 @@ export function TeamSection() {
 
                   <div className="mt-3 flex flex-wrap gap-2">
                     {member.highlights.map(
-                      (highlight) => (
+                      (
+                        highlight,
+                      ) => (
                         <span
-                          key={highlight}
+                          key={
+                            highlight
+                          }
                           className={cn(
                             "rounded-full border",
                             "border-warning/15",
@@ -528,7 +581,9 @@ export function TeamSection() {
                             "text-warning",
                           )}
                         >
-                          {highlight}
+                          {
+                            highlight
+                          }
                         </span>
                       ),
                     )}
@@ -548,9 +603,13 @@ export function TeamSection() {
 
                   <div className="mt-3 flex flex-wrap gap-2">
                     {member.skills.map(
-                      (skill) => (
+                      (
+                        skill,
+                      ) => (
                         <span
-                          key={skill}
+                          key={
+                            skill
+                          }
                           className={cn(
                             "rounded-full border",
                             "border-border-muted",
@@ -562,7 +621,9 @@ export function TeamSection() {
                             "group-hover:border-primary/15",
                           )}
                         >
-                          {skill}
+                          {
+                            skill
+                          }
                         </span>
                       ),
                     )}
@@ -588,10 +649,16 @@ export function TeamSection() {
                     )}
                   >
                     {member.stackGroups.map(
-                      (group) => (
+                      (
+                        group,
+                      ) => (
                         <StackGroup
-                          key={group.label}
-                          group={group}
+                          key={
+                            group.label
+                          }
+                          group={
+                            group
+                          }
                         />
                       ),
                     )}
@@ -611,9 +678,13 @@ export function TeamSection() {
 
                   <ul className="mt-4 space-y-3">
                     {member.activities.map(
-                      (activity) => (
+                      (
+                        activity,
+                      ) => (
                         <li
-                          key={activity}
+                          key={
+                            activity
+                          }
                           className="flex items-start gap-2.5"
                         >
                           <CheckCircle2
@@ -631,7 +702,9 @@ export function TeamSection() {
                               "text-text-muted",
                             )}
                           >
-                            {activity}
+                            {
+                              activity
+                            }
                           </span>
                         </li>
                       ),
@@ -648,15 +721,23 @@ export function TeamSection() {
                   )}
                 >
                   <SocialLink
-                    href={member.githubUrl}
+                    href={
+                      member.githubUrl
+                    }
                     label="GitHub"
-                    icon={Code}
+                    icon={
+                      Code
+                    }
                   />
 
                   <SocialLink
-                    href={member.linkedinUrl}
+                    href={
+                      member.linkedinUrl
+                    }
                     label="LinkedIn"
-                    icon={Share2}
+                    icon={
+                      Share2
+                    }
                   />
                 </div>
               </article>

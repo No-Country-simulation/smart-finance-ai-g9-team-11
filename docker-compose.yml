@@ -7,7 +7,7 @@ services:
     image: mysql:8.0
     container_name: finance-db
     environment:
-      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
       - MYSQL_DATABASE=finance_ai
     ports:
       - "3307:3306"

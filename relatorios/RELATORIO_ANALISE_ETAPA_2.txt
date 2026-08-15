@@ -1,0 +1,563 @@
+﻿RELATORIO - ANALISE FINANCEIRA ETAPA 2
+Gerado em: 10/08/2026 10:31:18
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/api.ts
+========================================================================================================================
+
+import axios from "axios";
+import type { AxiosError } from "axios";
+
+import type { ApiError } from "@/types/api";
+
+const DEFAULT_API_BASE_URL =
+  "http://localhost:8080";
+
+const ACCESS_TOKEN_STORAGE_KEY =
+  "finance-ai:access-token";
+
+const configuredApiBaseUrl =
+  import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const API_BASE_URL = (
+  configuredApiBaseUrl || DEFAULT_API_BASE_URL
+).replace(/\/+$/, "");
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15_000,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+api.interceptors.request.use((config) => {
+  if (typeof window === "undefined") {
+    return config;
+  }
+
+  const accessToken = window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+
+  if (accessToken) {
+    config.headers.Authorization =
+      `Bearer ${accessToken}`;
+  }
+
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiError>) =>
+    Promise.reject(error),
+);
+
+export function saveAccessToken(
+  accessToken: string,
+): void {
+  window.localStorage.setItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+    accessToken,
+  );
+}
+
+export function getAccessToken(): string | null {
+  return window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function removeAccessToken(): void {
+  window.localStorage.removeItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function getApiErrorMessage(
+  error: unknown,
+  fallbackMessage =
+    "Não foi possível concluir a solicitação.",
+): string {
+  if (!axios.isAxiosError<ApiError>(error)) {
+    return fallbackMessage;
+  }
+
+  return (
+    error.response?.data?.message ||
+    error.message ||
+    fallbackMessage
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/transaction.service.ts
+========================================================================================================================
+
+import { api } from "@/services/api";
+
+import type {
+  CreateTransactionRequest,
+  Transaction,
+  TransactionFilters,
+  UpdateTransactionRequest,
+} from "@/types/transaction";
+
+const TRANSACTIONS_RESOURCE =
+  "/classificar-transacoes";
+
+function validateFilters(
+  filters?: TransactionFilters,
+): void {
+  if (!filters) {
+    return;
+  }
+
+  const hasInitialDate =
+    Boolean(filters.dataInicial);
+
+  const hasFinalDate =
+    Boolean(filters.dataFinal);
+
+  if (
+    hasInitialDate !== hasFinalDate
+  ) {
+    throw new Error(
+      "Informe a data inicial e a data final.",
+    );
+  }
+}
+
+export const transactionService = {
+  async findAll(
+    filters?: TransactionFilters,
+  ): Promise<Transaction[]> {
+    validateFilters(filters);
+
+    const response =
+      await api.get<Transaction[]>(
+        TRANSACTIONS_RESOURCE,
+        {
+          params: filters,
+        },
+      );
+
+    return response.data;
+  },
+
+  async findById(
+    transactionId: number,
+  ): Promise<Transaction> {
+    const response =
+      await api.get<Transaction>(
+        `${TRANSACTIONS_RESOURCE}/${transactionId}`,
+      );
+
+    return response.data;
+  },
+
+  async create(
+    request: CreateTransactionRequest,
+  ): Promise<Transaction> {
+    const response =
+      await api.post<Transaction>(
+        TRANSACTIONS_RESOURCE,
+        request,
+      );
+
+    return response.data;
+  },
+
+  async createBatch(
+    requests:
+      CreateTransactionRequest[],
+  ): Promise<Transaction[]> {
+    const response =
+      await api.post<Transaction[]>(
+        `${TRANSACTIONS_RESOURCE}/batch`,
+        requests,
+      );
+
+    return response.data;
+  },
+
+  async update(
+    transactionId: number,
+    request: UpdateTransactionRequest,
+  ): Promise<Transaction> {
+    const response =
+      await api.put<Transaction>(
+        `${TRANSACTIONS_RESOURCE}/${transactionId}`,
+        request,
+      );
+
+    return response.data;
+  },
+
+  async remove(
+    transactionId: number,
+  ): Promise<void> {
+    await api.delete(
+      `${TRANSACTIONS_RESOURCE}/${transactionId}`,
+    );
+  },
+};
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/transaction.ts
+========================================================================================================================
+
+export const TRANSACTION_TYPES = [
+  "Receita",
+  "Despesa",
+] as const;
+
+export type TransactionType =
+  (typeof TRANSACTION_TYPES)[number];
+
+export const TRANSACTION_CATEGORIES = [
+  "Alimentação",
+  "Utilitários",
+  "Moradia",
+  "Investimento",
+  "Compras",
+  "Saúde",
+  "Entretenimento",
+  "Trajeto",
+  "Salário",
+  "Outros",
+] as const;
+
+export type TransactionCategory =
+  (typeof TRANSACTION_CATEGORIES)[number];
+
+export interface Transaction {
+  id: number;
+  descricao: string;
+  valor: number;
+  tipo: TransactionType;
+  categoria: TransactionCategory;
+  data: string;
+  usuarioId: number;
+}
+
+export interface CreateTransactionRequest {
+  descricao: string;
+  valor: number;
+  tipo: TransactionType;
+  data: string;
+}
+
+export type UpdateTransactionRequest =
+  CreateTransactionRequest;
+
+export interface TransactionFilters {
+  dataInicial?: string;
+  dataFinal?: string;
+}
+
+export function isIncomeTransaction(
+  transaction: Transaction,
+): boolean {
+  return transaction.tipo === "Receita";
+}
+
+export function isExpenseTransaction(
+  transaction: Transaction,
+): boolean {
+  return transaction.tipo === "Despesa";
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/FinancialAnalysis/FinancialAnalysisGrid.tsx
+========================================================================================================================
+
+import {
+  Activity,
+  BrainCircuit,
+  ChartNoAxesCombined,
+  PieChart,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+import { AIProfileCard } from "../AIProfileCard";
+import { ExpenseDistribution } from "../ExpenseDistribution";
+import { FinancialHealthRadar } from "../FinancialHealthRadar";
+
+export function FinancialAnalysisGrid() {
+  return (
+    <section
+      className="min-w-0 space-y-4"
+      aria-labelledby="financial-analysis-title"
+    >
+      <div
+        className={cn(
+          "flex flex-col gap-3",
+          "sm:flex-row sm:items-start sm:justify-between",
+        )}
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0",
+              "items-center justify-center",
+              "rounded-[13px] border",
+              "border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <ChartNoAxesCombined size={18} />
+          </div>
+
+          <div className="min-w-0">
+            <h2
+              id="financial-analysis-title"
+              className="text-base font-semibold text-text"
+            >
+              AnÃ¡lise financeira
+            </h2>
+
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              Acompanhe a distribuiÃ§Ã£o dos gastos, a saÃºde
+              financeira e a classificaÃ§Ã£o gerada pela IA.
+            </p>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "inline-flex w-fit items-center gap-2",
+            "rounded-[12px] border border-border",
+            "bg-surface-elevated/55 px-3 py-2",
+            "text-[10px] font-medium text-text-muted",
+          )}
+        >
+          <Activity
+            size={13}
+            aria-hidden="true"
+          />
+
+          Atualizado agora
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "grid min-w-0 grid-cols-1",
+          "items-stretch gap-4",
+          "md:grid-cols-2",
+          "xl:grid-cols-3",
+        )}
+      >
+        <div className="min-w-0">
+          <ExpenseDistribution />
+        </div>
+
+        <div className="min-w-0">
+          <FinancialHealthRadar />
+        </div>
+
+        <div
+          className={cn(
+            "min-w-0",
+            "md:col-span-2",
+            "xl:col-span-1",
+          )}
+        >
+          <AIProfileCard />
+        </div>
+      </div>
+
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div
+              className={cn(
+                "flex size-9 shrink-0",
+                "items-center justify-center",
+                "rounded-[11px]",
+                "border border-primary/20",
+                "bg-primary/10 text-primary-bright",
+              )}
+              aria-hidden="true"
+            >
+              <BrainCircuit size={16} />
+            </div>
+
+            <div className="min-w-0">
+              <CardTitle className="text-sm font-semibold">
+                VisÃ£o consolidada
+              </CardTitle>
+
+              <p className="mt-1 text-xs text-text-muted">
+                Os trÃªs blocos representam diferentes dimensÃµes
+                da situaÃ§Ã£o financeira atual.
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="pt-0">
+          <div
+            className={cn(
+              "grid grid-cols-1 gap-3",
+              "sm:grid-cols-3",
+            )}
+          >
+            <div
+              className={cn(
+                "flex items-center gap-3",
+                "rounded-[12px] border",
+                "border-border-muted",
+                "bg-background/30 px-3 py-3",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex size-8 shrink-0",
+                  "items-center justify-center",
+                  "rounded-[10px]",
+                  "bg-primary/10 text-primary-bright",
+                )}
+                aria-hidden="true"
+              >
+                <PieChart size={15} />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium text-text-subtle">
+                  Gastos
+                </p>
+
+                <p className="mt-0.5 text-xs font-semibold text-text">
+                  DistribuiÃ§Ã£o por categoria
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "flex items-center gap-3",
+                "rounded-[12px] border",
+                "border-border-muted",
+                "bg-background/30 px-3 py-3",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex size-8 shrink-0",
+                  "items-center justify-center",
+                  "rounded-[10px]",
+                  "bg-secondary/10 text-secondary-bright",
+                )}
+                aria-hidden="true"
+              >
+                <Activity size={15} />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium text-text-subtle">
+                  SaÃºde
+                </p>
+
+                <p className="mt-0.5 text-xs font-semibold text-text">
+                  Pilares financeiros
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "flex items-center gap-3",
+                "rounded-[12px] border",
+                "border-border-muted",
+                "bg-background/30 px-3 py-3",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex size-8 shrink-0",
+                  "items-center justify-center",
+                  "rounded-[10px]",
+                  "bg-success/10 text-success",
+                )}
+                aria-hidden="true"
+              >
+                <BrainCircuit size={15} />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium text-text-subtle">
+                  IA
+                </p>
+
+                <p className="mt-0.5 text-xs font-semibold text-text">
+                  ClassificaÃ§Ã£o do perfil
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/FinancialAnalysis/index.ts
+========================================================================================================================
+
+export * from "./FinancialAnalysisGrid";
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/DashboardGrid/DashboardGrid.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/DashboardGrid/index.ts
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Dashboard/Dashboard.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Dashboard/index.ts
+========================================================================================================================
+
+export { default as DashboardPage } from "./DashboardPage";
+
+========================================================================================================================
+ARQUIVO: frontend/src/App.tsx
+========================================================================================================================
+
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
+import { AppRouter } from "@/routes";
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+export default App;

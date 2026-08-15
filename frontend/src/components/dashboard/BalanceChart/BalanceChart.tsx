@@ -23,32 +23,48 @@ import {
   CardTitle,
 } from "@/components/common/Card";
 import { cn } from "@/lib/utils";
-import { dashboardService } from "@/services/dashboard.service";
 
 import { BalanceChartTooltip } from "./BalanceChartTooltip";
 
-const compactCurrencyFormatter = new Intl.NumberFormat(
-  "pt-BR",
-  {
-    notation: "compact",
-    compactDisplay: "short",
-    maximumFractionDigits: 0,
-  },
-);
+import type {
+  DashboardCashFlowItem,
+} from "@/types/dashboard";
 
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-  minimumFractionDigits: 2,
-});
-
-function formatAxisValue(value: number): string {
-  return `R$ ${compactCurrencyFormatter.format(value)}`;
+interface BalanceChartProps {
+  data: readonly DashboardCashFlowItem[];
 }
 
-export function BalanceChart() {
-  const data = dashboardService.getCashFlow();
+const compactCurrencyFormatter =
+  new Intl.NumberFormat(
+    "pt-BR",
+    {
+      notation: "compact",
+      compactDisplay: "short",
+      maximumFractionDigits: 0,
+    },
+  );
 
+const currencyFormatter =
+  new Intl.NumberFormat(
+    "pt-BR",
+    {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+    },
+  );
+
+function formatAxisValue(
+  value: number,
+): string {
+  return `R$ ${compactCurrencyFormatter.format(
+    value,
+  )}`;
+}
+
+export function BalanceChart({
+  data,
+}: Readonly<BalanceChartProps>) {
   const summary = useMemo(() => {
     const latest = data.at(-1);
 
@@ -56,12 +72,16 @@ export function BalanceChart() {
       return null;
     }
 
-    const balance = latest.income - latest.expenses;
+    const balance =
+      latest.income -
+      latest.expenses;
 
     const expensePercentage =
       latest.income > 0
         ? Math.round(
-            (latest.expenses / latest.income) * 100,
+            (latest.expenses /
+              latest.income) *
+              100,
           )
         : 0;
 
@@ -102,8 +122,7 @@ export function BalanceChart() {
             </CardTitle>
 
             <p className="mt-1 text-xs leading-5 text-text-muted">
-              Comparativo entre receitas e despesas nos
-              últimos seis meses.
+              Comparativo entre receitas e despesas nos últimos seis meses.
             </p>
           </div>
         </div>
@@ -126,7 +145,8 @@ export function BalanceChart() {
       </CardHeader>
 
       <CardContent>
-        {data.length > 0 && summary ? (
+        {data.length > 0 &&
+        summary ? (
           <>
             <div
               className={cn(
@@ -299,14 +319,18 @@ export function BalanceChart() {
                         fill: "var(--text-muted)",
                         fontSize: 10,
                       }}
-                      tickFormatter={formatAxisValue}
+                      tickFormatter={
+                        formatAxisValue
+                      }
                     />
 
                     <Tooltip
                       cursor={{
-                        stroke: "var(--border-highlight)",
+                        stroke:
+                          "var(--border-highlight)",
                         strokeWidth: 1,
-                        strokeDasharray: "4 4",
+                        strokeDasharray:
+                          "4 4",
                       }}
                       content={
                         <BalanceChartTooltip />
@@ -324,7 +348,8 @@ export function BalanceChart() {
                       activeDot={{
                         r: 5,
                         strokeWidth: 3,
-                        stroke: "var(--card)",
+                        stroke:
+                          "var(--card)",
                         fill: "#10b981",
                       }}
                       animationDuration={700}
@@ -341,7 +366,8 @@ export function BalanceChart() {
                       activeDot={{
                         r: 5,
                         strokeWidth: 3,
-                        stroke: "var(--card)",
+                        stroke:
+                          "var(--card)",
                         fill: "#f43f5e",
                       }}
                       animationDuration={850}
@@ -349,46 +375,6 @@ export function BalanceChart() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-            </div>
-
-            <div
-              className={cn(
-                "mt-4 flex flex-col gap-3",
-                "sm:flex-row sm:items-center",
-                "sm:justify-between",
-              )}
-            >
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="size-2.5 rounded-full bg-success"
-                    aria-hidden="true"
-                  />
-
-                  <span className="text-xs font-medium text-text-muted">
-                    Receitas
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span
-                    className="size-2.5 rounded-full bg-danger"
-                    aria-hidden="true"
-                  />
-
-                  <span className="text-xs font-medium text-text-muted">
-                    Despesas
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs text-text-muted">
-                Despesas representam{" "}
-                <strong className="font-semibold text-text">
-                  {summary.expensePercentage}%
-                </strong>{" "}
-                das receitas em {summary.month}.
-              </p>
             </div>
           </>
         ) : (
@@ -401,26 +387,18 @@ export function BalanceChart() {
               "px-6 text-center",
             )}
           >
-            <div
-              className={cn(
-                "flex size-12 items-center",
-                "justify-center rounded-[15px]",
-                "bg-primary/10 text-primary-bright",
-              )}
-            >
-              <BarChart3
-                size={22}
-                aria-hidden="true"
-              />
-            </div>
+            <BarChart3
+              size={22}
+              className="text-primary-bright"
+              aria-hidden="true"
+            />
 
             <p className="mt-4 text-sm font-semibold text-text">
               Nenhum dado financeiro disponível
             </p>
 
             <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
-              O gráfico será exibido quando houver receitas
-              e despesas registradas.
+              O gráfico será exibido quando houver receitas e despesas registradas.
             </p>
           </div>
         )}

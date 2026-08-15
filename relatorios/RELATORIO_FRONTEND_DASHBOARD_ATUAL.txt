@@ -1,0 +1,470 @@
+﻿RELATORIO FRONTEND - DASHBOARD ATUAL
+Gerado em: 08/08/2026 13:51:26
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/api.ts
+========================================================================================================================
+
+import axios from "axios";
+import type { AxiosError } from "axios";
+
+import type { ApiError } from "@/types/api";
+
+const DEFAULT_API_BASE_URL =
+  "http://localhost:8080";
+
+const ACCESS_TOKEN_STORAGE_KEY =
+  "finance-ai:access-token";
+
+const configuredApiBaseUrl =
+  import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const API_BASE_URL = (
+  configuredApiBaseUrl || DEFAULT_API_BASE_URL
+).replace(/\/+$/, "");
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15_000,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+api.interceptors.request.use((config) => {
+  if (typeof window === "undefined") {
+    return config;
+  }
+
+  const accessToken = window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+
+  if (accessToken) {
+    config.headers.Authorization =
+      `Bearer ${accessToken}`;
+  }
+
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiError>) =>
+    Promise.reject(error),
+);
+
+export function saveAccessToken(
+  accessToken: string,
+): void {
+  window.localStorage.setItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+    accessToken,
+  );
+}
+
+export function getAccessToken(): string | null {
+  return window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function removeAccessToken(): void {
+  window.localStorage.removeItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function getApiErrorMessage(
+  error: unknown,
+  fallbackMessage =
+    "Não foi possível concluir a solicitação.",
+): string {
+  if (!axios.isAxiosError<ApiError>(error)) {
+    return fallbackMessage;
+  }
+
+  return (
+    error.response?.data?.message ||
+    error.message ||
+    fallbackMessage
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/dashboard.service.ts
+========================================================================================================================
+
+import { dashboardMock } from "@/mocks/dashboard.mock";
+
+export const dashboardService = {
+  getSummary() {
+    return dashboardMock.summary ?? [];
+  },
+
+  getCashFlow() {
+    return dashboardMock.cashFlow ?? [];
+  },
+
+  getCategories() {
+    return dashboardMock.categories ?? [];
+  },
+
+  getTransactions() {
+    return dashboardMock.transactions ?? [];
+  },
+
+  getFinancialHealth() {
+    return dashboardMock.financialHealth;
+  },
+
+  getInsights() {
+    return dashboardMock.financialHealth.insights;
+  },
+
+  getScore() {
+    return dashboardMock.financialHealth;
+  },
+
+  getAlerts() {
+    return dashboardMock.financialHealth.alerts;
+  },
+
+  async getDashboardData() {
+    return Promise.resolve(dashboardMock);
+  },
+};
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/transaction.service.ts
+========================================================================================================================
+
+import { api } from "@/services/api";
+
+import type {
+  CreateTransactionRequest,
+  Transaction,
+  TransactionFilters,
+  UpdateTransactionRequest,
+} from "@/types/transaction";
+
+const TRANSACTIONS_RESOURCE =
+  "/classificar-transacoes";
+
+function validateFilters(
+  filters?: TransactionFilters,
+): void {
+  if (!filters) {
+    return;
+  }
+
+  const hasInitialDate =
+    Boolean(filters.dataInicial);
+
+  const hasFinalDate =
+    Boolean(filters.dataFinal);
+
+  if (hasInitialDate !== hasFinalDate) {
+    throw new Error(
+      "Informe a data inicial e a data final.",
+    );
+  }
+}
+
+export const transactionService = {
+  async findAll(
+    filters?: TransactionFilters,
+  ): Promise<Transaction[]> {
+    validateFilters(filters);
+
+    const response = await api.get<Transaction[]>(
+      TRANSACTIONS_RESOURCE,
+      {
+        params: filters,
+      },
+    );
+
+    return response.data;
+  },
+
+  async findById(
+    transactionId: number,
+  ): Promise<Transaction> {
+    const response = await api.get<Transaction>(
+      `${TRANSACTIONS_RESOURCE}/${transactionId}`,
+    );
+
+    return response.data;
+  },
+
+  async create(
+    request: CreateTransactionRequest,
+  ): Promise<Transaction> {
+    const response = await api.post<Transaction>(
+      TRANSACTIONS_RESOURCE,
+      request,
+    );
+
+    return response.data;
+  },
+
+  async createBatch(
+    requests: CreateTransactionRequest[],
+  ): Promise<Transaction[]> {
+    const response = await api.post<Transaction[]>(
+      `${TRANSACTIONS_RESOURCE}/batch`,
+      requests,
+    );
+
+    return response.data;
+  },
+
+  async update(
+    transactionId: number,
+    request: UpdateTransactionRequest,
+  ): Promise<Transaction> {
+    const response = await api.put<Transaction>(
+      `${TRANSACTIONS_RESOURCE}/${transactionId}`,
+      request,
+    );
+
+    return response.data;
+  },
+
+  async remove(
+    transactionId: number,
+  ): Promise<void> {
+    await api.delete(
+      `${TRANSACTIONS_RESOURCE}/${transactionId}`,
+    );
+  },
+};
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/api.ts
+========================================================================================================================
+
+export interface ApiError {
+  timestamp: string;
+  status: number;
+  error: string;
+  message: string;
+  path: string;
+}
+
+export interface ApiConnectionStatus {
+  connected: boolean;
+  message: string;
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/dashboard.ts
+========================================================================================================================
+
+import type { FinancialAlert } from "@/components/dashboard/Alerts";
+import type { BalanceChartData } from "@/components/dashboard/BalanceChart";
+import type { ExpenseCategory } from "@/components/dashboard/ExpenseChart/ExpenseChart.types";
+import type { FinancialCardProps } from "@/components/dashboard/FinancialCard";
+
+export interface Transaction {
+  id: number;
+  description: string;
+  category: string;
+  amount: number;
+  date: string;
+  type: "income" | "expense";
+  status: "completed" | "pending";
+}
+
+export interface FinancialScore {
+  score: number;
+  maxScore: number;
+  classification:
+    | "Excelente"
+    | "Bom"
+    | "Regular"
+    | "Baixo";
+  variation: string;
+}
+
+export interface FinancialHealth
+  extends FinancialScore {
+  insights: string[];
+  alerts: FinancialAlert[];
+}
+
+export interface DashboardMock {
+  summary: FinancialCardProps[];
+  cashFlow: BalanceChartData[];
+  categories: ExpenseCategory[];
+  transactions: Transaction[];
+  financialHealth: FinancialHealth;
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/transaction.ts
+========================================================================================================================
+
+export const TRANSACTION_TYPES = [
+  "Receita",
+  "Despesa",
+] as const;
+
+export type TransactionType =
+  (typeof TRANSACTION_TYPES)[number];
+
+export const TRANSACTION_CATEGORIES = [
+  "Alimentação",
+  "Utilitários",
+  "Moradia",
+  "Investimento",
+  "Compras",
+  "Saúde",
+  "Entretenimento",
+  "Trajeto",
+  "Salário",
+  "Outros",
+] as const;
+
+export type TransactionCategory =
+  (typeof TRANSACTION_CATEGORIES)[number];
+
+export interface Transaction {
+  id: number;
+  descricao: string;
+  valor: number;
+  tipo: TransactionType;
+  categoria: TransactionCategory;
+  data: string;
+  usuarioId: number;
+}
+
+export interface CreateTransactionRequest {
+  descricao: string;
+  valor: number;
+  tipo: TransactionType;
+  data: string;
+}
+
+export type UpdateTransactionRequest =
+  CreateTransactionRequest;
+
+export interface TransactionFilters {
+  dataInicial?: string;
+  dataFinal?: string;
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/financial.ts
+========================================================================================================================
+
+/**
+ * Tipos de domÃ­nio financeiro compartilhados entre FinancialCard,
+ * BalanceChart e ExpenseChart. MantÃ©m esses componentes sem duplicar
+ * a mesma forma de dado (valor + moeda + variaÃ§Ã£o) cada um do seu jeito.
+ */
+
+export type Currency = "BRL" | "USD" | "EUR";
+
+export type TrendDirection = "up" | "down" | "neutral";
+
+export interface MoneyValue {
+  amount: number;
+  currency: Currency;
+}
+
+export interface FinancialMetric {
+  label: string;
+  value: MoneyValue;
+  changePercent?: number;
+  trend?: TrendDirection;
+}
+
+/**
+ * Formata um MoneyValue pra exibiÃ§Ã£o em pt-BR.
+ * Fica aqui (nÃ£o em utils/) porque Ã© especÃ­fico do domÃ­nio financeiro,
+ * nÃ£o uma funÃ§Ã£o genÃ©rica de formataÃ§Ã£o de texto.
+ */
+export function formatMoney({ amount, currency }: MoneyValue): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency,
+  }).format(amount);
+}
+
+export function resolveTrend(changePercent?: number): TrendDirection {
+  if (changePercent === undefined) return "neutral";
+  if (changePercent > 0) return "up";
+  if (changePercent < 0) return "down";
+  return "neutral";
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Dashboard/DashboardPage.tsx
+========================================================================================================================
+
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+
+export function DashboardPage() {
+  return (
+    <main className="space-y-2">
+     
+
+      <DashboardGrid />
+    </main>
+  );
+}
+
+export default DashboardPage;
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/DashboardGrid.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/FinancialCards.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/FinancialCard.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/BalanceChart.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/ExpenseChart.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/TransactionsTable.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/AllInsights.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/lib/mocks/dashboard.mock.tsx
+========================================================================================================================
+
+ARQUIVO NAO ENCONTRADO

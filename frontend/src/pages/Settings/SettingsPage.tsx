@@ -1,17 +1,31 @@
-import type { LucideIcon } from "lucide-react";
+import type {
+  LucideIcon,
+} from "lucide-react";
+
 import {
-  BellRing,
-  BrainCircuit,
   Globe2,
+  Mail,
   MoonStar,
   ShieldCheck,
+  UserRound,
   WalletCards,
 } from "lucide-react";
-import type { ReactNode } from "react";
 
-import { ThemeToggle } from "@/components/layout/Header/ThemeToggle";
-import { userMock } from "@/mocks/user.mock";
-import { cn } from "@/lib/utils";
+import type {
+  ReactNode,
+} from "react";
+
+import {
+  ThemeToggle,
+} from "@/components/layout/Header/ThemeToggle";
+
+import {
+  useAuth,
+} from "@/hooks/useAuth";
+
+import {
+  cn,
+} from "@/lib/utils";
 
 interface SettingsSectionProps {
   title: string;
@@ -25,13 +39,6 @@ interface SettingsRowProps {
   description: string;
   value: string;
   muted?: boolean;
-}
-
-interface SettingsToggleProps {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  defaultChecked: boolean;
 }
 
 function SettingsSection({
@@ -69,7 +76,10 @@ function SettingsRow({
     <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
       <div className="flex min-w-0 items-start gap-3">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Icon size={19} aria-hidden="true" />
+          <Icon
+            size={19}
+            aria-hidden="true"
+          />
         </div>
 
         <div className="min-w-0">
@@ -86,7 +96,9 @@ function SettingsRow({
       <span
         className={cn(
           "shrink-0 text-sm font-semibold",
-          muted ? "text-text-muted" : "text-text",
+          muted
+            ? "text-text-muted"
+            : "text-text",
         )}
       >
         {value}
@@ -95,62 +107,10 @@ function SettingsRow({
   );
 }
 
-function SettingsToggle({
-  icon: Icon,
-  title,
-  description,
-  defaultChecked,
-}: Readonly<SettingsToggleProps>) {
-  return (
-    <div className="flex items-start justify-between gap-4 p-5 sm:items-center sm:p-6">
-      <div className="flex min-w-0 items-start gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Icon size={19} aria-hidden="true" />
-        </div>
-
-        <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-text">
-            {title}
-          </h3>
-
-          <p className="mt-1 text-sm leading-6 text-text-muted">
-            {description}
-          </p>
-        </div>
-      </div>
-
-      <label className="relative mt-1 inline-flex shrink-0 cursor-pointer items-center sm:mt-0">
-        <input
-          type="checkbox"
-          defaultChecked={defaultChecked}
-          className="peer sr-only"
-          aria-label={title}
-        />
-
-        <span
-          className={cn(
-            "relative h-6 w-11 rounded-full bg-surface-muted",
-            "transition-colors duration-200",
-            "peer-checked:bg-primary",
-            "peer-focus-visible:ring-2",
-            "peer-focus-visible:ring-primary",
-            "peer-focus-visible:ring-offset-2",
-            "after:absolute after:left-1 after:top-1",
-            "after:size-4 after:rounded-full after:bg-white",
-            "after:shadow-sm after:transition-transform",
-            "peer-checked:after:translate-x-5",
-          )}
-        />
-      </label>
-    </div>
-  );
-}
-
 export function SettingsPage() {
-  const languageLabel =
-    userMock.preferences.language === "pt-BR"
-      ? "Português (Brasil)"
-      : "English";
+  const {
+    user,
+  } = useAuth();
 
   return (
     <section className="mx-auto w-full max-w-5xl space-y-6">
@@ -164,27 +124,52 @@ export function SettingsPage() {
         </h1>
 
         <p className="mt-2 max-w-2xl text-sm text-text-muted sm:text-base">
-          Personalize a experiência e escolha quais informações deseja
-          receber do Finance AI.
+          Consulte as configurações disponíveis
+          para sua conta no Finance AI.
         </p>
       </header>
 
       <SettingsSection
+        title="Conta"
+        description="Informações vinculadas à sua conta."
+      >
+        <SettingsRow
+          icon={UserRound}
+          title="Nome"
+          description="Nome utilizado na sua conta."
+          value={
+            user?.nome ??
+            "Não informado"
+          }
+        />
+
+        <SettingsRow
+          icon={Mail}
+          title="E-mail"
+          description="Endereço utilizado para autenticação."
+          value={
+            user?.email ??
+            "Não informado"
+          }
+        />
+      </SettingsSection>
+
+      <SettingsSection
         title="Geral"
-        description="Preferências básicas de idioma e moeda."
+        description="Configurações utilizadas atualmente pela aplicação."
       >
         <SettingsRow
           icon={Globe2}
           title="Idioma"
           description="Idioma utilizado na interface."
-          value={languageLabel}
+          value="Português (Brasil)"
         />
 
         <SettingsRow
           icon={WalletCards}
           title="Moeda principal"
           description="Moeda utilizada nos indicadores financeiros."
-          value={userMock.preferences.currency}
+          value="BRL"
         />
       </SettingsSection>
 
@@ -195,7 +180,10 @@ export function SettingsPage() {
         <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div className="flex min-w-0 items-start gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <MoonStar size={19} aria-hidden="true" />
+              <MoonStar
+                size={19}
+                aria-hidden="true"
+              />
             </div>
 
             <div>
@@ -214,44 +202,23 @@ export function SettingsPage() {
       </SettingsSection>
 
       <SettingsSection
-        title="Notificações"
-        description="Controle as comunicações financeiras."
-      >
-        <SettingsToggle
-          icon={BellRing}
-          title="Alertas financeiros"
-          description="Receber avisos sobre gastos elevados e riscos."
-          defaultChecked={
-            userMock.preferences.receiveFinancialAlerts
-          }
-        />
-
-        <SettingsToggle
-          icon={BrainCircuit}
-          title="Recomendações da IA"
-          description="Receber orientações personalizadas do Finance AI."
-          defaultChecked={
-            userMock.preferences.receiveAiRecommendations
-          }
-        />
-
-        <SettingsToggle
-          icon={WalletCards}
-          title="Resumo mensal"
-          description="Receber um resumo da evolução financeira."
-          defaultChecked={
-            userMock.preferences.receiveMonthlySummary
-          }
-        />
-      </SettingsSection>
-
-      <SettingsSection
         title="Privacidade e segurança"
         description="Recursos de segurança da conta."
       >
         <SettingsRow
           icon={ShieldCheck}
-          title="Segurança da conta"
+          title="Status da conta"
+          description="Situação atual da sua conta no Finance AI."
+          value={
+            user?.ativo
+              ? "Ativa"
+              : "Indisponível"
+          }
+        />
+
+        <SettingsRow
+          icon={ShieldCheck}
+          title="Segurança avançada"
           description="Alteração de senha e autenticação em duas etapas."
           value="Em breve"
           muted

@@ -46,3 +46,15 @@ export interface TransactionFilters {
   dataInicial?: string;
   dataFinal?: string;
 }
+
+export function isIncomeTransaction(
+  transaction: Transaction,
+): boolean {
+  return transaction.tipo === "Receita";
+}
+
+export function isExpenseTransaction(
+  transaction: Transaction,
+): boolean {
+  return transaction.tipo === "Despesa";
+}

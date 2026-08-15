@@ -1,0 +1,3296 @@
+﻿RELATORIO - ANALISE FINANCEIRA FRONTEND BACKEND
+Gerado em: 09/08/2026 19:44:41
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Analysis/AnalysisPage.tsx
+========================================================================================================================
+
+const AnalysisPage = () => {
+  return <h1>Analysis</h1>;
+};
+
+export default AnalysisPage;
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Analysis/index.ts
+========================================================================================================================
+
+export { default as AnalysisPage } from "./AnalysisPage";
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/ScoreCard/ScoreCard.tsx
+========================================================================================================================
+
+import {
+  ArrowUpRight,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { ScoreGauge } from "./ScoreGauge";
+import type { ScoreCardProps } from "./ScoreCard.types";
+
+export function ScoreCard({
+  title = "PontuaÃ§Ã£o financeira",
+}: Readonly<ScoreCardProps>) {
+  const score = dashboardService.getScore();
+
+  const safeMaxScore = Math.max(
+    score.maxScore,
+    1,
+  );
+
+  const percentage = Math.min(
+    Math.max(
+      Math.round(
+        (score.score / safeMaxScore) * 100,
+      ),
+      0,
+    ),
+    100,
+  );
+
+  return (
+    <Card
+      className={cn(
+        "group relative flex min-h-[228px] min-w-0",
+        "flex-col overflow-hidden",
+        "border-border bg-card",
+        "transition-[border-color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-0.5",
+        "hover:border-border-highlight",
+        "hover:shadow-elevated",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute right-0 top-0",
+          "size-40 translate-x-1/3 -translate-y-1/3",
+          "rounded-full bg-primary/10 blur-3xl",
+        )}
+        aria-hidden="true"
+      />
+
+      <CardHeader className="relative shrink-0 pb-2">
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <CardTitle className="truncate text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <div
+            className={cn(
+              "flex size-9 shrink-0 items-center",
+              "justify-center rounded-[12px]",
+              "border border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <ShieldCheck size={17} />
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent
+        className={cn(
+          "relative flex flex-1 flex-col",
+          "justify-between gap-3 pt-0",
+        )}
+      >
+        <div className="flex min-w-0 items-center gap-4">
+          <ScoreGauge
+            score={score.score}
+            maxScore={score.maxScore}
+          />
+
+          <div className="min-w-0 flex-1">
+            <span
+              className={cn(
+                "inline-flex items-center rounded-full",
+                "border border-success/20",
+                "bg-success/10 px-2.5 py-1",
+                "text-[10px] font-semibold text-success",
+              )}
+            >
+              {score.classification}
+            </span>
+
+            <p className="mt-3 text-xs leading-5 text-text-muted">
+              Seu desempenho financeiro estÃ¡ acima da mÃ©dia.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3 text-[10px]">
+            <span className="font-medium text-text-muted">
+              Progresso do score
+            </span>
+
+            <span className="font-semibold text-primary-bright">
+              {percentage}%
+            </span>
+          </div>
+
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-muted">
+            <div
+              className={cn(
+                "h-full rounded-full",
+                "bg-gradient-to-r from-primary",
+                "via-primary-bright to-secondary-bright",
+                "transition-[width] duration-700 ease-out",
+              )}
+              style={{
+                width: `${percentage}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "flex items-center gap-2 rounded-[12px]",
+            "border border-border-muted",
+            "bg-surface-elevated/70 px-3 py-2",
+          )}
+        >
+          <div
+            className={cn(
+              "flex size-7 shrink-0 items-center",
+              "justify-center rounded-lg",
+              "bg-success/10 text-success",
+            )}
+            aria-hidden="true"
+          >
+            <ArrowUpRight size={15} />
+          </div>
+
+          <p className="min-w-0 text-[11px] font-medium text-text-muted">
+            {score.variation}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/ScoreCard/ScoreCard.types.ts
+========================================================================================================================
+
+export interface ScoreGaugeProps {
+  score: number;
+  maxScore: number;
+}
+
+export interface ScoreCardProps {
+  title?: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/ScoreCard/index.ts
+========================================================================================================================
+
+export * from "./ScoreCard";
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/AIInsights/AIInsights.tsx
+========================================================================================================================
+
+import {
+  ArrowUpRight,
+  Bot,
+  CreditCard,
+  Lightbulb,
+  Send,
+  Sparkles,
+  TriangleAlert,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { InsightItem } from "./InsightItem";
+
+import type {
+  AIInsightsProps,
+  InsightPresentation,
+} from "./AIInsights.types";
+
+const DEFAULT_MAX_VISIBLE_INSIGHTS = 4;
+
+const fallbackPresentations: readonly InsightPresentation[] =
+  [
+    {
+      icon: Sparkles,
+      tone: "success",
+      title: "Seu desempenho melhorou",
+    },
+    {
+      icon: Lightbulb,
+      tone: "warning",
+      title: "Oportunidade de economia",
+    },
+    {
+      icon: ArrowUpRight,
+      tone: "info",
+      title: "MovimentaÃ§Ã£o financeira",
+    },
+    {
+      icon: TriangleAlert,
+      tone: "danger",
+      title: "Ponto de atenÃ§Ã£o",
+    },
+  ];
+
+function getInsightPresentation(
+  insight: string,
+  index: number,
+): InsightPresentation {
+  const normalizedInsight =
+    insight.toLocaleLowerCase("pt-BR");
+
+  if (
+    normalizedInsight.includes("assinatura") ||
+    normalizedInsight.includes("atenÃ§Ã£o") ||
+    normalizedInsight.includes("risco")
+  ) {
+    return {
+      icon: CreditCard,
+      tone: "danger",
+      title: "AtenÃ§Ã£o necessÃ¡ria",
+    };
+  }
+
+  if (
+    normalizedInsight.includes("economizar") ||
+    normalizedInsight.includes("gasto") ||
+    normalizedInsight.includes("despesa") ||
+    normalizedInsight.includes("reduziu")
+  ) {
+    return {
+      icon: Lightbulb,
+      tone: "warning",
+      title: "Oportunidade de economia",
+    };
+  }
+
+  if (
+    normalizedInsight.includes("aument") ||
+    normalizedInsight.includes("crescimento") ||
+    normalizedInsight.includes("receita") ||
+    normalizedInsight.includes("renda") ||
+    normalizedInsight.includes("score")
+  ) {
+    return {
+      icon: ArrowUpRight,
+      tone: "success",
+      title: "EvoluÃ§Ã£o positiva",
+    };
+  }
+
+  return (
+    fallbackPresentations[
+      index % fallbackPresentations.length
+    ] ?? fallbackPresentations[0]
+  );
+}
+
+export function AIInsights({
+  title = "AI Assistant",
+  subtitle = "Insights e recomendaÃ§Ãµes inteligentes para suas finanÃ§as.",
+  maxVisibleInsights = DEFAULT_MAX_VISIBLE_INSIGHTS,
+}: Readonly<AIInsightsProps>) {
+  const insights: readonly string[] =
+    dashboardService.getInsights();
+
+  const safeMaxVisibleInsights = Math.max(
+    0,
+    maxVisibleInsights,
+  );
+
+  const visibleInsights = insights.slice(
+    0,
+    safeMaxVisibleInsights,
+  );
+
+  const hiddenInsightsCount = Math.max(
+    insights.length - visibleInsights.length,
+    0,
+  );
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0 items-center",
+              "justify-center rounded-[13px]",
+              "border border-primary/25",
+              "bg-gradient-to-br from-primary/20",
+              "via-primary/10 to-secondary/15",
+              "text-primary-bright",
+              "shadow-[0_0_24px_-12px_var(--glow-primary)]",
+            )}
+            aria-hidden="true"
+          >
+            <Bot size={20} />
+          </div>
+
+          <div className="min-w-0">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <span className="truncate">
+                {title}
+              </span>
+
+              <Sparkles
+                size={14}
+                className="shrink-0 text-secondary-bright"
+                aria-hidden="true"
+              />
+            </CardTitle>
+
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              {subtitle}
+            </p>
+          </div>
+        </div>
+
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5",
+            "rounded-full border border-success/20",
+            "bg-success/10 px-2.5 py-1",
+            "text-[10px] font-semibold text-success",
+          )}
+        >
+          <span
+            className="relative flex size-1.5"
+            aria-hidden="true"
+          >
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-50 motion-reduce:animate-none" />
+
+            <span className="relative inline-flex size-1.5 rounded-full bg-success" />
+          </span>
+
+          Online
+        </span>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {visibleInsights.length > 0 ? (
+          <div
+            className={cn(
+              "grid min-w-0 flex-1 grid-cols-1 gap-3",
+              "md:grid-cols-2",
+            )}
+            aria-label="Insights do assistente financeiro"
+          >
+            {visibleInsights.map(
+              (
+                insight: string,
+                index: number,
+              ) => {
+                const presentation =
+                  getInsightPresentation(
+                    insight,
+                    index,
+                  );
+
+                return (
+                  <InsightItem
+                    key={`${index}-${insight}`}
+                    insight={insight}
+                    presentation={presentation}
+                  />
+                );
+              },
+            )}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[280px] flex-col",
+              "items-center justify-center",
+              "rounded-[16px] border",
+              "border-dashed border-border",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-primary/20",
+                "bg-primary/10 text-primary-bright",
+              )}
+              aria-hidden="true"
+            >
+              <Bot size={22} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhum insight disponÃ­vel
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Uma nova anÃ¡lise financeira poderÃ¡ gerar
+              recomendaÃ§Ãµes personalizadas.
+            </p>
+          </div>
+        )}
+
+        {hiddenInsightsCount > 0 && (
+          <p className="mt-3 text-center text-xs text-text-muted">
+            +{hiddenInsightsCount}{" "}
+            {hiddenInsightsCount === 1
+              ? "insight adicional"
+              : "insights adicionais"}
+          </p>
+        )}
+
+        <div
+          className={cn(
+            "mt-4 flex min-w-0 items-center gap-2",
+            "rounded-[14px] border border-border",
+            "bg-background/50 p-1.5",
+            "transition-colors duration-200",
+            "focus-within:border-primary/40",
+          )}
+        >
+          <label
+            htmlFor="ai-financial-question"
+            className="sr-only"
+          >
+            Pergunte algo sobre suas finanÃ§as
+          </label>
+
+          <input
+            id="ai-financial-question"
+            type="text"
+            disabled
+            placeholder="Pergunte algo sobre suas finanÃ§as..."
+            className={cn(
+              "h-9 min-w-0 flex-1 bg-transparent px-2",
+              "text-xs text-text outline-none",
+              "placeholder:text-text-subtle",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-80",
+            )}
+          />
+
+          <button
+            type="button"
+            disabled
+            aria-label="Enviar pergunta"
+            title="DisponÃ­vel apÃ³s a integraÃ§Ã£o com o backend"
+            className={cn(
+              "flex size-9 shrink-0 items-center",
+              "justify-center rounded-[11px]",
+              "bg-gradient-to-br from-primary",
+              "to-secondary text-white",
+              "shadow-sm transition-opacity",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
+            )}
+          >
+            <Send
+              size={16}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-text-subtle">
+          <Sparkles
+            size={11}
+            aria-hidden="true"
+          />
+
+          <span>
+            Chat disponÃ­vel apÃ³s a integraÃ§Ã£o com o backend.
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/AIInsights/AIInsights.types.ts
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+
+export type InsightTone =
+  | "success"
+  | "warning"
+  | "danger"
+  | "info";
+
+export interface AIInsightsProps {
+  title?: string;
+  subtitle?: string;
+  maxVisibleInsights?: number;
+}
+
+export interface InsightPresentation {
+  icon: LucideIcon;
+  tone: InsightTone;
+  title: string;
+}
+
+export interface InsightItemProps {
+  insight: string;
+  presentation: InsightPresentation;
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/AIInsights/index.ts
+========================================================================================================================
+
+export * from "./AIInsights";
+export * from "./AIInsights.types";
+export * from "./InsightItem";
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/Alerts/Alerts.tsx
+========================================================================================================================
+
+import {
+  BellRing,
+  CheckCircle2,
+  Eye,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../common/Card";
+import { cn } from "@/lib/utils";
+
+import { AlertItem } from "./AlertItem";
+
+import type {
+  AlertsProps,
+  FinancialAlertType,
+} from "./Alerts.types";
+
+const DEFAULT_MAX_VISIBLE_ALERTS = 4;
+
+function countAlertsByType(
+  alerts: AlertsProps["alerts"],
+  type: FinancialAlertType,
+): number {
+  return alerts.filter(
+    (alert) => alert.type === type,
+  ).length;
+}
+
+export function Alerts({
+  alerts,
+  title = "Alertas financeiros",
+  description = "Pontos que merecem sua atenÃ§Ã£o.",
+  maxVisibleAlerts = DEFAULT_MAX_VISIBLE_ALERTS,
+  onAlertAction,
+}: Readonly<AlertsProps>) {
+  const safeMaxVisibleAlerts = Math.max(
+    0,
+    maxVisibleAlerts,
+  );
+
+  const visibleAlerts = alerts.slice(
+    0,
+    safeMaxVisibleAlerts,
+  );
+
+  const hiddenAlertsCount = Math.max(
+    alerts.length - visibleAlerts.length,
+    0,
+  );
+
+  const dangerCount = countAlertsByType(
+    alerts,
+    "danger",
+  );
+
+  const warningCount = countAlertsByType(
+    alerts,
+    "warning",
+  );
+
+  const attentionCount =
+    dangerCount + warningCount;
+
+  const shouldShowSummary =
+    visibleAlerts.length > 0 &&
+    visibleAlerts.length < 4;
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <CardTitle className="text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "relative flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-warning/20 bg-warning/10",
+            "text-warning",
+          )}
+          aria-hidden="true"
+        >
+          <BellRing className="size-4" />
+
+          {alerts.length > 0 && (
+            <span
+              className={cn(
+                "absolute -right-1 -top-1",
+                "flex size-5 items-center justify-center",
+                "rounded-full border-2 border-card",
+                "bg-danger text-[9px]",
+                "font-bold text-white",
+              )}
+            >
+              {alerts.length}
+            </span>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {visibleAlerts.length > 0 ? (
+          <div
+            className={cn(
+              "grid min-w-0 flex-1",
+              "grid-cols-1 gap-3",
+              "md:grid-cols-2",
+            )}
+            aria-label="Lista de alertas financeiros"
+          >
+            {visibleAlerts.map((alert) => (
+              <AlertItem
+                key={alert.id}
+                alert={alert}
+                onAction={onAlertAction}
+              />
+            ))}
+
+            {shouldShowSummary && (
+              <article
+                className={cn(
+                  "relative flex min-h-[156px]",
+                  "min-w-0 flex-col overflow-hidden",
+                  "rounded-[16px] border border-border",
+                  "bg-gradient-to-br",
+                  "from-primary/5 via-surface-elevated/55",
+                  "to-secondary/5 p-4",
+                )}
+                aria-label="Resumo do monitoramento financeiro"
+              >
+                <span
+                  className={cn(
+                    "absolute inset-y-0 left-0 w-0.5",
+                    attentionCount > 0
+                      ? "bg-warning"
+                      : "bg-success",
+                  )}
+                  aria-hidden="true"
+                />
+
+                <div className="flex items-start justify-between gap-3">
+                  <div
+                    className={cn(
+                      "flex size-9 shrink-0 items-center",
+                      "justify-center rounded-[11px]",
+                      "border border-primary/20",
+                      "bg-primary/10 text-primary-bright",
+                    )}
+                    aria-hidden="true"
+                  >
+                    <ShieldCheck className="size-4" />
+                  </div>
+
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5",
+                      "rounded-full border",
+                      "border-success/20 bg-success/10",
+                      "px-2 py-1 text-[9px]",
+                      "font-semibold uppercase",
+                      "tracking-[0.08em] text-success",
+                    )}
+                  >
+                    <span
+                      className="size-1.5 rounded-full bg-success"
+                      aria-hidden="true"
+                    />
+
+                    Ativo
+                  </span>
+                </div>
+
+                <div className="mt-3 min-w-0 flex-1">
+                  <h4 className="text-sm font-semibold text-text">
+                    Monitoramento financeiro
+                  </h4>
+
+                  <p className="mt-1.5 text-xs leading-5 text-text-muted">
+                    O Finance AI acompanha suas movimentaÃ§Ãµes
+                    e identifica alteraÃ§Ãµes relevantes.
+                  </p>
+                </div>
+
+                <div
+                  className={cn(
+                    "mt-3 flex items-center justify-between",
+                    "gap-3 rounded-[11px]",
+                    "border border-border-muted",
+                    "bg-background/40 px-3 py-2",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <Eye
+                      className="size-3.5 text-text-muted"
+                      aria-hidden="true"
+                    />
+
+                    <span className="text-[10px] font-medium text-text-muted">
+                      Alertas ativos
+                    </span>
+                  </div>
+
+                  <span className="text-xs font-bold text-text">
+                    {alerts.length}
+                  </span>
+                </div>
+              </article>
+            )}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[330px] flex-col",
+              "items-center justify-center",
+              "rounded-[16px] border",
+              "border-dashed border-border",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center justify-center",
+                "rounded-[15px]",
+                "border border-success/20",
+                "bg-success/10 text-success",
+              )}
+              aria-hidden="true"
+            >
+              <CheckCircle2 className="size-5" />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhum alerta no momento
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Sua situaÃ§Ã£o financeira nÃ£o apresenta pontos
+              crÃ­ticos ou mudanÃ§as relevantes.
+            </p>
+          </div>
+        )}
+
+        {hiddenAlertsCount > 0 && (
+          <div
+            className={cn(
+              "mt-3 flex items-center justify-center",
+              "rounded-[11px] border",
+              "border-border-muted bg-background/35",
+              "px-3 py-2",
+            )}
+          >
+            <p className="text-xs text-text-muted">
+              +{hiddenAlertsCount}{" "}
+              {hiddenAlertsCount === 1
+                ? "alerta adicional"
+                : "alertas adicionais"}
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/Alerts/Alerts.types.ts
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+
+export type FinancialAlertType =
+  | "success"
+  | "warning"
+  | "danger"
+  | "info";
+
+export interface FinancialAlert {
+  id: number;
+  title: string;
+  type: FinancialAlertType;
+  description?: string;
+  actionLabel?: string;
+}
+
+export interface AlertsProps {
+  alerts: readonly FinancialAlert[];
+  title?: string;
+  description?: string;
+  maxVisibleAlerts?: number;
+  onAlertAction?: (alert: FinancialAlert) => void;
+}
+
+export interface AlertItemProps {
+  alert: FinancialAlert;
+  onAction?: (alert: FinancialAlert) => void;
+}
+
+export interface AlertVisualConfig {
+  icon: LucideIcon;
+  label: string;
+  accentClassName: string;
+  iconClassName: string;
+  iconContainerClassName: string;
+  badgeClassName: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/Alerts/index.ts
+========================================================================================================================
+
+export { AlertItem } from "./AlertItem";
+export { Alerts } from "./Alerts";
+
+export type {
+  AlertItemProps,
+  AlertsProps,
+  AlertVisualConfig,
+  FinancialAlert,
+  FinancialAlertType,
+} from "./Alerts.types";
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/AIProfileCard/AIProfileCard.tsx
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+
+import {
+  AlertTriangle,
+  ArrowRight,
+  BrainCircuit,
+  CheckCircle2,
+  ShieldAlert,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+import { AIConfidenceGauge } from "./AIConfidenceGauge";
+
+import type {
+  AIClassificationVisualConfig,
+  AIFinancialClassification,
+  AIFinancialIndicatorStatus,
+  AIFinancialProfile,
+  AIProfileCardProps,
+} from "./AIProfileCard.types";
+
+const defaultProfile: AIFinancialProfile = {
+  classification: "attention",
+  riskLabel: "Risco moderado",
+  confidence: 82,
+  indicators: [
+    {
+      id: "debt-level",
+      label: "Nível de endividamento",
+      value: 25,
+      status: "good",
+    },
+    {
+      id: "income-commitment",
+      label: "Comprometimento da renda",
+      value: 75,
+      status: "attention",
+    },
+    {
+      id: "savings-rate",
+      label: "Taxa de poupança",
+      value: 25,
+      status: "good",
+    },
+  ],
+};
+
+const classificationConfig: Record<
+  AIFinancialClassification,
+  AIClassificationVisualConfig
+> = {
+  healthy: {
+    label: "Saudável",
+    description:
+      "Sua situação financeira apresenta bons indicadores.",
+    accentClassName: "bg-success",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    iconClassName: "text-success",
+  },
+
+  attention: {
+    label: "Em observação",
+    description:
+      "Alguns indicadores precisam de acompanhamento.",
+    accentClassName: "bg-warning",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+
+  risk: {
+    label: "Em risco",
+    description:
+      "Existem indicadores financeiros que exigem ação.",
+    accentClassName: "bg-danger",
+    badgeClassName:
+      "border-danger/20 bg-danger/10 text-danger",
+    iconContainerClassName:
+      "border-danger/20 bg-danger/10",
+    iconClassName: "text-danger",
+  },
+};
+
+const classificationIcons: Record<
+  AIFinancialClassification,
+  LucideIcon
+> = {
+  healthy: ShieldCheck,
+  attention: ShieldAlert,
+  risk: AlertTriangle,
+};
+
+const indicatorStatusConfig: Record<
+  AIFinancialIndicatorStatus,
+  {
+    label: string;
+    badgeClassName: string;
+    progressClassName: string;
+  }
+> = {
+  good: {
+    label: "Bom",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+    progressClassName: "bg-success",
+  },
+
+  attention: {
+    label: "Atenção",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+    progressClassName: "bg-warning",
+  },
+
+  critical: {
+    label: "Crítico",
+    badgeClassName:
+      "border-danger/20 bg-danger/10 text-danger",
+    progressClassName: "bg-danger",
+  },
+};
+
+export function AIProfileCard({
+  title = "Como a IA classificou sua situação?",
+  description = "Perfil financeiro gerado pela análise inteligente.",
+  profile = defaultProfile,
+  onViewDetails,
+}: Readonly<AIProfileCardProps>) {
+  const safeConfidence = Math.min(
+    Math.max(profile.confidence, 0),
+    100,
+  );
+
+  const classification =
+    classificationConfig[
+      profile.classification
+    ];
+
+  const ClassificationIcon =
+    classificationIcons[
+      profile.classification
+    ];
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <CardTitle className="text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-primary/20",
+            "bg-primary/10 text-primary-bright",
+          )}
+          aria-hidden="true"
+        >
+          <BrainCircuit size={18} />
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        <div
+          className={cn(
+            "relative overflow-hidden",
+            "rounded-[16px] border border-border",
+            "bg-surface-elevated/55 p-4",
+          )}
+        >
+          <span
+            className={cn(
+              "absolute inset-y-0 left-0 w-0.5",
+              classification.accentClassName,
+            )}
+            aria-hidden="true"
+          />
+
+          <div
+            className={cn(
+              "grid min-w-0 grid-cols-1",
+              "items-center gap-4",
+              "sm:grid-cols-[minmax(0,1fr)_auto]",
+            )}
+          >
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-start gap-3">
+                <div
+                  className={cn(
+                    "flex size-10 shrink-0",
+                    "items-center justify-center",
+                    "rounded-[12px] border",
+                    classification.iconContainerClassName,
+                    classification.iconClassName,
+                  )}
+                  aria-hidden="true"
+                >
+                  <ClassificationIcon size={18} />
+                </div>
+
+                <div className="min-w-0">
+                  <span
+                    className={cn(
+                      "inline-flex rounded-full border",
+                      "px-2.5 py-1",
+                      "text-[9px] font-semibold",
+                      "uppercase tracking-[0.08em]",
+                      classification.badgeClassName,
+                    )}
+                  >
+                    {classification.label}
+                  </span>
+
+                  <p className="mt-2 text-xs font-semibold text-text">
+                    {profile.riskLabel}
+                  </p>
+
+                  <p className="mt-1 text-xs leading-5 text-text-muted">
+                    {classification.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <AIConfidenceGauge
+              value={safeConfidence}
+            />
+          </div>
+        </div>
+
+        <div
+          className="mt-4 space-y-2.5"
+          aria-label="Indicadores da classificação financeira"
+        >
+          {profile.indicators.map(
+            (indicator) => {
+              const safeValue = Math.min(
+                Math.max(
+                  indicator.value,
+                  0,
+                ),
+                100,
+              );
+
+              const status =
+                indicatorStatusConfig[
+                  indicator.status
+                ];
+
+              return (
+                <div
+                  key={indicator.id}
+                  className={cn(
+                    "rounded-[12px]",
+                    "border border-border-muted",
+                    "bg-background/30",
+                    "px-3 py-2.5",
+                  )}
+                >
+                  <div className="flex min-w-0 items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <CheckCircle2
+                        size={14}
+                        className={cn(
+                          "shrink-0",
+                          indicator.status === "good"
+                            ? "text-success"
+                            : indicator.status ===
+                                "attention"
+                              ? "text-warning"
+                              : "text-danger",
+                        )}
+                        aria-hidden="true"
+                      />
+
+                      <span className="truncate text-[11px] font-medium text-text-muted">
+                        {indicator.label}
+                      </span>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="text-[10px] font-semibold tabular-nums text-text">
+                        {safeValue}%
+                      </span>
+
+                      <span
+                        className={cn(
+                          "rounded-full border",
+                          "px-2 py-0.5",
+                          "text-[9px] font-semibold",
+                          status.badgeClassName,
+                        )}
+                      >
+                        {status.label}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-muted">
+                    <div
+                      className={cn(
+                        "h-full rounded-full",
+                        "transition-[width] duration-500",
+                        status.progressClassName,
+                      )}
+                      style={{
+                        width: `${safeValue}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            },
+          )}
+        </div>
+
+        <div
+          className={cn(
+            "mt-4 flex items-center",
+            "justify-between gap-3",
+            "rounded-[12px]",
+            "border border-primary/15",
+            "bg-primary/5 px-3 py-2.5",
+          )}
+        >
+          <div className="flex min-w-0 items-center gap-2">
+            <BrainCircuit
+              size={14}
+              className="shrink-0 text-primary-bright"
+              aria-hidden="true"
+            />
+
+            <span className="text-[10px] leading-4 text-text-muted">
+              Resultado gerado pela análise do Finance AI.
+            </span>
+          </div>
+
+          <span className="shrink-0 text-[10px] font-semibold tabular-nums text-primary-bright">
+            {safeConfidence}% confiável
+          </span>
+        </div>
+
+        {onViewDetails && (
+          <button
+            type="button"
+            onClick={onViewDetails}
+            className={cn(
+              "mt-4 inline-flex h-10",
+              "w-full items-center",
+              "justify-center gap-2",
+              "rounded-[12px]",
+              "border border-primary/15",
+              "bg-primary/5",
+              "text-xs font-semibold",
+              "text-primary-bright",
+              "transition-[border-color,background-color]",
+              "hover:border-primary/30",
+              "hover:bg-primary/10",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary/40",
+            )}
+          >
+            Ver detalhes
+
+            <ArrowRight
+              size={14}
+              aria-hidden="true"
+            />
+          </button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/AIProfileCard/AIProfileCard.types.ts
+========================================================================================================================
+
+export type AIFinancialClassification =
+  | "healthy"
+  | "attention"
+  | "risk";
+
+export type AIFinancialIndicatorStatus =
+  | "good"
+  | "attention"
+  | "critical";
+
+export interface AIFinancialIndicator {
+  id: string;
+  label: string;
+  value: number;
+  status: AIFinancialIndicatorStatus;
+}
+
+export interface AIFinancialProfile {
+  classification: AIFinancialClassification;
+  riskLabel: string;
+  confidence: number;
+  indicators: readonly AIFinancialIndicator[];
+}
+
+export interface AIProfileCardProps {
+  title?: string;
+  description?: string;
+  profile?: AIFinancialProfile;
+  onViewDetails?: () => void;
+}
+
+export interface AIConfidenceGaugeProps {
+  value: number;
+  size?: number;
+}
+
+export interface AIClassificationVisualConfig {
+  label: string;
+  description: string;
+  accentClassName: string;
+  badgeClassName: string;
+  iconContainerClassName: string;
+  iconClassName: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/AIProfileCard/index.ts
+========================================================================================================================
+
+export * from "./AIConfidenceGauge";
+export * from "./AIProfileCard";
+export * from "./AIProfileCard.types";
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/FinancialHealthRadar/FinancialHealthRadar.tsx
+========================================================================================================================
+
+import {
+  useId,
+  useMemo,
+  useState,
+} from "react";
+import {
+  Activity,
+  ArrowRight,
+  HeartPulse,
+} from "lucide-react";
+import {
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
+  ResponsiveContainer,
+} from "recharts";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+import { FinancialHealthRadarTooltip } from "./FinancialHealthRadarTooltip";
+
+import type {
+  FinancialHealthMetric,
+  FinancialHealthRadarProps,
+} from "./FinancialHealthRadar.types";
+
+const defaultMetrics: readonly FinancialHealthMetric[] = [
+  {
+    id: "savings",
+    subject: "PoupanÃ§a",
+    value: 80,
+    fullMark: 100,
+    description:
+      "Avalia sua capacidade de reservar parte da renda mensal.",
+  },
+  {
+    id: "planning",
+    subject: "Planejamento",
+    value: 70,
+    fullMark: 100,
+    description:
+      "Mede a organizaÃ§Ã£o do orÃ§amento e a previsÃ£o dos gastos.",
+  },
+  {
+    id: "control",
+    subject: "Controle",
+    value: 85,
+    fullMark: 100,
+    description:
+      "Representa o acompanhamento e o controle das movimentaÃ§Ãµes.",
+  },
+  {
+    id: "investments",
+    subject: "Investimentos",
+    value: 60,
+    fullMark: 100,
+    description:
+      "Analisa a diversificaÃ§Ã£o e a regularidade dos investimentos.",
+  },
+  {
+    id: "debt-control",
+    subject: "DÃ­vidas",
+    value: 40,
+    fullMark: 100,
+    description:
+      "Avalia o controle do endividamento e a capacidade de pagamento.",
+  },
+];
+
+function sanitizeMetrics(
+  metrics: readonly FinancialHealthMetric[],
+): FinancialHealthMetric[] {
+  return metrics.map((metric) => {
+    const safeFullMark = Math.max(
+      metric.fullMark,
+      1,
+    );
+
+    return {
+      ...metric,
+      fullMark: safeFullMark,
+      value: Math.min(
+        Math.max(metric.value, 0),
+        safeFullMark,
+      ),
+    };
+  });
+}
+
+function getMetricPercentage(
+  metric: FinancialHealthMetric,
+): number {
+  const safeFullMark = Math.max(
+    metric.fullMark,
+    1,
+  );
+
+  return Math.min(
+    Math.max(
+      Math.round(
+        (metric.value / safeFullMark) * 100,
+      ),
+      0,
+    ),
+    100,
+  );
+}
+
+export function FinancialHealthRadar({
+  title = "QuÃ£o saudÃ¡vel estÃ¡ sua vida financeira?",
+  description = "AnÃ¡lise dos principais pilares financeiros.",
+  metrics: providedMetrics = defaultMetrics,
+  onViewDetails,
+}: Readonly<FinancialHealthRadarProps>) {
+  const chartTitleId = useId();
+
+  const metrics = useMemo(
+    () => sanitizeMetrics(providedMetrics),
+    [providedMetrics],
+  );
+
+  const [activeMetricId, setActiveMetricId] =
+    useState<string>(
+      metrics[0]?.id ?? "",
+    );
+
+  const activeMetric =
+    metrics.find(
+      (metric) =>
+        metric.id === activeMetricId,
+    ) ?? metrics[0];
+
+  const averageScore = useMemo(() => {
+    if (metrics.length === 0) {
+      return 0;
+    }
+
+    const totalPercentage = metrics.reduce(
+      (total, metric) =>
+        total +
+        (metric.value / metric.fullMark) *
+          100,
+      0,
+    );
+
+    return Math.round(
+      totalPercentage / metrics.length,
+    );
+  }, [metrics]);
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <div id={chartTitleId}>
+            <CardTitle className="text-sm font-semibold">
+              {title}
+            </CardTitle>
+          </div>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "relative flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-secondary/20",
+            "bg-secondary/10",
+            "text-secondary-bright",
+          )}
+          aria-hidden="true"
+        >
+          <HeartPulse size={18} />
+
+          <span
+            className={cn(
+              "absolute -right-1 -top-1",
+              "flex size-6 items-center",
+              "justify-center rounded-full",
+              "border-2 border-card",
+              "bg-secondary-bright",
+              "text-[8px] font-bold text-white",
+            )}
+          >
+            {averageScore}
+          </span>
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {metrics.length > 0 &&
+        activeMetric ? (
+          <>
+            <div
+              className={cn(
+                "grid min-w-0 flex-1",
+                "grid-cols-1 items-center gap-5",
+                "lg:grid-cols-[minmax(220px,0.95fr)_minmax(0,1.05fr)]",
+              )}
+              aria-labelledby={chartTitleId}
+            >
+              <div className="min-w-0">
+                <div className="relative h-[280px] min-w-0">
+                  <ResponsiveContainer
+                    width="100%"
+                    height="100%"
+                  >
+                    <RadarChart
+                      data={metrics}
+                      outerRadius="68%"
+                      margin={{
+                        top: 24,
+                        right: 35,
+                        bottom: 24,
+                        left: 35,
+                      }}
+                    >
+                      <defs>
+                        <linearGradient
+                          id="financial-health-radar-fill"
+                          x1="0"
+                          y1="0"
+                          x2="1"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#7c3aed"
+                            stopOpacity={0.48}
+                          />
+
+                          <stop
+                            offset="100%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0.18}
+                          />
+                        </linearGradient>
+                      </defs>
+
+                      <PolarGrid
+                        stroke="var(--border-muted)"
+                        gridType="polygon"
+                      />
+
+                      <PolarAngleAxis
+                        dataKey="subject"
+                        tick={{
+                          fill: "var(--text-muted)",
+                          fontSize: 10,
+                          fontWeight: 600,
+                        }}
+                        tickLine={false}
+                      />
+
+                      <PolarRadiusAxis
+                        angle={90}
+                        domain={[0, 100]}
+                        tick={false}
+                        axisLine={false}
+                      />
+
+                      <Radar
+                        name="SaÃºde financeira"
+                        dataKey="value"
+                        stroke="#7c3aed"
+                        strokeWidth={2.5}
+                        fill="url(#financial-health-radar-fill)"
+                        fillOpacity={1}
+                        dot={{
+                          r: 4,
+                          fill: "#7c3aed",
+                          stroke: "var(--card)",
+                          strokeWidth: 2,
+                        }}
+                        activeDot={{
+                          r: 6,
+                          fill: "#3b82f6",
+                          stroke: "var(--card)",
+                          strokeWidth: 3,
+                        }}
+                        animationDuration={700}
+                      />
+                    </RadarChart>
+                  </ResponsiveContainer>
+
+                  <div
+                    className={cn(
+                      "pointer-events-none absolute inset-0",
+                      "flex items-center justify-center",
+                    )}
+                    aria-hidden="true"
+                  >
+                    <div
+                      className={cn(
+                        "flex size-[74px] flex-col",
+                        "items-center justify-center",
+                        "rounded-full border border-border",
+                        "bg-card/90 shadow-card",
+                        "backdrop-blur-sm",
+                      )}
+                    >
+                      <Activity
+                        size={14}
+                        className="text-secondary-bright"
+                      />
+
+                      <strong className="mt-1 text-lg font-bold tabular-nums text-text">
+                        {averageScore}
+                      </strong>
+
+                      <span className="text-[8px] font-medium uppercase tracking-[0.08em] text-text-subtle">
+                        mÃ©dia
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="min-w-0 space-y-2"
+                aria-label="Pilares da saÃºde financeira"
+              >
+                {metrics.map((metric) => {
+                  const isActive =
+                    metric.id === activeMetric.id;
+
+                  const percentage =
+                    getMetricPercentage(metric);
+
+                  return (
+                    <button
+                      key={metric.id}
+                      type="button"
+                      onMouseEnter={() =>
+                        setActiveMetricId(
+                          metric.id,
+                        )
+                      }
+                      onFocus={() =>
+                        setActiveMetricId(
+                          metric.id,
+                        )
+                      }
+                      onClick={() =>
+                        setActiveMetricId(
+                          metric.id,
+                        )
+                      }
+                      className={cn(
+                        "w-full min-w-0",
+                        "rounded-[11px] border",
+                        "px-3 py-2.5 text-left",
+                        "transition-[border-color,background-color]",
+                        isActive
+                          ? [
+                              "border-secondary/30",
+                              "bg-secondary/10",
+                            ]
+                          : [
+                              "border-transparent",
+                              "hover:border-border",
+                              "hover:bg-surface-elevated/55",
+                            ],
+                        "focus-visible:outline-none",
+                        "focus-visible:ring-2",
+                        "focus-visible:ring-secondary/40",
+                      )}
+                    >
+                      <div className="flex min-w-0 items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <span
+                            className={cn(
+                              "size-2.5 shrink-0 rounded-full",
+                              isActive
+                                ? "bg-secondary-bright"
+                                : "bg-text-subtle",
+                            )}
+                            aria-hidden="true"
+                          />
+
+                          <span
+                            className={cn(
+                              "truncate text-[11px]",
+                              "font-medium",
+                              isActive
+                                ? "text-text"
+                                : "text-text-muted",
+                            )}
+                          >
+                            {metric.subject}
+                          </span>
+                        </div>
+
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className="text-[10px] font-semibold tabular-nums text-text">
+                            {metric.value}
+                          </span>
+
+                          <span
+                            className={cn(
+                              "min-w-10 rounded-full",
+                              "px-1.5 py-0.5",
+                              "text-center text-[9px]",
+                              "font-semibold tabular-nums",
+                              isActive
+                                ? [
+                                    "bg-secondary/15",
+                                    "text-secondary-bright",
+                                  ]
+                                : [
+                                    "bg-surface-muted",
+                                    "text-text-muted",
+                                  ],
+                            )}
+                          >
+                            {percentage}%
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-muted">
+                        <div
+                          className={cn(
+                            "h-full rounded-full",
+                            "transition-[width] duration-500",
+                            isActive
+                              ? "bg-secondary-bright"
+                              : "bg-text-subtle",
+                          )}
+                          style={{
+                            width: `${percentage}%`,
+                          }}
+                        />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <FinancialHealthRadarTooltip
+                metric={activeMetric}
+              />
+            </div>
+
+            {onViewDetails && (
+              <button
+                type="button"
+                onClick={onViewDetails}
+                className={cn(
+                  "mt-4 inline-flex h-10",
+                  "w-full items-center",
+                  "justify-center gap-2",
+                  "rounded-[12px]",
+                  "border border-secondary/15",
+                  "bg-secondary/5",
+                  "text-xs font-semibold",
+                  "text-secondary-bright",
+                  "transition-[border-color,background-color]",
+                  "hover:border-secondary/30",
+                  "hover:bg-secondary/10",
+                  "focus-visible:outline-none",
+                  "focus-visible:ring-2",
+                  "focus-visible:ring-secondary/40",
+                )}
+              >
+                Ver detalhes
+
+                <ArrowRight
+                  size={14}
+                  aria-hidden="true"
+                />
+              </button>
+            )}
+          </>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[360px] flex-1",
+              "flex-col items-center",
+              "justify-center rounded-[16px]",
+              "border border-dashed",
+              "border-border px-6",
+              "text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-border",
+                "bg-surface-muted",
+                "text-text-muted",
+              )}
+              aria-hidden="true"
+            >
+              <HeartPulse size={21} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              AnÃ¡lise indisponÃ­vel
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Os pilares da saÃºde financeira serÃ£o exibidos
+              quando houver dados suficientes.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/FinancialHealthRadar/FinancialHealthRadar.types.ts
+========================================================================================================================
+
+export type FinancialHealthStatus =
+  | "excellent"
+  | "good"
+  | "attention"
+  | "critical";
+
+export interface FinancialHealthMetric {
+  id: string;
+  subject: string;
+  value: number;
+  fullMark: number;
+  description: string;
+}
+
+export interface FinancialHealthRadarProps {
+  title?: string;
+  description?: string;
+  metrics?: readonly FinancialHealthMetric[];
+  onViewDetails?: () => void;
+}
+
+export interface FinancialHealthRadarDetailProps {
+  metric: FinancialHealthMetric;
+}
+
+export interface FinancialHealthStatusConfig {
+  label: string;
+  className: string;
+  progressClassName: string;
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/dashboard/FinancialHealthRadar/index.ts
+========================================================================================================================
+
+export * from "./FinancialHealthRadar";
+export * from "./FinancialHealthRadar.types";
+export * from "./FinancialHealthRadarTooltip";
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/dashboard.service.ts
+========================================================================================================================
+
+import {
+  mapTransactionToDashboard,
+  type DashboardCashFlowItem,
+  type DashboardData,
+  type DashboardExpenseCategory,
+  type DashboardMonthlyAccumulator,
+  type DashboardSummary,
+} from "@/types/dashboard";
+
+import {
+  isExpenseTransaction,
+  isIncomeTransaction,
+  type Transaction,
+  type TransactionCategory,
+  type TransactionFilters,
+} from "@/types/transaction";
+
+import { transactionService } from "@/services/transaction.service";
+
+const MONTH_FORMATTER =
+  new Intl.DateTimeFormat(
+    "pt-BR",
+    {
+      month: "short",
+    },
+  );
+
+const MAX_CASH_FLOW_MONTHS = 6;
+const MAX_RECENT_TRANSACTIONS = 8;
+
+function createSummary(
+  transactions: readonly Transaction[],
+): DashboardSummary {
+  const income = transactions
+    .filter(isIncomeTransaction)
+    .reduce(
+      (total, transaction) =>
+        total + Number(transaction.valor),
+      0,
+    );
+
+  const expenses = transactions
+    .filter(isExpenseTransaction)
+    .reduce(
+      (total, transaction) =>
+        total + Number(transaction.valor),
+      0,
+    );
+
+  return {
+    balance: income - expenses,
+    income,
+    expenses,
+    transactionCount:
+      transactions.length,
+  };
+}
+
+function createExpenseCategories(
+  transactions: readonly Transaction[],
+): DashboardExpenseCategory[] {
+  const categoryTotals =
+    new Map<TransactionCategory, number>();
+
+  transactions
+    .filter(isExpenseTransaction)
+    .forEach((transaction) => {
+      const currentValue =
+        categoryTotals.get(
+          transaction.categoria,
+        ) ?? 0;
+
+      categoryTotals.set(
+        transaction.categoria,
+        currentValue +
+          Number(transaction.valor),
+      );
+    });
+
+  return Array.from(
+    categoryTotals.entries(),
+  )
+    .map(([name, value]) => ({
+      name,
+      value,
+    }))
+    .sort(
+      (first, second) =>
+        second.value - first.value,
+    );
+}
+
+function getMonthKey(
+  year: number,
+  monthNumber: number,
+): string {
+  return `${year}-${String(
+    monthNumber,
+  ).padStart(2, "0")}`;
+}
+
+function createCashFlow(
+  transactions: readonly Transaction[],
+): DashboardCashFlowItem[] {
+  const monthlyData =
+    new Map<
+      string,
+      DashboardMonthlyAccumulator
+    >();
+
+  transactions.forEach(
+    (transaction) => {
+      const date = new Date(
+        `${transaction.data}T00:00:00`,
+      );
+
+      if (
+        Number.isNaN(
+          date.getTime(),
+        )
+      ) {
+        return;
+      }
+
+      const year =
+        date.getFullYear();
+
+      const monthNumber =
+        date.getMonth() + 1;
+
+      const key =
+        getMonthKey(
+          year,
+          monthNumber,
+        );
+
+      const current =
+        monthlyData.get(key) ?? {
+          year,
+          monthNumber,
+          income: 0,
+          expenses: 0,
+        };
+
+      const value =
+        Number(transaction.valor);
+
+      if (
+        transaction.tipo ===
+        "Receita"
+      ) {
+        current.income += value;
+      }
+      else {
+        current.expenses += value;
+      }
+
+      monthlyData.set(
+        key,
+        current,
+      );
+    },
+  );
+
+  return Array.from(
+    monthlyData.values(),
+  )
+    .sort((first, second) => {
+      if (
+        first.year !== second.year
+      ) {
+        return (
+          first.year -
+          second.year
+        );
+      }
+
+      return (
+        first.monthNumber -
+        second.monthNumber
+      );
+    })
+    .slice(
+      -MAX_CASH_FLOW_MONTHS,
+    )
+    .map((item) => {
+      const referenceDate =
+        new Date(
+          item.year,
+          item.monthNumber - 1,
+          1,
+        );
+
+      const formattedMonth =
+        MONTH_FORMATTER
+          .format(referenceDate)
+          .replace(".", "");
+
+      return {
+        month:
+          formattedMonth
+            .charAt(0)
+            .toLocaleUpperCase(
+              "pt-BR",
+            ) +
+          formattedMonth.slice(1),
+        year: item.year,
+        monthNumber:
+          item.monthNumber,
+        income:
+          item.income,
+        expenses:
+          item.expenses,
+      };
+    });
+}
+
+function createRecentTransactions(
+  transactions: readonly Transaction[],
+) {
+  return [...transactions]
+    .sort((first, second) => {
+      const dateComparison =
+        second.data.localeCompare(
+          first.data,
+        );
+
+      if (
+        dateComparison !== 0
+      ) {
+        return dateComparison;
+      }
+
+      return second.id - first.id;
+    })
+    .slice(
+      0,
+      MAX_RECENT_TRANSACTIONS,
+    )
+    .map(
+      mapTransactionToDashboard,
+    );
+}
+
+function createDashboardData(
+  transactions: readonly Transaction[],
+): DashboardData {
+  return {
+    summary:
+      createSummary(transactions),
+
+    cashFlow:
+      createCashFlow(transactions),
+
+    categories:
+      createExpenseCategories(
+        transactions,
+      ),
+
+    transactions:
+      createRecentTransactions(
+        transactions,
+      ),
+  };
+}
+
+export const dashboardService = {
+  async getDashboardData(
+    filters?: TransactionFilters,
+  ): Promise<DashboardData> {
+    const transactions =
+      await transactionService.findAll(
+        filters,
+      );
+
+    return createDashboardData(
+      transactions,
+    );
+  },
+
+  /*
+   * Compatibilidade temporÃ¡ria.
+   *
+   * Estes mÃ©todos serÃ£o removidos conforme
+   * migrarmos os componentes restantes para
+   * receber dados por props.
+   */
+
+  getCashFlow() {
+    return [];
+  },
+
+  getCategories() {
+    return [];
+  },
+
+  getTransactions() {
+    return [];
+  },
+
+  getInsights(): string[] {
+    return [];
+  },
+
+  getScore() {
+    return {
+      score: 0,
+      maxScore: 100,
+      classification:
+        "Regular" as const,
+      variation:
+        "AnÃ¡lise financeira pendente",
+    };
+  },
+
+  getAlerts() {
+    return [];
+  },
+};
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/dashboard.ts
+========================================================================================================================
+
+import type {
+  Transaction as ApiTransaction,
+  TransactionCategory,
+} from "@/types/transaction";
+
+export interface DashboardSummary {
+  balance: number;
+  income: number;
+  expenses: number;
+  transactionCount: number;
+}
+
+export interface DashboardCashFlowItem {
+  month: string;
+  year: number;
+  monthNumber: number;
+  income: number;
+  expenses: number;
+}
+
+export interface DashboardExpenseCategory {
+  name: TransactionCategory;
+  value: number;
+}
+
+export type DashboardTransactionType =
+  | "income"
+  | "expense";
+
+export type DashboardTransactionStatus =
+  "completed";
+
+export interface DashboardTransaction {
+  id: number;
+  description: string;
+  category: string;
+  amount: number;
+  date: string;
+  type: DashboardTransactionType;
+  status: DashboardTransactionStatus;
+}
+
+export interface DashboardData {
+  summary: DashboardSummary;
+  cashFlow: DashboardCashFlowItem[];
+  categories: DashboardExpenseCategory[];
+  transactions: DashboardTransaction[];
+}
+
+export interface DashboardPeriod {
+  dataInicial?: string;
+  dataFinal?: string;
+}
+
+export interface DashboardMonthlyAccumulator {
+  year: number;
+  monthNumber: number;
+  income: number;
+  expenses: number;
+}
+
+export function mapTransactionToDashboard(
+  transaction: ApiTransaction,
+): DashboardTransaction {
+  const isIncome =
+    transaction.tipo === "Receita";
+
+  return {
+    id: transaction.id,
+    description:
+      transaction.descricao,
+    category:
+      transaction.categoria,
+    amount: isIncome
+      ? transaction.valor
+      : -transaction.valor,
+    date: transaction.data,
+    type: isIncome
+      ? "income"
+      : "expense",
+    status: "completed",
+  };
+}
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/controller/FinancialAnalysisController.java
+========================================================================================================================
+
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.FinancialAnalysisRequest;
+import br.com.financeai.dto.response.FinancialAnalysisHistoryResponse;
+import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.ApiErrorResponse;
+import br.com.financeai.service.FinancialAnalysisService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+@Tag(
+        name = "Financial Analysis",
+        description = "Protected endpoints for generating and managing the authenticated user's financial analyses."
+)
+@RestController
+@RequestMapping("/analise-financeira")
+public class FinancialAnalysisController {
+
+    private final FinancialAnalysisService financialAnalysisService;
+
+    public FinancialAnalysisController(
+            FinancialAnalysisService financialAnalysisService
+    ) {
+        this.financialAnalysisService = financialAnalysisService;
+    }
+
+    /**
+     * Gera uma nova anÃ¡lise financeira utilizando as transaÃ§Ãµes
+     * do usuÃ¡rio autenticado dentro do perÃ­odo informado.
+     */
+    @Operation(
+            summary = "Generate financial analysis",
+            description = """
+            Generates a financial analysis for the authenticated user based on
+            the transactions registered within the informed period.
+
+            Authentication:
+            Requires a valid JWT access token in the Authorization header using
+            the format: Bearer {token}.
+
+            Behavior:
+            Retrieves all transactions belonging to the authenticated user
+            within the specified period and sends them to the Machine Learning
+            service. If the ML service is unavailable, a local fallback analysis
+            is generated automatically. The generated analysis is stored and
+            returned to the client.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Financial analysis generated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = FinancialAnalysisResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
+    @PostMapping
+    public ResponseEntity<FinancialAnalysisResponse> analyze(
+            @AuthenticationPrincipal AppUser loggedUser,
+            @Valid @RequestBody FinancialAnalysisRequest request
+    ) {
+        FinancialAnalysisResponse response =
+                financialAnalysisService.analyze(
+                        loggedUser.getId(),
+                        request
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "List financial analyses",
+            description = """
+            Returns the complete history of financial analyses generated
+            by the authenticated user.
+
+            Authentication:
+            Requires a valid JWT access token in the Authorization header using
+            the format: Bearer {token}.
+
+            Behavior:
+            Returns only the analyses belonging to the authenticated user,
+            ordered from the most recent to the oldest.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Financial analyses retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = FinancialAnalysisHistoryResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
+    @GetMapping
+    public ResponseEntity<List<FinancialAnalysisHistoryResponse>> findAll(
+            @AuthenticationPrincipal AppUser loggedUser
+    ) {
+        List<FinancialAnalysisHistoryResponse> response =
+                financialAnalysisService.findAll(loggedUser.getId());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Get financial analysis",
+            description = """
+            Returns a specific financial analysis belonging to the
+            authenticated user.
+
+            Authentication:
+            Requires a valid JWT access token in the Authorization header using
+            the format: Bearer {token}.
+
+            Behavior:
+            Retrieves the requested analysis only if it belongs to the
+            authenticated user. If the analysis does not exist or belongs
+            to another user, a not found response is returned.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Financial analysis retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = FinancialAnalysisHistoryResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Financial analysis not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
+    @GetMapping("/{analysisId}")
+    public ResponseEntity<FinancialAnalysisHistoryResponse> findById(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the financial analysis",
+                    example = "1"
+            )
+            @PathVariable Long analysisId
+    ) {
+        FinancialAnalysisHistoryResponse response =
+                financialAnalysisService.findById(
+                        loggedUser.getId(),
+                        analysisId
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Delete financial analysis",
+            description = """
+            Deletes a financial analysis belonging to the authenticated user.
+
+            Authentication:
+            Requires a valid JWT access token in the Authorization header using
+            the format: Bearer {token}.
+
+            Behavior:
+            Removes the requested financial analysis only if it belongs
+            to the authenticated user. If the analysis does not exist or
+            belongs to another user, a not found response is returned.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Financial analysis deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Financial analysis not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
+    @DeleteMapping("/{analysisId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the financial analysis",
+                    example = "1"
+            )
+            @PathVariable Long analysisId
+    ) {
+        financialAnalysisService.delete(
+                loggedUser.getId(),
+                analysisId
+        );
+
+        return ResponseEntity.noContent().build();
+    }
+}
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/service/FinancialAnalysisService.java
+========================================================================================================================
+
+package br.com.financeai.service;
+
+import br.com.financeai.dto.request.FinancialAnalysisRequest;
+import br.com.financeai.dto.response.FinancialAnalysisHistoryResponse;
+import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.entity.FinancialAnalysis;
+import br.com.financeai.entity.Transaction;
+import br.com.financeai.enums.Source;
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import br.com.financeai.exception.BusinessException;
+import br.com.financeai.exception.ExternalServiceException;
+import br.com.financeai.exception.InvalidRequestException;
+import br.com.financeai.exception.ResourceNotFoundException;
+import br.com.financeai.exception.UserNotFoundException;
+import br.com.financeai.integration.client.MlClient;
+import br.com.financeai.integration.dto.request.MlRequest;
+import br.com.financeai.integration.dto.response.MlResponse;
+import br.com.financeai.integration.dto.response.MlTransactionResponse;
+import br.com.financeai.repository.FinancialAnalysisRepository;
+import br.com.financeai.repository.TransactionRepository;
+import br.com.financeai.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * ResponsÃ¡vel por gerar e gerenciar as anÃ¡lises financeiras dos usuÃ¡rios.
+ * Fluxo de geraÃ§Ã£o:
+ * 1. Localiza o usuÃ¡rio autenticado.
+ * 2. Busca as transaÃ§Ãµes do usuÃ¡rio dentro do perÃ­odo informado.
+ * 3. Monta a requisiÃ§Ã£o para a API de Machine Learning.
+ * 4. Recebe o resultado da anÃ¡lise.
+ * 5. Persiste o resultado no banco.
+ * 6. Devolve o resultado ao frontend.
+ */
+@Slf4j
+@Service
+public class FinancialAnalysisService {
+
+    private final FinancialProfileService financialProfileService;
+    private final FinancialAnalysisRepository financialAnalysisRepository;
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final MlClient mlClient;
+
+    public FinancialAnalysisService(
+            FinancialProfileService financialProfileService, MlClient mlClient,
+            FinancialAnalysisRepository financialAnalysisRepository,
+            TransactionRepository transactionRepository,
+            UserRepository userRepository
+    ) {
+        this.financialProfileService = financialProfileService;
+        this.mlClient = mlClient;
+        this.financialAnalysisRepository = financialAnalysisRepository;
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Gera uma anÃ¡lise financeira baseada no histÃ³rico de transaÃ§Ãµes do perÃ­odo informado.
+     Tanto o resultado vindo da IA quanto o resultado do fallback local sÃ£o
+     * persistidos no banco, diferenciados pelo campo {@code origem}
+     * ({@link Source#ML} ou {@link Source#FALLBACK}).
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio autenticado.
+     * @param request dados contendo o perÃ­odo (data inicial e data final) para o qual a anÃ¡lise serÃ¡ gerada.
+     * @return resposta contendo o perfil financeiro, resumo dos gastos, frequÃªncia de poupanÃ§a,
+     *         nÃ­vel de endividamento e recomendaÃ§Ãµes geradas â€” via IA ou via fallback local.
+     * @throws BusinessException caso o perÃ­odo informado seja no futuro ou nÃ£o haja o mÃ­nimo de transaÃ§Ãµes exigido (3).
+     * @throws InvalidRequestException caso o usuÃ¡rio nÃ£o possua nenhuma transaÃ§Ã£o no perÃ­odo informado.
+     * @throws UserNotFoundException caso o usuÃ¡rio nÃ£o seja encontrado no banco de dados.
+     */
+    public FinancialAnalysisResponse analyze(Long usuarioId, FinancialAnalysisRequest request) {
+
+        AppUser user = findUserById(usuarioId);
+
+        // Impede anÃ¡lise de um perÃ­odo que ainda nÃ£o comeÃ§ou â€” valida antes
+        // de consultar o banco, evitando uma query desnecessÃ¡ria.
+        if (request.dataInicial().isAfter(LocalDate.now())) {
+            throw new BusinessException(
+                    "NÃ£o Ã© possÃ­vel gerar anÃ¡lise para um perÃ­odo que ainda nÃ£o comeÃ§ou."
+            );
+        }
+
+        List<Transaction> transactions = buscarTransacoes(user, request);
+        MlRequest mlRequest = new MlRequest(mapToMlTransactions(transactions));
+
+        MlResponse mlResponse;
+        try {
+            mlResponse = mlClient.analyze(mlRequest);
+
+        } catch (ExternalServiceException ex) {
+
+            log.warn("IA indisponÃ­vel. AnÃ¡lise feita utilizando fallback local para o usuÃ¡rio {}",
+                    user.getId(), ex);
+
+            FinancialAnalysisResponse fallback = financialProfileService.gerarAnaliseFallback(transactions);
+            financialAnalysisRepository.save(
+                    criarAnalise(
+                            user,
+                            fallback.perfilFinanceiro(),
+                            fallback.nivelEndividamento(),
+                            fallback.frequenciaPoupanca(),
+                            fallback.probabilidade(),
+                            Source.FALLBACK
+                    )
+            );
+
+            return fallback;
+        }
+
+        // Monta a entidade FinancialAnalysis com o resultado devolvido pela IA
+        // e persiste no banco â€” isso cria um "retrato" daquela anÃ¡lise, sem guardar
+        // vÃ­nculo direto com as transaÃ§Ãµes que a originaram.
+        financialAnalysisRepository.save(
+                criarAnalise(
+                        user,
+                        mlResponse.perfilFinanceiro(),
+                        mlResponse.nivelEndividamento(),
+                        mlResponse.frequenciaPoupanca(),
+                        mlResponse.probabilidade(),
+                        Source.ML
+                )
+        );
+
+        return new FinancialAnalysisResponse(
+                mlResponse.perfilFinanceiro(),
+                mlResponse.nivelEndividamento(),
+                mlResponse.frequenciaPoupanca(),
+                mlResponse.probabilidade(),
+                mlResponse.resumoGastos(),
+                mlResponse.recomendacoes()
+        );
+    }
+
+    /**
+     * Busca o usuÃ¡rio pelo ID, lanÃ§ando erro claro se ele nÃ£o existir.
+     */
+    private AppUser findUserById(Long usuarioId) {
+        return userRepository.findById(usuarioId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "UsuÃ¡rio nÃ£o encontrado com o ID: " + usuarioId
+                ));
+    }
+
+    /**
+     * Converte as entidades Transaction para o formato esperado pela ML.
+     */
+    private List<MlTransactionResponse> mapToMlTransactions(List<Transaction> transactions) {
+        return transactions.stream()
+                .map(transaction -> new MlTransactionResponse(
+                        transaction.getDescricao(),
+                        transaction.getValor(),
+                        transaction.getTipo(),
+                        transaction.getCategoria(),
+                        transaction.getData()
+                ))
+                .toList();
+    }
+
+    /**
+     * Lista todas as anÃ¡lises financeiras do usuÃ¡rio,
+     * ordenadas da mais recente para a mais antiga.
+     */
+    public List<FinancialAnalysisHistoryResponse> findAll(Long usuarioId) {
+        return financialAnalysisRepository
+                .findAllByUsuarioIdOrderByDataAnaliseDescIdDesc(usuarioId)
+                .stream()
+                .map(FinancialAnalysisHistoryResponse::new)
+                .toList();
+    }
+
+    /**
+     * Busca uma anÃ¡lise pelo ID, desde que pertenÃ§a ao usuÃ¡rio.
+     */
+    public FinancialAnalysisHistoryResponse findById(
+            Long usuarioId,
+            Long analysisId
+    ) {
+        FinancialAnalysis analysis =
+                findAnalysisByIdAndUserId(
+                        analysisId,
+                        usuarioId
+                );
+
+        return new FinancialAnalysisHistoryResponse(analysis);
+    }
+
+    /**
+     * Exclui uma anÃ¡lise somente quando ela pertence ao usuÃ¡rio.
+     */
+    @Transactional
+    public void delete(
+            Long usuarioId,
+            Long analysisId
+    ) {
+        FinancialAnalysis analysis =
+                findAnalysisByIdAndUserId(
+                        analysisId,
+                        usuarioId
+                );
+
+        financialAnalysisRepository.delete(analysis);
+    }
+
+    /**
+     * Busca uma anÃ¡lise validando que ela pertence ao usuÃ¡rio autenticado.
+     * Se a anÃ¡lise existir, mas pertencer a outro usuÃ¡rio, tambÃ©m serÃ¡
+     * considerada nÃ£o encontrada. Isso impede exposiÃ§Ã£o de dados de terceiros.
+     */
+    private FinancialAnalysis findAnalysisByIdAndUserId(
+            Long analysisId,
+            Long usuarioId
+    ) {
+        return financialAnalysisRepository
+                .findByIdAndUsuarioId(
+                        analysisId,
+                        usuarioId
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "AnÃ¡lise financeira nÃ£o encontrada."
+                        ));
+    }
+
+    private List<Transaction> buscarTransacoes(
+            AppUser usuario,
+            FinancialAnalysisRequest request
+    ) {
+
+        List<Transaction> transactions =
+                transactionRepository.findByUsuarioAndDataBetween(
+                        usuario,
+                        request.dataInicial(),
+                        request.dataFinal()
+                );
+
+        if (transactions.isEmpty()) {
+            throw new InvalidRequestException(
+                    "NÃ£o hÃ¡ transaÃ§Ãµes no perÃ­odo informado."
+            );
+        }
+
+        if (transactions.size() < 3) {
+            throw new BusinessException(
+                    "Ã‰ necessÃ¡rio ter pelo menos 3 transaÃ§Ãµes no perÃ­odo para gerar uma anÃ¡lise confiÃ¡vel."
+            );
+        }
+
+        return transactions;
+    }
+
+    private FinancialAnalysis criarAnalise(
+            AppUser usuario,
+            FinancialProfile perfil,
+            BigDecimal nivelEndividamento,
+            SavingFrequency frequenciaPoupanca,
+            BigDecimal probabilidade,
+            Source origem
+    ) {
+
+        FinancialAnalysis analysis = new FinancialAnalysis();
+
+        analysis.setUsuario(usuario);
+        analysis.setPerfilFinanceiro(perfil);
+        analysis.setNivelEndividamento(nivelEndividamento);
+        analysis.setFrequenciaPoupanca(frequenciaPoupanca);
+        analysis.setProbabilidade(probabilidade);
+        analysis.setDataAnalise(LocalDate.now());
+        analysis.setOrigem(origem);
+
+        return analysis;
+    }
+}
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/service/FinancialProfileService.java
+========================================================================================================================
+
+package br.com.financeai.service;
+
+
+import br.com.financeai.dto.response.ExpenseSummaryResponse;
+import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.entity.Transaction;
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.enums.TransactionType;
+import br.com.financeai.exception.BusinessException;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+public class FinancialProfileService {
+
+    private static final BigDecimal ALTA = BigDecimal.valueOf(40);
+    private static final BigDecimal MEDIA = BigDecimal.valueOf(20);
+
+    /**
+     * Gera uma anÃ¡lise simplificada baseada em regras determinÃ­sticas,
+     * usada como fallback quando o serviÃ§o de ML estÃ¡ indisponÃ­vel.
+     */
+    public FinancialAnalysisResponse gerarAnaliseFallback(List<Transaction> transactions) {
+
+        BigDecimal totalReceitas = somarPorTipo(transactions, TransactionType.RECEITA);
+        BigDecimal totalDespesas = somarPorTipo(transactions, TransactionType.DESPESA);
+
+        FinancialProfile perfilFinanceiro = totalDespesas.compareTo(totalReceitas) > 0
+                ? FinancialProfile.EM_RISCO
+                : FinancialProfile.EM_OBSERVACAO;
+
+        BigDecimal nivelEndividamento = totalReceitas.compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.ZERO
+                : totalDespesas
+                .divide(totalReceitas, 2, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+
+        SavingFrequency frequenciaPoupanca = getSavingFrequency(totalReceitas, totalDespesas);
+
+        List<String> recomendacoes = new ArrayList<>();
+        if (totalDespesas.compareTo(totalReceitas) > 0) {
+            recomendacoes.add("Suas despesas superaram suas receitas neste perÃ­odo.");
+        }
+        recomendacoes.add("AnÃ¡lise gerada em modo simplificado â€” serviÃ§o de IA indisponÃ­vel no momento.");
+
+        return new FinancialAnalysisResponse(
+                perfilFinanceiro,
+                nivelEndividamento,
+                frequenciaPoupanca,
+                BigDecimal.ZERO,
+                calcularResumoGastos(transactions),
+                recomendacoes
+        );
+    }
+
+    private static SavingFrequency getSavingFrequency(BigDecimal totalReceitas, BigDecimal totalDespesas) {
+        BigDecimal sobra = totalReceitas.subtract(totalDespesas);
+        BigDecimal percentualSobra;
+
+        if (totalReceitas.compareTo(BigDecimal.ZERO) == 0){
+           percentualSobra = BigDecimal.ZERO;
+        } else {
+            percentualSobra = sobra.divide(totalReceitas, 2, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+        }
+
+        SavingFrequency frequenciaPoupanca;
+
+        if (percentualSobra.compareTo(ALTA) >= 0){
+             frequenciaPoupanca = SavingFrequency.ALTA;
+        } else if (percentualSobra.compareTo(MEDIA) >= 0) {
+             frequenciaPoupanca = SavingFrequency.MEDIA;
+        } else {
+             frequenciaPoupanca = SavingFrequency.BAIXA;
+        }
+        return frequenciaPoupanca;
+    }
+
+    private BigDecimal somarPorTipo(List<Transaction> transactions, TransactionType tipo) {
+        return transactions.stream()
+                .filter(t -> t.getTipo() == tipo)
+                .map(Transaction::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public ExpenseSummaryResponse calcularResumoGastos(List<Transaction> transactions){
+        Map<TransactionCategory, BigDecimal> porCategoria = transactions.stream()
+                .filter(t -> t.getTipo() == TransactionType.DESPESA)
+                .collect(Collectors.groupingBy(
+                        Transaction::getCategoria,
+                        Collectors.reducing(BigDecimal.ZERO, Transaction::getValor, BigDecimal::add)));
+
+        return new ExpenseSummaryResponse(
+                porCategoria.getOrDefault(TransactionCategory.ALIMENTACAO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.MORADIA, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.UTILITARIOS, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.INVESTIMENTO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.COMPRAS, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.SAUDE, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.ENTRETENIMENTO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.TRAJETO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.SALARIO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.OUTROS, BigDecimal.ZERO)
+        );
+    }
+}
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/request/FinancialAnalysisRequest.java
+========================================================================================================================
+
+package br.com.financeai.dto.request;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record FinancialAnalysisRequest(
+        @NotNull(message = "A data inicial Ã© obrigatÃ³ria.")
+        @JsonProperty("data_inicial")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate dataInicial,
+
+       @NotNull(message = "A data final Ã© obrigatÃ³ria.")
+       @JsonProperty("data_final")
+       @JsonFormat(pattern = "yyyy-MM-dd")
+       LocalDate dataFinal
+) {
+    @JsonIgnore
+    @AssertTrue(message = "A data inicial nÃ£o pode ser posterior Ã  data final.")
+    public boolean isPeriodoValido(){
+        if(dataInicial == null || dataFinal == null){
+            return true;
+        }
+
+        return !dataInicial.isAfter(dataFinal);
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisResponse.java
+========================================================================================================================
+
+package br.com.financeai.dto.response;
+
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+public record FinancialAnalysisResponse(
+
+        @JsonProperty("perfil_financeiro")
+        FinancialProfile perfilFinanceiro,
+
+        @JsonProperty("nivel_endividamento")
+        BigDecimal nivelEndividamento,
+
+        @JsonProperty("frequencia_poupanca")
+        SavingFrequency frequenciaPoupanca,
+
+        @JsonProperty("probabilidade")
+        BigDecimal probabilidade,
+
+        @JsonProperty("resumo_gastos")
+        ExpenseSummaryResponse resumoGastos,
+
+        @JsonProperty("recomendacoes")
+        List<String> recomendacoes
+) {}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisHistoryResponse.java
+========================================================================================================================
+
+package br.com.financeai.dto.response;
+
+import br.com.financeai.entity.FinancialAnalysis;
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record FinancialAnalysisHistoryResponse(
+
+        Long id,
+
+        BigDecimal nivelEndividamento,
+
+        SavingFrequency frequenciaPoupanca,
+
+        FinancialProfile perfilFinanceiro,
+
+        BigDecimal probabilidade,
+
+        LocalDate dataAnalise
+
+) {
+
+    public FinancialAnalysisHistoryResponse(FinancialAnalysis analysis) {
+        this(
+                analysis.getId(),
+                analysis.getNivelEndividamento(),
+                analysis.getFrequenciaPoupanca(),
+                analysis.getPerfilFinanceiro(),
+                analysis.getProbabilidade(),
+                analysis.getDataAnalise()
+        );
+    }
+}
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/response/ExpenseSummaryResponse.java
+========================================================================================================================
+
+package br.com.financeai.dto.response;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.math.BigDecimal;
+
+public record ExpenseSummaryResponse(
+        @JsonProperty("AlimentaÃ§Ã£o")
+        BigDecimal alimentacao,
+
+        @JsonProperty("Moradia")
+        BigDecimal moradia,
+
+        @JsonProperty("Compras")
+        BigDecimal compras,
+
+        @JsonProperty("Entretenimento")
+        BigDecimal entretenimento,
+
+        @JsonProperty("Investimento")
+        BigDecimal investimento,
+
+        @JsonProperty("SalÃ¡rio")
+        BigDecimal salario,
+
+        @JsonProperty("SaÃºde")
+        BigDecimal saude,
+
+        @JsonProperty("Trajeto")
+        BigDecimal trajeto,
+
+        @JsonProperty("UtilitÃ¡rios")
+        BigDecimal utilitarios,
+
+        @JsonProperty("Outros")
+        BigDecimal outros
+) {}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/enums/FinancialProfile.java
+========================================================================================================================
+
+package br.com.financeai.enums;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public enum FinancialProfile {
+
+    SAUDAVEL("SaudÃ¡vel"),
+
+    EM_OBSERVACAO("Em observaÃ§Ã£o"),
+
+    EM_RISCO("Em risco");
+
+    private final String label;
+
+    FinancialProfile(String label) {
+        this.label = label;
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/enums/SavingFrequency.java
+========================================================================================================================
+
+package br.com.financeai.enums;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public enum SavingFrequency {
+
+    BAIXA("Baixa"),
+
+    MEDIA("MÃ©dia"),
+
+    ALTA("Alta");
+
+    private final String label;
+
+    SavingFrequency(String label) {
+        this.label = label;
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
+
+    }
+
+
+========================================================================================================================
+REFERENCIAS A MOCKS / ANALISE FINANCEIRA
+========================================================================================================================
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIInsights\AIInsights.tsx:112
+    dashboardService.getInsights();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:20
+export function FinancialAnalysisGrid() {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\index.ts:1
+export * from "./FinancialAnalysisGrid";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.tsx:21
+  const score = dashboardService.getScore();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\mocks\dashboard.mock.tsx:9
+import type { DashboardMock } from "@/types/dashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\mocks\dashboard.mock.tsx:11
+export const dashboardMock: DashboardMock = {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:301
+  getInsights(): string[] {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:305
+  getScore() {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:316
+  getAlerts() {
+

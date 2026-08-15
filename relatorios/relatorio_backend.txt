@@ -1,0 +1,2888 @@
+﻿=========================================
+ 🔴 SECURITY
+=========================================
+
+-----------------------------------------
+ARQUIVO: src/main/java/br/com/financeai/security/SecurityConfigurations.java
+-----------------------------------------
+package br.com.financeai.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfigurations {
+
+    @Autowired
+    private SecurityFilter securityFilter;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(req -> {
+                    req.requestMatchers(HttpMethod.POST, "/auth/login").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/auth/reactivate").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/users").permitAll();
+                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    req.anyRequest().authenticated();
+                })
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+                List.of("http://localhost:5173")
+        );
+
+        configuration.setAllowedMethods(
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE",
+                        "OPTIONS"
+                )
+        );
+
+        configuration.setAllowedHeaders(
+                List.of(
+                        "Authorization",
+                        "Content-Type"
+                )
+        );
+
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: src/main/java/br/com/financeai/security/SecurityFilter.java
+-----------------------------------------
+package br.com.financeai.security;
+
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.repository.UserRepository;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@Component
+public class SecurityFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        var token = recuperarToken(request);
+
+        if (token != null) {
+            var login = tokenService.validarToken(token);
+            if (!login.isEmpty()) {
+                AppUser usuario = userRepository.findByEmail(login).orElse(null);
+
+                if (usuario != null && usuario.isEnabled()) {
+                    var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String recuperarToken(HttpServletRequest request) {
+        var authHeader = request.getHeader("Authorization");
+        if (authHeader == null) return null;
+        return authHeader.replace("Bearer ", "");
+    }
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: src/main/java/br/com/financeai/security/TokenService.java
+-----------------------------------------
+
+package br.com.financeai.security;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+@Service
+public class TokenService {
+
+    @Value("${api.security.token.secret}")
+    private String secret;
+
+    public String gerarToken(String email) {
+        try {
+            Algorithm algoritmo = Algorithm.HMAC256(secret);
+            return JWT.create()
+                    .withIssuer("FinanceAI API")
+                    .withSubject(email)
+                    .withExpiresAt(dataExpiracao())
+                    .sign(algoritmo);
+        } catch (JWTCreationException exception) {
+            throw new RuntimeException("Erro ao gerar token JWT", exception);
+        }
+    }
+
+    public String validarToken(String token) {
+        try {
+            Algorithm algoritmo = Algorithm.HMAC256(secret);
+            return JWT.require(algoritmo)
+                    .withIssuer("FinanceAI API")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        } catch (JWTVerificationException exception) {
+            return "";
+        }
+    }
+
+    private Instant dataExpiracao() {
+        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+    }
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: src/main/java/br/com/financeai/service/AutenticacaoService.java
+-----------------------------------------
+package br.com.financeai.service;
+
+import br.com.financeai.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AutenticacaoService implements UserDetailsService {
+
+    @Autowired
+    private UserRepository repository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return repository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("UsuÃ¡rio nÃ£o encontrado: " + username));
+    }
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: src/main/java/br/com/financeai/controller/AutenticacaoController.java
+-----------------------------------------
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.DadosAutenticacao;
+import br.com.financeai.dto.request.UserRegisterDto;
+import br.com.financeai.dto.response.DadosTokenJWT;
+import br.com.financeai.dto.response.UserResponseDto;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.AuthenticationException;
+import br.com.financeai.security.TokenService;
+import br.com.financeai.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+import br.com.financeai.exception.ApiErrorResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@RestController
+@RequestMapping("/auth")
+@Tag(
+        name="Authentication",
+        description = "Public endpoints for user registration and authentication"
+)
+public class AutenticacaoController {
+
+    @Autowired
+    private AuthenticationManager manager;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private UserService userService;
+
+    @Operation(
+            summary = "Authenticate user",
+            description = """
+                Authenticates a user and returns a JWT access token.
+
+                Authentication:
+                This endpoint is public and does not require a JWT token.
+
+                Behavior:
+                Validates the provided email and password. When the credentials are
+                valid, returns a token that must be sent to protected endpoints in
+                the Authorization header using the format: Bearer {token}.
+                """
+    )
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User authenticated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = DadosTokenJWT.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid email or password",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/login")
+    public ResponseEntity<DadosTokenJWT>  efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
+
+            try {
+                var authentication = manager.authenticate(authenticationToken);
+
+                var usuario = (AppUser) authentication.getPrincipal();
+                var tokenJWT = tokenService.gerarToken(usuario.getEmail());
+
+            return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+
+        } catch (BadCredentialsException ex) {
+            // Traduz o erro do Spring Security para a exceÃ§Ã£o de domÃ­nio do projeto,
+            // que jÃ¡ Ã© tratada de forma padronizada pelo GlobalExceptionHandler.
+            throw new AuthenticationException(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/reactivate")
+    public ResponseEntity<Void> reativarConta(@RequestBody @Valid DadosAutenticacao dados) {
+        userService.reativarConta(dados);
+        return ResponseEntity.noContent().build();
+    }
+
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: src/main/java/br/com/financeai/dto/request/DadosAutenticacao.java
+-----------------------------------------
+package br.com.financeai.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+
+public record DadosAutenticacao(
+        @NotBlank String email,
+        @NotBlank String senha
+) {}
+
+
+
+-----------------------------------------
+ARQUIVO: src/main/java/br/com/financeai/dto/response/DadosTokenJWT.java
+-----------------------------------------
+package br.com.financeai.dto.response;
+
+public record DadosTokenJWT(String token) {
+}
+
+
+
+
+
+=========================================
+ 🔴 CONTROLLERS
+=========================================
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\controller\AutenticacaoController.java
+-----------------------------------------
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.DadosAutenticacao;
+import br.com.financeai.dto.request.UserRegisterDto;
+import br.com.financeai.dto.response.DadosTokenJWT;
+import br.com.financeai.dto.response.UserResponseDto;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.AuthenticationException;
+import br.com.financeai.security.TokenService;
+import br.com.financeai.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+import br.com.financeai.exception.ApiErrorResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@RestController
+@RequestMapping("/auth")
+@Tag(
+        name="Authentication",
+        description = "Public endpoints for user registration and authentication"
+)
+public class AutenticacaoController {
+
+    @Autowired
+    private AuthenticationManager manager;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private UserService userService;
+
+    @Operation(
+            summary = "Authenticate user",
+            description = """
+                Authenticates a user and returns a JWT access token.
+
+                Authentication:
+                This endpoint is public and does not require a JWT token.
+
+                Behavior:
+                Validates the provided email and password. When the credentials are
+                valid, returns a token that must be sent to protected endpoints in
+                the Authorization header using the format: Bearer {token}.
+                """
+    )
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User authenticated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = DadosTokenJWT.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid email or password",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/login")
+    public ResponseEntity<DadosTokenJWT>  efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
+
+            try {
+                var authentication = manager.authenticate(authenticationToken);
+
+                var usuario = (AppUser) authentication.getPrincipal();
+                var tokenJWT = tokenService.gerarToken(usuario.getEmail());
+
+            return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+
+        } catch (BadCredentialsException ex) {
+            // Traduz o erro do Spring Security para a exceÃ§Ã£o de domÃ­nio do projeto,
+            // que jÃ¡ Ã© tratada de forma padronizada pelo GlobalExceptionHandler.
+            throw new AuthenticationException(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/reactivate")
+    public ResponseEntity<Void> reativarConta(@RequestBody @Valid DadosAutenticacao dados) {
+        userService.reativarConta(dados);
+        return ResponseEntity.noContent().build();
+    }
+
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\controller\FinancialAnalysisController.java
+-----------------------------------------
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.FinancialAnalysisRequest;
+import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.service.FinancialAnalysisService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+
+@RestController
+@RequestMapping("/analise-financeira")
+public class FinancialAnalysisController {
+
+    private final FinancialAnalysisService financialAnalysisService;
+
+    public FinancialAnalysisController(FinancialAnalysisService financialAnalysisService) {
+        this.financialAnalysisService = financialAnalysisService;
+
+    }
+
+    @Operation(
+            summary = "Analyze financial profile",
+            description = "Receives the user's financial data and returns a mocked financial analysis."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Financial analysis completed seccessfully"
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request data"
+    )
+    @PostMapping
+    public ResponseEntity<FinancialAnalysisResponse> analyze(@Valid @RequestBody FinancialAnalysisRequest request) {
+
+        return ResponseEntity.ok(financialAnalysisService.analyze(request));
+
+    }
+}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\controller\TransactionController.java
+-----------------------------------------
+package br.com.financeai.controller;
+
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.dto.request.CreateTransactionRequest;
+import br.com.financeai.dto.request.UpdateTransactionRequest;
+import br.com.financeai.dto.response.TransactionResponse;
+import br.com.financeai.exception.InvalidRequestException;
+import br.com.financeai.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import br.com.financeai.exception.ApiErrorResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping("/classificar-transacoes")
+@Tag(
+        name = "Transactions",
+        description = "Protected endpoints for creating, classifying and managing the authenticated user's financial transactions."
+)
+public class TransactionController {
+
+    private final TransactionService transactionService;
+
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
+
+    @Operation(
+            summary = "Create and classify a transaction",
+            description = """
+                Creates a financial transaction for the currently authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Sends the transaction description to the Machine Learning service,
+                receives the predicted category and stores the classified transaction
+                in the database.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Transaction created and classified successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid transaction data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "502",
+                    description = "Machine Learning service rejected the request or returned an invalid response",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "Machine Learning service is unavailable",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PostMapping
+    public ResponseEntity<TransactionResponse> create(
+            @AuthenticationPrincipal AppUser loggedUser, @Valid @RequestBody CreateTransactionRequest request) {
+        TransactionResponse response = transactionService.create(loggedUser.getId(), request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @Operation(
+            summary = "Create and classify multiple transactions",
+            description = """
+                Creates and classifies multiple financial transactions for the
+                currently authenticated user in a single request.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Sends each transaction to the Machine Learning classification flow,
+                associates the results with the authenticated user and stores the
+                classified transactions in the database. This operation is useful
+                for statement imports or batch registration.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Transactions created and classified successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @io.swagger.v3.oas.annotations.media.ArraySchema(
+                                    schema = @Schema(implementation = TransactionResponse.class)
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid transaction list or transaction data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "502",
+                    description = "Machine Learning service rejected the request or returned an invalid response",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "Machine Learning service is unavailable",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/batch")
+    public ResponseEntity<List<TransactionResponse>> createBatch(
+            @AuthenticationPrincipal AppUser loggedUser,
+            @Valid @RequestBody List<CreateTransactionRequest> requests
+    ) {
+        List<TransactionResponse> response = transactionService.createBatch(loggedUser.getId(), requests);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @Operation(
+            summary = "List authenticated user's transactions",
+            description = """
+                Returns the financial transactions that belong to the currently
+                authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Without query parameters, returns all transactions owned by the user.
+                When both dataInicial and dataFinal are provided, returns only the
+                transactions within the inclusive date range. Both dates must be sent
+                together using the format yyyy-MM-dd.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Transactions retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = TransactionResponse.class)
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Incomplete or invalid date range",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @GetMapping
+    public ResponseEntity<List<TransactionResponse>> findAll(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Start date of the optional filter, in yyyy-MM-dd format. Must be provided together with dataFinal.",
+                    example = "2026-07-01"
+            )
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dataInicial,
+
+            @Parameter(
+                    description = "End date of the optional filter (yyyy-MM-dd). Must be provided together with dataInicial.",
+                    example = "2026-07-31"
+            )
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dataFinal
+    ) {
+        validateOptionalPeriod(dataInicial, dataFinal);
+
+        List<TransactionResponse> response;
+
+        if (dataInicial != null) {
+            response = transactionService.findAllByPeriod(
+                    loggedUser.getId(),
+                    dataInicial,
+                    dataFinal
+            );
+        }
+        else {
+            response = transactionService.findAll(loggedUser.getId());
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Get a transaction by ID",
+            description = """
+                Returns a specific financial transaction owned by the currently
+                authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Retrieves the transaction only when it belongs to the authenticated
+                user. A transaction owned by another user must not be exposed.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Transaction retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Transaction not found for the authenticated user",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponse> findById(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the transaction to retrieve.",
+                    example = "15"
+            )
+            @PathVariable Long transactionId
+    ) {
+        TransactionResponse response =
+                transactionService.findById(loggedUser.getId(), transactionId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Update a transaction",
+            description = """
+                Fully updates a financial transaction owned by the currently
+                authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Because this endpoint uses PUT, all required transaction fields must
+                be provided. The transaction is updated only when it belongs to the
+                authenticated user.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Transaction updated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid transaction data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Transaction not found for the authenticated user",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Transaction could not be updated because of a business conflict",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PutMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponse> update(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the transaction to update.",
+                    example = "15"
+            )
+            @PathVariable Long transactionId,
+            @Valid @RequestBody UpdateTransactionRequest request
+    ) {
+        TransactionResponse response =
+                transactionService.update(
+                        loggedUser.getId(),
+                        transactionId,
+                        request
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Delete a transaction",
+            description = """
+                Permanently deletes a financial transaction owned by the currently
+                authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Deletes the transaction only when it belongs to the authenticated user.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Transaction deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Transaction not found for the authenticated user",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @DeleteMapping("/{transactionId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the transaction to delete.",
+                    example = "15"
+            )
+            @PathVariable Long transactionId
+    ) {
+        transactionService.delete(loggedUser.getId(), transactionId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Evita consultas incompletas, como informar somente
+     * a data inicial ou somente a data final.
+     */
+    private void validateOptionalPeriod(
+            LocalDate dataInicial,
+            LocalDate dataFinal
+    ) {
+        boolean onlyInitialDateWasProvided =
+                dataInicial != null && dataFinal == null;
+
+        boolean onlyFinalDateWasProvided =
+                dataInicial == null && dataFinal != null;
+
+        if (onlyInitialDateWasProvided || onlyFinalDateWasProvided) {
+            throw new InvalidRequestException(
+                    "Informe a data inicial e a data final para filtrar por perÃ­odo."
+            );
+        }
+    }
+}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\controller\UserController.java
+-----------------------------------------
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.UserRegisterDto;
+import br.com.financeai.dto.request.UserUpdateDto;
+import br.com.financeai.dto.response.UserResponseDto;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.ApiErrorResponse;
+import br.com.financeai.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+@RestController
+@RequestMapping("/users")
+@Tag(
+        name = "Users",
+        description = "Protected endpoints for managing the authenticated user's profile."
+)
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+  
+   @Operation(
+            summary = "Register a new user",
+            description = """
+                Creates a new user account.
+
+                Authentication:
+                This endpoint is public and does not require a JWT token.
+
+                Behavior:
+                Validates the registration data, requires a unique email address
+                and encrypts the password before storing it. The password is never
+                included in the API response.
+                """
+    )
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "User registered successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid registration data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email address already registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+
+    @PostMapping
+    public ResponseEntity<UserResponseDto> cadastrar(@RequestBody @Valid UserRegisterDto dto, UriComponentsBuilder uriBuilder) {
+        UserResponseDto response = userService.cadastrar(dto);
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(response.id()).toUri();
+        return ResponseEntity.created(uri).body(response);
+    }
+
+    @Operation(
+            summary = "Get authenticated user",
+            description = """
+                Returns the profile information of the currently authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Identifies the user from the token and returns their profile data
+                without exposing sensitive information such as the password.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDto> obterPerfil(@AuthenticationPrincipal AppUser usuarioLogado) {
+        UserResponseDto response = userService.buscarPerfil(usuarioLogado);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Update authenticated user",
+            description = """
+                Updates the profile information of the currently authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Allows the authenticated user to update their own account information.
+                If the email is changed, the new address must not already belong to
+                another user. A new password is encrypted before being stored.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User updated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email address already registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PutMapping("/me")
+    public ResponseEntity<UserResponseDto> atualizarPerfil(
+            @AuthenticationPrincipal AppUser usuarioLogado,
+            @RequestBody @Valid UserUpdateDto dto) {
+        UserResponseDto response = userService.atualizarPerfil(usuarioLogado, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Deactivate authenticated user",
+            description = """
+                Deactivates the currently authenticated user's account.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Performs a logical deletion by marking the account as inactive.
+                The user record remains stored in the database, but the account
+                must no longer be authorized to access protected endpoints.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "User deactivated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> desativarConta(@AuthenticationPrincipal AppUser usuarioLogado) {
+        userService.desativarConta(usuarioLogado);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+
+
+=========================================
+ 🔴 DTOS
+=========================================
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\request\CreateTransactionRequest.java
+-----------------------------------------
+package br.com.financeai.dto.request;
+
+import br.com.financeai.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+/**
+ * Dados recebidos para criaÃ§Ã£o de uma nova transaÃ§Ã£o.
+ *
+ * A categoria nÃ£o Ã© enviada pelo frontend neste momento,
+ * pois serÃ¡ definida pelo serviÃ§o de classificaÃ§Ã£o.
+ */
+public record CreateTransactionRequest(
+
+
+        @NotBlank(message = "A descriÃ§Ã£o da transaÃ§Ã£o Ã© obrigatÃ³ria.")
+        @Size(max = 255, message = "A descriÃ§Ã£o da transaÃ§Ã£o deve possuir no mÃ¡ximo 255 caracteres.")
+        String descricao,
+
+
+        @NotNull(message = "O valor da transaÃ§Ã£o Ã© obrigatÃ³rio.")
+        @Positive(message = "O valor da transaÃ§Ã£o deve ser maior que zero.")
+        BigDecimal valor,
+
+
+        @NotNull(message = "O tipo da transaÃ§Ã£o Ã© obrigatÃ³rio.")
+        TransactionType tipo,
+
+        @NotNull(message = "A data da transaÃ§Ã£o Ã© obrigatÃ³ria.")
+        @PastOrPresent(message = "A data da transaÃ§Ã£o nÃ£o pode estar no futuro.")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate data
+
+) {
+}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\request\DadosAutenticacao.java
+-----------------------------------------
+package br.com.financeai.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+
+public record DadosAutenticacao(
+        @NotBlank String email,
+        @NotBlank String senha
+) {}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\request\FinancialAnalysisRequest.java
+-----------------------------------------
+package br.com.financeai.dto.request;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record FinancialAnalysisRequest(
+        @NotNull(message = "A data inicial Ã© obrigatÃ³ria.")
+        @JsonProperty("data_inicial")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate dataInicial,
+
+       @NotNull(message = "A data final Ã© obrigatÃ³ria.")
+       @JsonProperty("data_final")
+       @JsonFormat(pattern = "yyyy-MM-dd")
+       LocalDate dataFinal
+) {
+    @JsonIgnore
+    @AssertTrue(message = "A data inicial nÃ£o pode ser posterior Ã  data final.")
+    public boolean isPeriodoValido(){
+        if(dataInicial == null || dataFinal == null){
+            return true;
+        }
+
+        return !dataInicial.isAfter(dataFinal);
+    }
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\request\UpdateTransactionRequest.java
+-----------------------------------------
+package br.com.financeai.dto.request;
+
+import br.com.financeai.enums.TransactionType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+/**
+ * Dados recebidos para atualizaÃ§Ã£o completa de uma transaÃ§Ã£o.
+ *
+ * Como o endpoint utilizarÃ¡ PUT, todos os campos permanecem
+ * obrigatÃ³rios nesta primeira versÃ£o do CRUD.
+ */
+public record UpdateTransactionRequest(
+
+        @NotBlank(message = "A descriÃ§Ã£o da transaÃ§Ã£o Ã© obrigatÃ³ria.")
+        @Size(
+                max = 255,
+                message = "A descriÃ§Ã£o da transaÃ§Ã£o deve possuir no mÃ¡ximo 255 caracteres."
+        )
+        String descricao,
+
+        @NotNull(message = "O valor da transaÃ§Ã£o Ã© obrigatÃ³rio.")
+        @Positive(message = "O valor da transaÃ§Ã£o deve ser maior que zero.")
+        BigDecimal valor,
+
+        @NotNull(message = "O tipo da transaÃ§Ã£o Ã© obrigatÃ³rio.")
+        TransactionType tipo,
+
+        @NotNull(message = "A data da transaÃ§Ã£o Ã© obrigatÃ³ria.")
+        @PastOrPresent(
+                message = "A data da transaÃ§Ã£o nÃ£o pode estar no futuro."
+        )
+        LocalDate data
+
+) {
+}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\request\UserRegisterDto.java
+-----------------------------------------
+package br.com.financeai.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record UserRegisterDto(
+        @NotBlank(message = "O nome Ã© obrigatÃ³rio")
+        @Size(max = 100, message = "O nome nÃ£o pode ter mais de 100 caracteres")
+        String nome,
+
+        @NotBlank(message = "O e-mail Ã© obrigatÃ³rio")
+        @Email(message = "Formato de e-mail invÃ¡lido")
+        @Size(max = 150, message = "O e-mail nÃ£o pode ter mais de 150 caracteres")
+        String email,
+
+        @NotBlank(message = "A senha Ã© obrigatÃ³ria")
+        @Size(min = 6, max = 20, message = "A senha deve conter entre 6 e 20 caracteres")
+        String senha
+) {}
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\request\UserUpdateDto.java
+-----------------------------------------
+package br.com.financeai.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
+
+public record UserUpdateDto(
+        @Size(max = 100, message = "O nome nÃ£o pode ter mais de 100 caracteres")
+        String nome,
+
+        @Email(message = "Formato de e-mail invÃ¡lido")
+        @Size(max = 150, message = "O e-mail nÃ£o pode ter mais de 150 caracteres")
+        String email,
+
+        @Size(min = 6, max = 20, message = "A senha deve conter entre 6 e 20 caracteres")
+        String senha
+) {}
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\response\DadosTokenJWT.java
+-----------------------------------------
+package br.com.financeai.dto.response;
+
+public record DadosTokenJWT(String token) {
+}
+
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\response\ExpenseSummaryResponse.java
+-----------------------------------------
+package br.com.financeai.dto.response;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.math.BigDecimal;
+
+public record ExpenseSummaryResponse(
+        @JsonProperty("AlimentaÃ§Ã£o")
+        BigDecimal alimentacao,
+
+        @JsonProperty("Moradia")
+        BigDecimal moradia,
+
+        @JsonProperty("Compras")
+        BigDecimal compras,
+
+        @JsonProperty("Entretenimento")
+        BigDecimal entretenimento,
+
+        @JsonProperty("Investimento")
+        BigDecimal investimento,
+
+        @JsonProperty("SalÃ¡rio")
+        BigDecimal salario,
+
+        @JsonProperty("SaÃºde")
+        BigDecimal saude,
+
+        @JsonProperty("Trajeto")
+        BigDecimal trajeto,
+
+        @JsonProperty("UtilitÃ¡rios")
+        BigDecimal utilitarios,
+
+        @JsonProperty("Outros")
+        BigDecimal outros
+) {}
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\response\FinancialAnalysisResponse.java
+-----------------------------------------
+package br.com.financeai.dto.response;
+
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+public record FinancialAnalysisResponse(
+
+        @JsonProperty("perfil_financeiro")
+        FinancialProfile perfilFinanceiro,
+
+        @JsonProperty("nivel_endividamento")
+        BigDecimal nivelEndividamento,
+
+        @JsonProperty("frequencia_poupanca")
+        SavingFrequency frequenciaPoupanca,
+
+        @JsonProperty("probabilidade")
+        BigDecimal probabilidade,
+
+        @JsonProperty("resumo_gastos")
+        ExpenseSummaryResponse resumoGastos,
+
+        @JsonProperty("recomendacoes")
+        List<String> recomendacoes
+) {}
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\response\TransactionResponse.java
+-----------------------------------------
+package br.com.financeai.dto.response;
+
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.enums.TransactionType;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+/**
+ * RepresentaÃ§Ã£o pÃºblica de uma transaÃ§Ã£o.
+ *
+ * O objeto AppUser nÃ£o Ã© retornado para evitar exposiÃ§Ã£o de
+ * informaÃ§Ãµes sensÃ­veis, como senha e dados internos da entidade.
+ */
+public record TransactionResponse(
+
+        Long id,
+
+        String descricao,
+
+        BigDecimal valor,
+
+        TransactionType tipo,
+
+        TransactionCategory categoria,
+
+        LocalDate data,
+
+        Long usuarioId
+
+) {
+}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\dto\response\UserResponseDto.java
+-----------------------------------------
+package br.com.financeai.dto.response;
+
+import br.com.financeai.entity.AppUser;
+
+public record UserResponseDto(
+        Long id,
+        String nome,
+        String email,
+        boolean ativo
+) {
+    public UserResponseDto(AppUser usuario) {
+        this(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.isAtivo());
+    }
+}
+
+
+
+
+=========================================
+ 🔴 SERVICES
+=========================================
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\service\AutenticacaoService.java
+-----------------------------------------
+package br.com.financeai.service;
+
+import br.com.financeai.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AutenticacaoService implements UserDetailsService {
+
+    @Autowired
+    private UserRepository repository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return repository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("UsuÃ¡rio nÃ£o encontrado: " + username));
+    }
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\service\FinancialAnalysisService.java
+-----------------------------------------
+package br.com.financeai.service;
+
+import br.com.financeai.dto.request.FinancialAnalysisRequest;
+import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.entity.FinancialAnalysis;
+import br.com.financeai.entity.Transaction;
+import br.com.financeai.exception.BusinessException;
+import br.com.financeai.exception.InvalidRequestException;
+import br.com.financeai.exception.UserNotFoundException;
+import br.com.financeai.integration.client.MlClient;
+import br.com.financeai.integration.dto.request.MlRequest;
+import br.com.financeai.integration.dto.request.MlTransactionRequest;
+import br.com.financeai.integration.dto.response.MlResponse;
+import br.com.financeai.integration.dto.response.MlTransactionResponse;
+import br.com.financeai.repository.FinancialAnalysisRepository;
+import br.com.financeai.repository.TransactionRepository;
+import br.com.financeai.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * ResponsÃ¡vel por gerar a anÃ¡lise financeira de um usuÃ¡rio para um perÃ­odo informado.
+
+ * Fluxo geral:
+ *   1. Localiza o usuÃ¡rio
+ *   2. Busca as transaÃ§Ãµes do usuÃ¡rio dentro do perÃ­odo informado
+ *   3. Monta a requisiÃ§Ã£o para a IA (MlRequest) com essas transaÃ§Ãµes
+ *   4. Chama a IA e recebe o resultado (perfil financeiro, probabilidade, resumo de gastos, etc.)
+ *   5. Persiste o resultado da anÃ¡lise no banco
+ *   6. Devolve o resultado formatado para o frontend
+ */
+@Service
+public class FinancialAnalysisService {
+
+    // E-mail fixo do usuÃ¡rio de teste, usado enquanto nÃ£o existe autenticaÃ§Ã£o real.
+    // Quando o JWT for implementado, essa constante deixa de ser necessÃ¡ria.
+    private static final String TEST_USER_EMAIL = "teste@financeai.com";
+
+    private final FinancialAnalysisRepository financialAnalysisRepository;
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final MlClient mlClient;
+
+
+    public FinancialAnalysisService(MlClient mlClient, FinancialAnalysisRepository financialAnalysisRepository, TransactionRepository transactionRepository, UserRepository userRepository) {
+        this.mlClient = mlClient;
+        this.financialAnalysisRepository = financialAnalysisRepository;
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Gera e persiste uma anÃ¡lise financeira para o perÃ­odo informado no request.
+     *
+     * @param request contÃ©m apenas o perÃ­odo (dataInicial/dataFinal) â€” nÃ£o recebe transaÃ§Ãµes
+     * @return o resultado da anÃ¡lise, no formato que o frontend espera
+     */
+    public FinancialAnalysisResponse analyze(FinancialAnalysisRequest request) {
+
+        // Passo 1: identifica o usuÃ¡rio dono das transaÃ§Ãµes a serem analisadas
+        AppUser user = getTestUser();
+
+        // Passo 2: busca no banco as transaÃ§Ãµes do usuÃ¡rio dentro do perÃ­odo pedido.
+        // Essas transaÃ§Ãµes jÃ¡ foram cadastradas e classificadas anteriormente
+        // (via TransactionService) â€” aqui sÃ³ lemos o que jÃ¡ existe.
+        List<Transaction> transactions = transactionRepository
+                .findByUsuarioAndDataBetween(user, request.dataInicial(), request.dataFinal());
+
+
+        if (request.dataInicial().isAfter(LocalDate.now())) {
+            throw new BusinessException(
+                    "NÃ£o Ã© possÃ­vel gerar anÃ¡lise para um perÃ­odo que ainda nÃ£o comeÃ§ou."
+            );
+        }
+        // Sem transaÃ§Ãµes no perÃ­odo, nÃ£o hÃ¡ o que analisar â€” melhor falhar
+        // de forma clara do que mandar uma lista vazia para a IA.
+        if (transactions.isEmpty()) {
+            throw new InvalidRequestException("NÃ£o hÃ¡ transaÃ§Ãµes no perÃ­odo informado.");
+        }
+        if (transactions.size() < 3) {
+            throw new BusinessException(
+                    "Ã‰ necessÃ¡rio ter pelo menos 3 transaÃ§Ãµes no perÃ­odo para gerar uma anÃ¡lise confiÃ¡vel."
+            );
+        }
+
+        // Passo 3: converte as entidades do banco para o formato que a IA espera.
+        // Monta a lista que a IA precisa, a partir do que jÃ¡ estÃ¡ no banco
+        List<MlTransactionResponse> mlTransactions = transactions.stream()
+                .map(t -> new MlTransactionResponse(
+                        t.getDescricao(),
+                        t.getValor(),
+                        t.getTipo(),
+                        t.getCategoria(),
+                        t.getData()))
+                .toList();
+
+        // Passo 4: chama a IA passando todas as transaÃ§Ãµes do perÃ­odo de uma vez,
+        // e recebe de volta o resultado da anÃ¡lise (perfil, probabilidade, etc.)
+        MlRequest mlRequest = new MlRequest(mlTransactions);
+        MlResponse mlResponse = mlClient.analyze(mlRequest);
+
+        // Busca o usuÃ¡rio novamente sÃ³ para validar que ele ainda existe
+        // antes de vincular a anÃ¡lise a ele.
+        AppUser appUser = userRepository
+                .findByEmail(TEST_USER_EMAIL)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "UsuÃ¡rio de teste nÃ£o encontrado."
+                        )
+                );
+
+        // Passo 5: monta a entidade FinancialAnalysis com o resultado devolvido pela IA
+        // e persiste no banco â€” isso cria um "retrato" daquela anÃ¡lise, sem guardar
+        // vÃ­nculo direto com as transaÃ§Ãµes que a originaram.
+        FinancialAnalysis analysis = new FinancialAnalysis();
+        analysis.setUsuario(user);
+        analysis.setPerfilFinanceiro(mlResponse.perfilFinanceiro());
+        analysis.setFrequenciaPoupanca(mlResponse.frequenciaPoupanca());
+        analysis.setNivelEndividamento(mlResponse.nivelEndividamento());
+        analysis.setProbabilidade(mlResponse.probabilidade());
+        analysis.setDataAnalise(LocalDate.now());
+
+        financialAnalysisRepository.save(analysis);
+
+        // Passo 6: devolve o resultado da anÃ¡lise jÃ¡ no formato de resposta da API,
+        // usando os mesmos dados que acabamos de persistir.
+        return new FinancialAnalysisResponse(
+                mlResponse.perfilFinanceiro(),
+                mlResponse.nivelEndividamento(),
+                mlResponse.frequenciaPoupanca(),
+                mlResponse.probabilidade(),
+                mlResponse.resumoGastos(),
+                mlResponse.recomendacoes()
+        );
+    }
+
+    /**
+     * Busca o usuÃ¡rio de teste fixo no banco.
+     *
+     * SubstituÃ­do futuramente pela identificaÃ§Ã£o do usuÃ¡rio autenticado (JWT).
+     */
+    private AppUser getTestUser() {
+
+        return userRepository.findByEmail(TEST_USER_EMAIL)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "UsuÃ¡rio de teste nÃ£o encontrado."
+                        ));
+    }
+}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\service\FinancialProfileService.java
+-----------------------------------------
+package br.com.financeai.service;
+
+import org.springframework.stereotype.Service;
+
+/**
+ * Placeholder: ainda nÃ£o tem implementaÃ§Ã£o.
+ *
+ * Reservada para uma futura lÃ³gica de perfil financeiro que hoje Ã©
+ * calculada inteiramente pela IA externa (via MlClient/MlResponse).
+ * Se algum dia parte desse cÃ¡lculo passar a ser feita localmente no
+ * backend (ex: regras determinÃ­sticas em cima das transaÃ§Ãµes, sem
+ * depender da IA), Ã© aqui que essa lÃ³gica entraria.
+ */
+@Service
+public class FinancialProfileService {
+}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\service\TransactionService.java
+-----------------------------------------
+package br.com.financeai.service;
+
+import br.com.financeai.dto.request.CreateTransactionRequest;
+import br.com.financeai.dto.request.UpdateTransactionRequest;
+import br.com.financeai.dto.response.TransactionResponse;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.entity.Transaction;
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.enums.TransactionType;
+import br.com.financeai.exception.BusinessException;
+import br.com.financeai.exception.InvalidRequestException;
+import br.com.financeai.exception.ResourceNotFoundException;
+import br.com.financeai.exception.UserNotFoundException;
+import br.com.financeai.integration.client.MlClient;
+import br.com.financeai.integration.dto.request.MlTransactionRequest;
+import br.com.financeai.integration.dto.response.MlTransactionResponse;
+import br.com.financeai.repository.TransactionRepository;
+import br.com.financeai.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * ResponsÃ¡vel pelo CRUD completo de transaÃ§Ãµes: criar (uma ou em lote),
+ * listar, buscar por id, atualizar e excluir.
+ *
+ * Toda transaÃ§Ã£o criada ou editada passa pela IA (MlClient) para receber
+ * uma categoria â€” o usuÃ¡rio nunca informa a categoria manualmente.
+ *
+ * O usuÃ¡rio Ã© identificado pelo header X-User-Id (placeholder provisÃ³rio,
+ * atÃ© existir autenticaÃ§Ã£o real via JWT), e toda operaÃ§Ã£o valida que a
+ * transaÃ§Ã£o pertence de fato ao usuÃ¡rio informado, evitando que alguÃ©m
+ * acesse/edite/exclua dados de outra pessoa sÃ³ adivinhando um ID.
+ */
+@Service
+public class TransactionService {
+
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final MlClient mlClient;
+
+    public TransactionService(
+            TransactionRepository transactionRepository,
+            UserRepository userRepository,
+            MlClient mlClient
+    ) {
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+        this.mlClient = mlClient;
+    }
+
+    /**
+     * Cria uma Ãºnica transaÃ§Ã£o para o usuÃ¡rio informado.
+     *
+     * Reaproveita o createBatch() internamente, tratando o caso
+     * de uma transaÃ§Ã£o sÃ³ como uma lista de tamanho 1.
+     */
+    @Transactional
+    public TransactionResponse create(Long usuarioId, CreateTransactionRequest request) {
+
+        return createBatch(usuarioId, List.of(request)).get(0);
+    }
+
+    /**
+     * Cria uma ou vÃ¡rias transaÃ§Ãµes de uma vez para o usuÃ¡rio informado.
+     *
+     * Cada transaÃ§Ã£o Ã© classificada individualmente antes do saveAll,
+     * mantendo a mesma regra de negÃ³cio usada na criaÃ§Ã£o Ãºnica.
+     */
+    @Transactional
+    public List<TransactionResponse> createBatch(
+            Long usuarioId,
+            List<CreateTransactionRequest> requests
+    ) {
+        // Garante que o usuÃ¡rio existe antes de processar qualquer transaÃ§Ã£o
+        AppUser usuario = findUserById(usuarioId);
+
+        for (CreateTransactionRequest request : requests) {
+            boolean exists = transactionRepository.existsByUsuarioAndDescricaoAndValorAndData(
+                    usuario, request.descricao(), request.valor(), request.data()
+            );
+            if (exists) {
+                throw new BusinessException(
+                        "JÃ¡ existe uma transaÃ§Ã£o idÃªntica cadastrada para esta data."
+                );
+            }
+        }
+        // Para cada transaÃ§Ã£o recebida: classifica (chama a IA) e monta a entidade
+        // pronta para ser salva. O mapeamento acontece uma transaÃ§Ã£o por vez.
+        List<Transaction> transactions = requests.stream()
+                .map(request -> buildTransaction(
+                        request.descricao(),
+                        request.valor(),
+                        request.tipo(),
+                        request.data(),
+                        usuario
+                ))
+                .toList();
+
+        // Persiste todas de uma vez (uma Ãºnica operaÃ§Ã£o no banco, mesmo que
+        // sejam vÃ¡rias transaÃ§Ãµes), e converte cada entidade salva de volta
+        // para o formato de resposta da API.
+        return transactionRepository.saveAll(transactions)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
+     * Lista todas as transaÃ§Ãµes do usuÃ¡rio.
+     */
+    public List<TransactionResponse> findAll(Long usuarioId) {
+        findUserById(usuarioId);
+
+        return transactionRepository
+                .findAllByUsuarioIdOrderByDataDescIdDesc(usuarioId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
+     * Lista transaÃ§Ãµes dentro de um intervalo de datas.
+     */
+    public List<TransactionResponse> findAllByPeriod(
+            Long usuarioId,
+            LocalDate dataInicial,
+            LocalDate dataFinal
+    ) {
+        findUserById(usuarioId);
+        // Garante que as duas datas foram informadas e que fazem sentido
+        // (dataInicial nÃ£o pode vir depois de dataFinal) antes de consultar.
+        validatePeriod(dataInicial, dataFinal);
+
+        return transactionRepository
+                .findAllByUsuarioIdAndDataBetweenOrderByDataDescIdDesc(
+                        usuarioId,
+                        dataInicial,
+                        dataFinal
+                )
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
+     * Busca uma transaÃ§Ã£o garantindo que ela pertenÃ§a ao usuÃ¡rio.
+     */
+    public TransactionResponse findById(Long usuarioId, Long transactionId) {
+        // findTransactionByIdAndUserId jÃ¡ garante a posse do recurso:
+        // se a transaÃ§Ã£o existir mas for de outro usuÃ¡rio, Ã© tratada
+        // como "nÃ£o encontrada" (nÃ£o vaza a existÃªncia do dado de terceiros).
+        Transaction transaction =
+                findTransactionByIdAndUserId(transactionId, usuarioId);
+
+        return toResponse(transaction);
+    }
+
+    /**
+     * Atualiza todos os dados editÃ¡veis da transaÃ§Ã£o.
+     *
+     * A categoria Ã© recalculada porque alteraÃ§Ãµes na descriÃ§Ã£o
+     * ou no valor podem mudar o resultado da classificaÃ§Ã£o.
+     */
+    @Transactional
+    public TransactionResponse update(Long usuarioId, Long transactionId, UpdateTransactionRequest request) {
+        // SÃ³ busca a transaÃ§Ã£o se ela realmente pertencer a esse usuÃ¡rio
+        Transaction transaction = findTransactionByIdAndUserId(transactionId, usuarioId);
+
+        validateEditableWindow(transaction);
+
+        // Recalcula a categoria com os dados novos, jÃ¡ que descriÃ§Ã£o/valor
+        // podem ter mudado o suficiente para mudar a classificaÃ§Ã£o da IA.
+        TransactionCategory categoria = classify(
+                request.descricao(),
+                request.valor(),
+                request.tipo(),
+                request.data()
+        );
+
+        // Aplica os novos valores na entidade jÃ¡ existente (nÃ£o cria uma nova)
+        transaction.setDescricao(request.descricao().trim());
+        transaction.setValor(request.valor());
+        transaction.setTipo(request.tipo());
+        transaction.setCategoria(categoria);
+        transaction.setData(request.data());
+
+        Transaction updatedTransaction =
+                transactionRepository.save(transaction);
+
+        return toResponse(updatedTransaction);
+    }
+
+    /**
+     * Exclui uma transaÃ§Ã£o somente quando ela pertence ao usuÃ¡rio.
+     */
+    @Transactional
+    public void delete(Long usuarioId, Long transactionId) {
+        // Reaproveita a mesma validaÃ§Ã£o de posse usada em findById/update â€”
+        // se a transaÃ§Ã£o nÃ£o for do usuÃ¡rio, lanÃ§a ResourceNotFoundException.
+
+        Transaction transaction = findTransactionByIdAndUserId(transactionId, usuarioId);
+
+        validateEditableWindow(transaction);
+
+        transactionRepository.delete(transaction);
+    }
+
+    /**
+     * Monta a entidade Transaction jÃ¡ classificada, pronta para persistir.
+     * Centraliza a lÃ³gica usada tanto pelo create() quanto pelo createBatch().
+     */
+    private Transaction buildTransaction(
+            String descricao,
+            BigDecimal valor,
+            TransactionType tipo,
+            LocalDate dataTransacao,
+            AppUser usuario
+    ) {
+        // A categoria nunca Ã© informada pelo usuÃ¡rio â€” sempre vem da IA
+        TransactionCategory categoria = classify(descricao, valor, tipo, dataTransacao);
+
+        Transaction transaction = new Transaction();
+        transaction.setDescricao(descricao.trim());
+        transaction.setValor(valor);
+        transaction.setTipo(tipo);
+        transaction.setCategoria(categoria);
+        transaction.setData(dataTransacao);
+        transaction.setUsuario(usuario);
+
+        return transaction;
+    }
+
+    /**
+     * Chama o MlClient para obter a categoria da transaÃ§Ã£o.
+     *
+     * Ã‰ o Ãºnico ponto de contato com a IA para classificaÃ§Ã£o â€” tanto o
+     * cadastro (buildTransaction) quanto a ediÃ§Ã£o (update) passam por aqui,
+     * garantindo que a regra de "quem classifica Ã© a IA" nunca seja
+     * duplicada ou implementada de forma diferente em outro lugar.
+     */
+    private TransactionCategory classify(
+            String descricao,
+            BigDecimal valor,
+            TransactionType tipo,
+            LocalDate dataTransacao
+    ) {
+        MlTransactionRequest mlRequest = new MlTransactionRequest(descricao, valor, tipo, dataTransacao);
+
+        MlTransactionResponse mlResponse = mlClient.classifyTransaction(mlRequest);
+
+        return mlResponse.categoria();
+    }
+
+    /**
+     * Busca o usuÃ¡rio pelo ID, lanÃ§ando erro claro se ele nÃ£o existir.
+     * Usado no inÃ­cio de toda operaÃ§Ã£o que precisa saber "de quem" Ã© a transaÃ§Ã£o.
+     */
+    private AppUser findUserById(Long usuarioId) {
+        return userRepository
+                .findById(usuarioId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "UsuÃ¡rio nÃ£o encontrado com o ID: " + usuarioId
+                ));
+    }
+
+    /**
+     * Busca uma transaÃ§Ã£o validando, na prÃ³pria consulta, que ela pertence
+     * ao usuÃ¡rio informado â€” evita que alguÃ©m acesse/edite/exclua uma
+     * transaÃ§Ã£o de outro usuÃ¡rio sÃ³ sabendo o ID dela.
+     */
+    private Transaction findTransactionByIdAndUserId(Long transactionId, Long usuarioId) {
+        return transactionRepository
+                .findByIdAndUsuarioId(transactionId, usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "TransaÃ§Ã£o nÃ£o encontrada para o usuÃ¡rio informado."
+                ));
+    }
+
+    /**
+     * Valida que o perÃ­odo informado para o filtro faz sentido:
+     * as duas datas precisam estar presentes, e a inicial nÃ£o pode
+     * ser posterior Ã  final.
+     */
+    private void validatePeriod(LocalDate dataInicial, LocalDate dataFinal) {
+        if (dataInicial == null || dataFinal == null) {
+            throw new InvalidRequestException(
+                    "A data inicial e a data final sÃ£o obrigatÃ³rias para o filtro."
+            );
+        }
+
+        if (dataInicial.isAfter(dataFinal)) {
+            throw new InvalidRequestException(
+                    "A data inicial nÃ£o pode ser posterior Ã  data final."
+            );
+        }
+    }
+
+    /**
+     * Converte a entidade Transaction (formato de banco) para o DTO
+     * de resposta da API (formato exposto ao frontend).
+     */
+    private TransactionResponse toResponse(Transaction transaction) {
+        return new TransactionResponse(
+                transaction.getId(),
+                transaction.getDescricao(),
+                transaction.getValor(),
+                transaction.getTipo(),
+                transaction.getCategoria(),
+                transaction.getData(),
+                transaction.getUsuario().getId()
+        );
+    }
+    // Bloqueia ediÃ§Ã£o de transaÃ§Ãµes fora da janela permitida
+    private void validateEditableWindow(Transaction transaction) {
+        if (transaction.getData().isBefore(LocalDate.now().minusDays(30))) {
+            throw new BusinessException(
+                    "NÃ£o Ã© possÃ­vel editar ou excluir transaÃ§Ãµes com mais de 30 dias."
+            );
+        }
+    }
+}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\service\UserService.java
+-----------------------------------------
+package br.com.financeai.service;
+
+import br.com.financeai.dto.request.DadosAutenticacao;
+import br.com.financeai.dto.request.UserRegisterDto;
+import br.com.financeai.dto.request.UserUpdateDto;
+import br.com.financeai.dto.response.UserResponseDto;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.*;
+import br.com.financeai.repository.UserRepository;
+import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Transactional
+    public UserResponseDto cadastrar(UserRegisterDto dto) {
+        if (userRepository.existsByEmail(dto.email())) {
+            AppUser existente = userRepository.findByEmail(dto.email()).get();
+            if (!existente.isAtivo()) {
+                throw new BusinessException("Este e-mail pertence a uma conta desativada. Entre em contato com o suporte para reativaÃ§Ã£o.");
+            }
+            throw new UserAlreadyExistsException("E-mail jÃ¡ cadastrado no sistema.");
+        }
+
+        AppUser usuario = new AppUser();
+        usuario.setNome(dto.nome());
+        usuario.setEmail(dto.email());
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
+        usuario.setAtivo(true);
+
+        try {
+            userRepository.save(usuario);
+        } catch (DataIntegrityViolationException ex) {
+
+            throw new DatabaseException("E-mail jÃ¡ cadastrado no sistema.", ex);
+        }
+
+        return new UserResponseDto(usuario);
+    }
+
+    public UserResponseDto buscarPerfil(AppUser usuarioLogado) {
+        return new UserResponseDto(usuarioLogado);
+    }
+
+    @Transactional
+    public UserResponseDto atualizarPerfil(AppUser usuarioLogado, UserUpdateDto dto) {
+        AppUser usuario = userRepository.findById(usuarioLogado.getId())
+                .orElseThrow(() -> new UserNotFoundException("UsuÃ¡rio nÃ£o encontrado."));
+
+        if (dto.email() != null && !dto.email().isBlank() && !dto.email().equalsIgnoreCase(usuario.getEmail())) {
+            if (userRepository.existsByEmail(dto.email())) {
+                throw new UserAlreadyExistsException("O e-mail informado jÃ¡ estÃ¡ em uso.");
+            }
+            usuario.setEmail(dto.email());
+        }
+
+        if (dto.nome() != null && !dto.nome().isBlank()) {
+            usuario.setNome(dto.nome());
+        }
+
+        if (dto.senha() != null && !dto.senha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(dto.senha()));
+        }
+
+        return new UserResponseDto(usuario);
+    }
+
+    @Transactional
+    public void desativarConta(AppUser usuarioLogado) {
+        AppUser usuario = userRepository.findById(usuarioLogado.getId())
+                .orElseThrow(() -> new UserNotFoundException("UsuÃ¡rio nÃ£o encontrado."));
+
+        if (!usuario.isAtivo()) {
+            throw new BusinessException("Esta conta jÃ¡ estÃ¡ desativada.");
+        }
+
+        usuario.setAtivo(false);
+        userRepository.save(usuario);
+
+
+    }
+
+    @Transactional
+    public void reativarConta(DadosAutenticacao dados) {
+        AppUser usuario = userRepository.findByEmail(dados.email())
+                .orElseThrow(() -> new UserNotFoundException("UsuÃ¡rio nÃ£o encontrado."));
+
+        if (usuario.isAtivo()) {
+            throw new BusinessException("Esta conta jÃ¡ estÃ¡ ativa.");
+        }
+
+        if (!passwordEncoder.matches(dados.senha(), usuario.getSenha())) {
+            throw new AuthenticationException("E-mail ou senha invÃ¡lidos.");
+        }
+
+        usuario.setAtivo(true);
+        userRepository.save(usuario);
+    }
+}
+
+
+
+
+=========================================
+ 🔴 ENTITIES
+=========================================
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\entity\AppUser.java
+-----------------------------------------
+package br.com.financeai.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+@Entity
+@Table(name = "usuarios")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class AppUser implements UserDetails {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "nome", nullable = false, length = 100)
+    private String nome;
+
+    @Column(name = "email", nullable = false, unique = true, length = 150)
+    private String email;
+
+    @Column(name = "senha", nullable = false, length = 255)
+    private String senha;
+
+    @Column(name = "ativo", nullable = false)
+    private boolean ativo = true;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<FinancialAnalysis> analisesFinanceiras = new ArrayList<>();
+
+    /*
+     * O mappedBy aponta para o atributo "usuario" da entidade Transaction.
+     * O usuÃ¡rio passa a ser o proprietÃ¡rio lÃ³gico de suas movimentaÃ§Ãµes.
+     */
+    @OneToMany(mappedBy = "usuario")
+    private List<Transaction> transacoes = new ArrayList<>();
+
+    // --- MÃ‰TODOS OBRIGATÃ“RIOS DA INTERFACE UserDetails ---
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() {
+        return this.senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.ativo;
+    }
+}
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\entity\FinancialAnalysis.java
+-----------------------------------------
+package br.com.financeai.entity;
+
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "analises_financeiras")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class FinancialAnalysis {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, precision = 5, scale = 3)
+    private BigDecimal nivelEndividamento;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SavingFrequency frequenciaPoupanca;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private FinancialProfile perfilFinanceiro;
+
+    @Column(nullable = false, precision = 3, scale = 2)
+    private BigDecimal probabilidade;
+
+    @Column(nullable = false)
+    private LocalDate dataAnalise;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private AppUser usuario;
+
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\entity\Transaction.java
+-----------------------------------------
+package br.com.financeai.entity;
+
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.enums.TransactionType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "transacoes")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class Transaction {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "descricao", nullable = false, length = 255)
+    private String descricao;
+
+    @Column(name = "valor", nullable = false, precision = 10, scale = 2)
+    private BigDecimal valor;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false, length = 20)
+    private TransactionType tipo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria", nullable = false, length = 30)
+    private TransactionCategory categoria;
+
+    @Column(name = "data_transacao", nullable = false)
+    private LocalDate data;
+
+    /*
+     * A transaÃ§Ã£o pertence diretamente ao usuÃ¡rio.
+     * Dessa forma, ela pode existir antes de uma anÃ¡lise financeira
+     * e pode ser utilizada em anÃ¡lises de diferentes perÃ­odos.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private AppUser usuario;
+}
+
+
+
+=========================================
+ 🔴 REPOSITORIES
+=========================================
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\repository\FinancialAnalysisRepository.java
+-----------------------------------------
+package br.com.financeai.repository;
+
+import br.com.financeai.entity.FinancialAnalysis;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface FinancialAnalysisRepository extends JpaRepository<FinancialAnalysis, Long> {
+}
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\repository\TransactionRepository.java
+-----------------------------------------
+package br.com.financeai.repository;
+
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.entity.Transaction;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+
+    /**
+     * Busca uma transaÃ§Ã£o somente quando ela pertence ao usuÃ¡rio informado.
+     *
+     * Essa consulta evita que um usuÃ¡rio acesse uma transaÃ§Ã£o de outro
+     * usuÃ¡rio apenas conhecendo o identificador do registro.
+     */
+    Optional<Transaction> findByIdAndUsuarioId(Long transactionId, Long usuarioId
+    );
+
+    /**
+     * Lista todas as transaÃ§Ãµes do usuÃ¡rio, ordenando primeiro
+     * pelas movimentaÃ§Ãµes mais recentes.
+     */
+    List<Transaction> findAllByUsuarioIdOrderByDataDescIdDesc(Long usuarioId
+    );
+
+    /**
+     * Lista as transaÃ§Ãµes do usuÃ¡rio dentro de um perÃ­odo.
+     */
+    List<Transaction>
+    findAllByUsuarioIdAndDataBetweenOrderByDataDescIdDesc(Long usuarioId, LocalDate dataInicial, LocalDate dataFinal
+    );
+
+    List<Transaction> findByUsuarioAndDataBetween(AppUser user, LocalDate dataInical, LocalDate dataFinal);
+
+    boolean existsByUsuarioAndDescricaoAndValorAndData(AppUser usuario, String descricao, BigDecimal valor, LocalDate data);
+}
+
+
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\java\br\com\financeai\repository\UserRepository.java
+-----------------------------------------
+package br.com.financeai.repository;
+
+import br.com.financeai.entity.AppUser;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<AppUser, Long> {
+
+    boolean existsByEmail(String email);
+
+    Optional<AppUser> findByEmail(String email);
+}
+
+
+
+
+=========================================
+ 🔴 APPLICATION PROPERTIES
+=========================================
+
+-----------------------------------------
+ARQUIVO: src/main/resources/application.properties
+-----------------------------------------
+spring.application.name=finance-ai-api
+
+# ==========================
+# Configuracoes do banco de dados MySQLW
+# ==========================
+spring.datasource.url=jdbc:mysql://localhost:3306/finance_ai?createDatabaseIfNotExist=true
+spring.datasource.username=${DB_USERNAME:root}
+spring.datasource.password=${DB_PASSWORD:root}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# ==========================
+# Configuracoes do Hibernate
+# ==========================
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=false
+spring.jpa.open-in-view=false
+
+# ==========================
+# Configuracoes do FlyWay
+# ==========================
+spring.flyway.enabled=true
+spring.flyway.baseline-on-migrate=true
+spring.flyway.locations=classpath:db/migration
+spring.flyway.baseline-version=0
+
+# ==========================
+# Configuracoes do servico do FastAPI
+# ==========================
+ml.api.url=http://localhost:8000
+
+# Configuracao de Seguranca - JWT
+api.security.token.secret=${JWT_SECRET:minha-chave-secreta-super-segura-123}
+
+
+
+=========================================
+ 🔴 FLYWAY MIGRATIONS
+=========================================
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\resources\db\migration\V1__create_tables.sql
+-----------------------------------------
+CREATE TABLE usuarios (
+
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    nome VARCHAR(100) NOT NULL,
+
+    email VARCHAR(150) NOT NULL UNIQUE,
+
+    senha VARCHAR(255) NOT NULL,
+
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
+
+);
+
+
+CREATE TABLE analises_financeiras (
+
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    nivel_endividamento DECIMAL(3,2),
+
+    frequencia_poupanca VARCHAR(20) NOT NULL,
+
+    perfil_financeiro VARCHAR(30),
+
+    probabilidade DECIMAL(3,2),
+
+    data_analise DATE NOT NULL,
+
+    usuario_id BIGINT NOT NULL,
+
+    CONSTRAINT fk_analise_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id)
+
+);
+
+
+CREATE TABLE transacoes (
+
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    descricao VARCHAR(255) NOT NULL,
+
+    valor DECIMAL(10,2) NOT NULL,
+
+    tipo VARCHAR(20) NOT NULL,
+
+    categoria VARCHAR(30),
+
+    data_transacao DATE NOT NULL,
+
+    usuario_id BIGINT NOT NULL,
+
+     CONSTRAINT fk_transacao_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+
+);
+
+
+
+-----------------------------------------
+ARQUIVO: C:\projetos\smart-finance-ai-g9-team-11\backend\src\main\resources\db\migration\V2__alter_nivel_endividamento.sql
+-----------------------------------------
+ALTER TABLE analises_financeiras
+MODIFY COLUMN nivel_endividamento DECIMAL(5,2) NOT NULL;
+
+
+
+=========================================
+ 🟡 ESTRUTURA DO BACKEND
+=========================================
+
+Listagem de caminhos de pasta
+O n·mero de sÚrie do volume Ú 000001B8 5CCE:B45E
+C:\PROJETOS\SMART-FINANCE-AI-G9-TEAM-11\BACKEND\SRC\MAIN
++---java
+|   \---br
+|       \---com
+|           \---financeai
+|               |   FinanceAiApiApplication.java
+|               |   
+|               +---config
+|               |       DatabaseInitializer.java
+|               |       OpenApiConfig.java
+|               |       RestClientConfig.java
+|               |       
+|               +---controller
+|               |       AutenticacaoController.java
+|               |       FinancialAnalysisController.java
+|               |       TransactionController.java
+|               |       UserController.java
+|               |       
+|               +---dto
+|               |   +---request
+|               |   |       CreateTransactionRequest.java
+|               |   |       DadosAutenticacao.java
+|               |   |       FinancialAnalysisRequest.java
+|               |   |       UpdateTransactionRequest.java
+|               |   |       UserRegisterDto.java
+|               |   |       UserUpdateDto.java
+|               |   |       
+|               |   \---response
+|               |           DadosTokenJWT.java
+|               |           ExpenseSummaryResponse.java
+|               |           FinancialAnalysisResponse.java
+|               |           TransactionResponse.java
+|               |           UserResponseDto.java
+|               |           
+|               +---entity
+|               |       AppUser.java
+|               |       FinancialAnalysis.java
+|               |       Transaction.java
+|               |       
+|               +---enums
+|               |       FinancialProfile.java
+|               |       SavingFrequency.java
+|               |       TransactionCategory.java
+|               |       TransactionType.java
+|               |       
+|               +---exception
+|               |       ApiErrorResponse.java
+|               |       AuthenticationException.java
+|               |       BusinessException.java
+|               |       DatabaseException.java
+|               |       ExternalServiceException.java
+|               |       GlobalExceptionHandler.java
+|               |       InvalidRequestException.java
+|               |       ResourceNotFoundException.java
+|               |       UserAlreadyExistsException.java
+|               |       UserNotFoundException.java
+|               |       
+|               +---integration
+|               |   +---client
+|               |   |       MlClient.java
+|               |   |       
+|               |   \---dto
+|               |       +---request
+|               |       |       MlRequest.java
+|               |       |       MlTransactionRequest.java
+|               |       |       
+|               |       \---response
+|               |               MlResponse.java
+|               |               MlTransactionResponse.java
+|               |               
+|               +---repository
+|               |       FinancialAnalysisRepository.java
+|               |       TransactionRepository.java
+|               |       UserRepository.java
+|               |       
+|               +---security
+|               |       SecurityConfigurations.java
+|               |       SecurityFilter.java
+|               |       TokenService.java
+|               |       
+|               \---service
+|                       AutenticacaoService.java
+|                       FinancialAnalysisService.java
+|                       FinancialProfileService.java
+|                       TransactionService.java
+|                       UserService.java
+|                       
+\---resources
+    |   application.properties
+    |   
+    \---db
+        \---migration
+                V1__create_tables.sql
+                V2__alter_nivel_endividamento.sql
+                
+=========================================
+ 🔴 SWAGGER CONFIG
+=========================================
+
+-----------------------------------------
+ARQUIVO: src/main/java/br/com/financeai/config/OpenApiConfig.java
+-----------------------------------------
+package br.com.financeai.config;
+
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class OpenApiConfig {
+
+    private static final String SECURITY_SCHEME_NAME = "bearerAuth";
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Finance AI API")
+                        .description("API do Finance AI")
+                        .version("v1"))
+                .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
+                .components(new Components()
+                        .addSecuritySchemes(SECURITY_SCHEME_NAME,
+                                new SecurityScheme()
+                                        .name(SECURITY_SCHEME_NAME)
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        )
+                );
+    }
+}
+
+
+

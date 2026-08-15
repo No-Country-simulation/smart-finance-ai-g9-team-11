@@ -1,64 +1,66 @@
-import { api, saveAccessToken, removeAccessToken } from "@/services/api";
+import {
+  api,
+  getAccessToken,
+  removeAccessToken,
+  saveAccessToken,
+} from "@/services/api";
+
 import type {
+  AuthUser,
   LoginRequest,
   LoginResponse,
-  AuthUser,
+  RegisterRequest,
 } from "@/types/auth";
 
-const AUTH_ENDPOINT = "/auth/login";
-
-function parseJwt(token: string): Record<string, unknown> {
-  const base64Payload = token.split(".")[1];
-
-  if (!base64Payload) {
-    throw new Error("Token JWT inválido.");
-  }
-
-  const payload = atob(
-    base64Payload.replace(/-/g, "+").replace(/_/g, "/"),
-  );
-
-  return JSON.parse(payload);
-}
+const LOGIN_ENDPOINT = "/auth/login";
+const USERS_ENDPOINT = "/users";
+const PROFILE_ENDPOINT = "/users/me";
 
 export async function login(
   credentials: LoginRequest,
-): Promise<AuthUser> {
-  const { data } = await api.post<LoginResponse>(
-    AUTH_ENDPOINT,
-    credentials,
-  );
+): Promise<void> {
+  const { data } =
+    await api.post<LoginResponse>(
+      LOGIN_ENDPOINT,
+      credentials,
+    );
+
+  if (!data.token) {
+    throw new Error(
+      "Token de autenticação não retornado pelo servidor.",
+    );
+  }
 
   saveAccessToken(data.token);
+}
 
-  const payload = parseJwt(data.token);
+export async function registerUser(
+  payload: RegisterRequest,
+): Promise<AuthUser> {
+  const { data } =
+    await api.post<AuthUser>(
+      USERS_ENDPOINT,
+      payload,
+    );
 
-  return {
-    email: String(payload.sub),
-  };
+  return data;
+}
+
+export async function getProfile(): Promise<AuthUser> {
+  const { data } =
+    await api.get<AuthUser>(
+      PROFILE_ENDPOINT,
+    );
+
+  return data;
 }
 
 export function logout(): void {
   removeAccessToken();
 }
 
-export function getAuthenticatedUser(): AuthUser | null {
-  const token = window.localStorage.getItem(
-    "finance-ai:access-token",
+export function hasStoredToken(): boolean {
+  return Boolean(
+    getAccessToken(),
   );
-
-  if (!token) {
-    return null;
-  }
-
-  try {
-    const payload = parseJwt(token);
-
-    return {
-      email: String(payload.sub),
-    };
-  } catch {
-    removeAccessToken();
-    return null;
-  }
 }

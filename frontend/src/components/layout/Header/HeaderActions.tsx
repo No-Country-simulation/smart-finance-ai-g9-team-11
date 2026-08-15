@@ -1,5 +1,6 @@
 import { SearchBar } from "@/components/layout/SearchBar";
-import { userMock } from "@/mocks/user.mock";
+
+import { useAuth } from "@/hooks/useAuth";
 
 import { UserMenu } from "../UserMenu";
 
@@ -14,6 +15,10 @@ interface HeaderActionsProps {
 export function HeaderActions({
   onOpenSidebar,
 }: Readonly<HeaderActionsProps>) {
+  const {
+    user,
+  } = useAuth();
+
   return (
     <div className="flex min-w-0 shrink-0 items-center gap-2">
       <SearchBar className="hidden w-[240px] 2xl:block" />
@@ -28,11 +33,28 @@ export function HeaderActions({
 
       <NotificationButton />
 
-      <UserMenu
-        user={userMock}
-        isOnline
-        onOpenSidebar={onOpenSidebar}
-      />
+      {user && (
+        <UserMenu
+          user={{
+            id: String(user.id),
+            name: user.nome,
+            email: user.email,
+            financialProfile: "Regular",
+            memberSince: "",
+            preferences: {
+              currency: "BRL",
+              language: "pt-BR",
+              receiveFinancialAlerts: false,
+              receiveAiRecommendations: false,
+              receiveMonthlySummary: false,
+            },
+          }}
+          isOnline={user.ativo}
+          onOpenSidebar={
+            onOpenSidebar
+          }
+        />
+      )}
     </div>
   );
 }

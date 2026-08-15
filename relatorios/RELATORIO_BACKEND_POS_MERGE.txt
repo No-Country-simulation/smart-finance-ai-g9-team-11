@@ -1,0 +1,2349 @@
+﻿RELATORIO - BACKEND POS MERGE DEVELOP
+Gerado em: 08/08/2026 13:26:00
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/controller/FinancialAnalysisController.java
+========================================================================================================================
+
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.FinancialAnalysisRequest;
+import br.com.financeai.dto.response.FinancialAnalysisHistoryResponse;
+import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.ApiErrorResponse;
+import br.com.financeai.service.FinancialAnalysisService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+@Tag(
+        name = "Financial Analysis",
+        description = "Protected endpoints for generating and managing the authenticated user's financial analyses."
+)
+@RestController
+@RequestMapping("/analise-financeira")
+public class FinancialAnalysisController {
+
+    private final FinancialAnalysisService financialAnalysisService;
+
+    public FinancialAnalysisController(
+            FinancialAnalysisService financialAnalysisService
+    ) {
+        this.financialAnalysisService = financialAnalysisService;
+    }
+
+    /**
+     * Gera uma nova anÃ¡lise financeira utilizando as transaÃ§Ãµes
+     * do usuÃ¡rio autenticado dentro do perÃ­odo informado.
+     */
+    @Operation(
+            summary = "Generate financial analysis",
+            description = """
+            Generates a financial analysis for the authenticated user based on
+            the transactions registered within the informed period.
+
+            Authentication:
+            Requires a valid JWT access token in the Authorization header using
+            the format: Bearer {token}.
+
+            Behavior:
+            Retrieves all transactions belonging to the authenticated user
+            within the specified period and sends them to the Machine Learning
+            service. If the ML service is unavailable, a local fallback analysis
+            is generated automatically. The generated analysis is stored and
+            returned to the client.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Financial analysis generated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = FinancialAnalysisResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
+    @PostMapping
+    public ResponseEntity<FinancialAnalysisResponse> analyze(
+            @AuthenticationPrincipal AppUser loggedUser,
+            @Valid @RequestBody FinancialAnalysisRequest request
+    ) {
+        FinancialAnalysisResponse response =
+                financialAnalysisService.analyze(
+                        loggedUser.getId(),
+                        request
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "List financial analyses",
+            description = """
+            Returns the complete history of financial analyses generated
+            by the authenticated user.
+
+            Authentication:
+            Requires a valid JWT access token in the Authorization header using
+            the format: Bearer {token}.
+
+            Behavior:
+            Returns only the analyses belonging to the authenticated user,
+            ordered from the most recent to the oldest.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Financial analyses retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = FinancialAnalysisHistoryResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
+    @GetMapping
+    public ResponseEntity<List<FinancialAnalysisHistoryResponse>> findAll(
+            @AuthenticationPrincipal AppUser loggedUser
+    ) {
+        List<FinancialAnalysisHistoryResponse> response =
+                financialAnalysisService.findAll(loggedUser.getId());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Get financial analysis",
+            description = """
+            Returns a specific financial analysis belonging to the
+            authenticated user.
+
+            Authentication:
+            Requires a valid JWT access token in the Authorization header using
+            the format: Bearer {token}.
+
+            Behavior:
+            Retrieves the requested analysis only if it belongs to the
+            authenticated user. If the analysis does not exist or belongs
+            to another user, a not found response is returned.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Financial analysis retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = FinancialAnalysisHistoryResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Financial analysis not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
+    @GetMapping("/{analysisId}")
+    public ResponseEntity<FinancialAnalysisHistoryResponse> findById(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the financial analysis",
+                    example = "1"
+            )
+            @PathVariable Long analysisId
+    ) {
+        FinancialAnalysisHistoryResponse response =
+                financialAnalysisService.findById(
+                        loggedUser.getId(),
+                        analysisId
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Delete financial analysis",
+            description = """
+            Deletes a financial analysis belonging to the authenticated user.
+
+            Authentication:
+            Requires a valid JWT access token in the Authorization header using
+            the format: Bearer {token}.
+
+            Behavior:
+            Removes the requested financial analysis only if it belongs
+            to the authenticated user. If the analysis does not exist or
+            belongs to another user, a not found response is returned.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Financial analysis deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Financial analysis not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiErrorResponse.class
+                            )
+                    )
+            )
+    })
+    @DeleteMapping("/{analysisId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the financial analysis",
+                    example = "1"
+            )
+            @PathVariable Long analysisId
+    ) {
+        financialAnalysisService.delete(
+                loggedUser.getId(),
+                analysisId
+        );
+
+        return ResponseEntity.noContent().build();
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/controller/TransactionController.java
+========================================================================================================================
+
+package br.com.financeai.controller;
+
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.dto.request.CreateTransactionRequest;
+import br.com.financeai.dto.request.UpdateTransactionRequest;
+import br.com.financeai.dto.response.TransactionResponse;
+import br.com.financeai.exception.InvalidRequestException;
+import br.com.financeai.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import br.com.financeai.exception.ApiErrorResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping("/classificar-transacoes")
+@Tag(
+        name = "Transactions",
+        description = "Protected endpoints for creating, classifying and managing the authenticated user's financial transactions."
+)
+public class TransactionController {
+
+    private final TransactionService transactionService;
+
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
+
+    @Operation(
+            summary = "Create and classify a transaction",
+            description = """
+                Creates a financial transaction for the currently authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Sends the transaction description to the Machine Learning service,
+                receives the predicted category and stores the classified transaction
+                in the database.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Transaction created and classified successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid transaction data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "502",
+                    description = "Machine Learning service rejected the request or returned an invalid response",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "Machine Learning service is unavailable",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PostMapping
+    public ResponseEntity<TransactionResponse> create(
+            @AuthenticationPrincipal AppUser loggedUser, @Valid @RequestBody CreateTransactionRequest request) {
+        TransactionResponse response = transactionService.create(loggedUser.getId(), request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @Operation(
+            summary = "Create and classify multiple transactions",
+            description = """
+                Creates and classifies multiple financial transactions for the
+                currently authenticated user in a single request.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Sends each transaction to the Machine Learning classification flow,
+                associates the results with the authenticated user and stores the
+                classified transactions in the database. This operation is useful
+                for statement imports or batch registration.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Transactions created and classified successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @io.swagger.v3.oas.annotations.media.ArraySchema(
+                                    schema = @Schema(implementation = TransactionResponse.class)
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid transaction list or transaction data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "502",
+                    description = "Machine Learning service rejected the request or returned an invalid response",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "Machine Learning service is unavailable",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/batch")
+    public ResponseEntity<List<TransactionResponse>> createBatch(
+            @AuthenticationPrincipal AppUser loggedUser,
+            @Valid @RequestBody List<CreateTransactionRequest> requests
+    ) {
+        List<TransactionResponse> response = transactionService.createBatch(loggedUser.getId(), requests);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @Operation(
+            summary = "List authenticated user's transactions",
+            description = """
+                Returns the financial transactions that belong to the currently
+                authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Without query parameters, returns all transactions owned by the user.
+                When both dataInicial and dataFinal are provided, returns only the
+                transactions within the inclusive date range. Both dates must be sent
+                together using the format yyyy-MM-dd.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Transactions retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = TransactionResponse.class)
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Incomplete or invalid date range",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @GetMapping
+    public ResponseEntity<List<TransactionResponse>> findAll(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Start date of the optional filter, in yyyy-MM-dd format. Must be provided together with dataFinal.",
+                    example = "2026-07-01"
+            )
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dataInicial,
+
+            @Parameter(
+                    description = "End date of the optional filter (yyyy-MM-dd). Must be provided together with dataInicial.",
+                    example = "2026-07-31"
+            )
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dataFinal
+    ) {
+        validateOptionalPeriod(dataInicial, dataFinal);
+
+        List<TransactionResponse> response;
+
+        if (dataInicial != null) {
+            response = transactionService.findAllByPeriod(
+                    loggedUser.getId(),
+                    dataInicial,
+                    dataFinal
+            );
+        }
+        else {
+            response = transactionService.findAll(loggedUser.getId());
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Get a transaction by ID",
+            description = """
+                Returns a specific financial transaction owned by the currently
+                authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Retrieves the transaction only when it belongs to the authenticated
+                user. A transaction owned by another user must not be exposed.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Transaction retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Transaction not found for the authenticated user",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponse> findById(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the transaction to retrieve.",
+                    example = "15"
+            )
+            @PathVariable Long transactionId
+    ) {
+        TransactionResponse response =
+                transactionService.findById(loggedUser.getId(), transactionId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Update a transaction",
+            description = """
+                Fully updates a financial transaction owned by the currently
+                authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Because this endpoint uses PUT, all required transaction fields must
+                be provided. The transaction is updated only when it belongs to the
+                authenticated user.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Transaction updated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid transaction data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Transaction not found for the authenticated user",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Transaction could not be updated because of a business conflict",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PutMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponse> update(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the transaction to update.",
+                    example = "15"
+            )
+            @PathVariable Long transactionId,
+            @Valid @RequestBody UpdateTransactionRequest request
+    ) {
+        TransactionResponse response =
+                transactionService.update(
+                        loggedUser.getId(),
+                        transactionId,
+                        request
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Delete a transaction",
+            description = """
+                Permanently deletes a financial transaction owned by the currently
+                authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Deletes the transaction only when it belongs to the authenticated user.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Transaction deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Transaction not found for the authenticated user",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @DeleteMapping("/{transactionId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal AppUser loggedUser,
+
+            @Parameter(
+                    description = "Identifier of the transaction to delete.",
+                    example = "15"
+            )
+            @PathVariable Long transactionId
+    ) {
+        transactionService.delete(loggedUser.getId(), transactionId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Evita consultas incompletas, como informar somente
+     * a data inicial ou somente a data final.
+     */
+    private void validateOptionalPeriod(
+            LocalDate dataInicial,
+            LocalDate dataFinal
+    ) {
+        boolean onlyInitialDateWasProvided =
+                dataInicial != null && dataFinal == null;
+
+        boolean onlyFinalDateWasProvided =
+                dataInicial == null && dataFinal != null;
+
+        if (onlyInitialDateWasProvided || onlyFinalDateWasProvided) {
+            throw new InvalidRequestException(
+                    "Informe a data inicial e a data final para filtrar por perÃ­odo."
+            );
+        }
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/service/FinancialAnalysisService.java
+========================================================================================================================
+
+package br.com.financeai.service;
+
+import br.com.financeai.dto.request.FinancialAnalysisRequest;
+import br.com.financeai.dto.response.FinancialAnalysisHistoryResponse;
+import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.entity.FinancialAnalysis;
+import br.com.financeai.entity.Transaction;
+import br.com.financeai.enums.Source;
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import br.com.financeai.exception.BusinessException;
+import br.com.financeai.exception.ExternalServiceException;
+import br.com.financeai.exception.InvalidRequestException;
+import br.com.financeai.exception.ResourceNotFoundException;
+import br.com.financeai.exception.UserNotFoundException;
+import br.com.financeai.integration.client.MlClient;
+import br.com.financeai.integration.dto.request.MlRequest;
+import br.com.financeai.integration.dto.response.MlResponse;
+import br.com.financeai.integration.dto.response.MlTransactionResponse;
+import br.com.financeai.repository.FinancialAnalysisRepository;
+import br.com.financeai.repository.TransactionRepository;
+import br.com.financeai.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * ResponsÃ¡vel por gerar e gerenciar as anÃ¡lises financeiras dos usuÃ¡rios.
+ * Fluxo de geraÃ§Ã£o:
+ * 1. Localiza o usuÃ¡rio autenticado.
+ * 2. Busca as transaÃ§Ãµes do usuÃ¡rio dentro do perÃ­odo informado.
+ * 3. Monta a requisiÃ§Ã£o para a API de Machine Learning.
+ * 4. Recebe o resultado da anÃ¡lise.
+ * 5. Persiste o resultado no banco.
+ * 6. Devolve o resultado ao frontend.
+ */
+@Slf4j
+@Service
+public class FinancialAnalysisService {
+
+    private final FinancialProfileService financialProfileService;
+    private final FinancialAnalysisRepository financialAnalysisRepository;
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final MlClient mlClient;
+
+    public FinancialAnalysisService(
+            FinancialProfileService financialProfileService, MlClient mlClient,
+            FinancialAnalysisRepository financialAnalysisRepository,
+            TransactionRepository transactionRepository,
+            UserRepository userRepository
+    ) {
+        this.financialProfileService = financialProfileService;
+        this.mlClient = mlClient;
+        this.financialAnalysisRepository = financialAnalysisRepository;
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Gera uma anÃ¡lise financeira baseada no histÃ³rico de transaÃ§Ãµes do perÃ­odo informado.
+     Tanto o resultado vindo da IA quanto o resultado do fallback local sÃ£o
+     * persistidos no banco, diferenciados pelo campo {@code origem}
+     * ({@link Source#ML} ou {@link Source#FALLBACK}).
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio autenticado.
+     * @param request dados contendo o perÃ­odo (data inicial e data final) para o qual a anÃ¡lise serÃ¡ gerada.
+     * @return resposta contendo o perfil financeiro, resumo dos gastos, frequÃªncia de poupanÃ§a,
+     *         nÃ­vel de endividamento e recomendaÃ§Ãµes geradas â€” via IA ou via fallback local.
+     * @throws BusinessException caso o perÃ­odo informado seja no futuro ou nÃ£o haja o mÃ­nimo de transaÃ§Ãµes exigido (3).
+     * @throws InvalidRequestException caso o usuÃ¡rio nÃ£o possua nenhuma transaÃ§Ã£o no perÃ­odo informado.
+     * @throws UserNotFoundException caso o usuÃ¡rio nÃ£o seja encontrado no banco de dados.
+     */
+    public FinancialAnalysisResponse analyze(Long usuarioId, FinancialAnalysisRequest request) {
+
+        AppUser user = findUserById(usuarioId);
+
+        // Impede anÃ¡lise de um perÃ­odo que ainda nÃ£o comeÃ§ou â€” valida antes
+        // de consultar o banco, evitando uma query desnecessÃ¡ria.
+        if (request.dataInicial().isAfter(LocalDate.now())) {
+            throw new BusinessException(
+                    "NÃ£o Ã© possÃ­vel gerar anÃ¡lise para um perÃ­odo que ainda nÃ£o comeÃ§ou."
+            );
+        }
+
+        List<Transaction> transactions = buscarTransacoes(user, request);
+        MlRequest mlRequest = new MlRequest(mapToMlTransactions(transactions));
+
+        MlResponse mlResponse;
+        try {
+            mlResponse = mlClient.analyze(mlRequest);
+
+        } catch (ExternalServiceException ex) {
+
+            log.warn("IA indisponÃ­vel. AnÃ¡lise feita utilizando fallback local para o usuÃ¡rio {}",
+                    user.getId(), ex);
+
+            FinancialAnalysisResponse fallback = financialProfileService.gerarAnaliseFallback(transactions);
+            financialAnalysisRepository.save(
+                    criarAnalise(
+                            user,
+                            fallback.perfilFinanceiro(),
+                            fallback.nivelEndividamento(),
+                            fallback.frequenciaPoupanca(),
+                            fallback.probabilidade(),
+                            Source.FALLBACK
+                    )
+            );
+
+            return fallback;
+        }
+
+        // Monta a entidade FinancialAnalysis com o resultado devolvido pela IA
+        // e persiste no banco â€” isso cria um "retrato" daquela anÃ¡lise, sem guardar
+        // vÃ­nculo direto com as transaÃ§Ãµes que a originaram.
+        financialAnalysisRepository.save(
+                criarAnalise(
+                        user,
+                        mlResponse.perfilFinanceiro(),
+                        mlResponse.nivelEndividamento(),
+                        mlResponse.frequenciaPoupanca(),
+                        mlResponse.probabilidade(),
+                        Source.ML
+                )
+        );
+
+        return new FinancialAnalysisResponse(
+                mlResponse.perfilFinanceiro(),
+                mlResponse.nivelEndividamento(),
+                mlResponse.frequenciaPoupanca(),
+                mlResponse.probabilidade(),
+                mlResponse.resumoGastos(),
+                mlResponse.recomendacoes()
+        );
+    }
+
+    /**
+     * Busca o usuÃ¡rio pelo ID, lanÃ§ando erro claro se ele nÃ£o existir.
+     */
+    private AppUser findUserById(Long usuarioId) {
+        return userRepository.findById(usuarioId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "UsuÃ¡rio nÃ£o encontrado com o ID: " + usuarioId
+                ));
+    }
+
+    /**
+     * Converte as entidades Transaction para o formato esperado pela ML.
+     */
+    private List<MlTransactionResponse> mapToMlTransactions(List<Transaction> transactions) {
+        return transactions.stream()
+                .map(transaction -> new MlTransactionResponse(
+                        transaction.getDescricao(),
+                        transaction.getValor(),
+                        transaction.getTipo(),
+                        transaction.getCategoria(),
+                        transaction.getData()
+                ))
+                .toList();
+    }
+
+    /**
+     * Lista todas as anÃ¡lises financeiras do usuÃ¡rio,
+     * ordenadas da mais recente para a mais antiga.
+     */
+    public List<FinancialAnalysisHistoryResponse> findAll(Long usuarioId) {
+        return financialAnalysisRepository
+                .findAllByUsuarioIdOrderByDataAnaliseDescIdDesc(usuarioId)
+                .stream()
+                .map(FinancialAnalysisHistoryResponse::new)
+                .toList();
+    }
+
+    /**
+     * Busca uma anÃ¡lise pelo ID, desde que pertenÃ§a ao usuÃ¡rio.
+     */
+    public FinancialAnalysisHistoryResponse findById(
+            Long usuarioId,
+            Long analysisId
+    ) {
+        FinancialAnalysis analysis =
+                findAnalysisByIdAndUserId(
+                        analysisId,
+                        usuarioId
+                );
+
+        return new FinancialAnalysisHistoryResponse(analysis);
+    }
+
+    /**
+     * Exclui uma anÃ¡lise somente quando ela pertence ao usuÃ¡rio.
+     */
+    @Transactional
+    public void delete(
+            Long usuarioId,
+            Long analysisId
+    ) {
+        FinancialAnalysis analysis =
+                findAnalysisByIdAndUserId(
+                        analysisId,
+                        usuarioId
+                );
+
+        financialAnalysisRepository.delete(analysis);
+    }
+
+    /**
+     * Busca uma anÃ¡lise validando que ela pertence ao usuÃ¡rio autenticado.
+     * Se a anÃ¡lise existir, mas pertencer a outro usuÃ¡rio, tambÃ©m serÃ¡
+     * considerada nÃ£o encontrada. Isso impede exposiÃ§Ã£o de dados de terceiros.
+     */
+    private FinancialAnalysis findAnalysisByIdAndUserId(
+            Long analysisId,
+            Long usuarioId
+    ) {
+        return financialAnalysisRepository
+                .findByIdAndUsuarioId(
+                        analysisId,
+                        usuarioId
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "AnÃ¡lise financeira nÃ£o encontrada."
+                        ));
+    }
+
+    private List<Transaction> buscarTransacoes(
+            AppUser usuario,
+            FinancialAnalysisRequest request
+    ) {
+
+        List<Transaction> transactions =
+                transactionRepository.findByUsuarioAndDataBetween(
+                        usuario,
+                        request.dataInicial(),
+                        request.dataFinal()
+                );
+
+        if (transactions.isEmpty()) {
+            throw new InvalidRequestException(
+                    "NÃ£o hÃ¡ transaÃ§Ãµes no perÃ­odo informado."
+            );
+        }
+
+        if (transactions.size() < 3) {
+            throw new BusinessException(
+                    "Ã‰ necessÃ¡rio ter pelo menos 3 transaÃ§Ãµes no perÃ­odo para gerar uma anÃ¡lise confiÃ¡vel."
+            );
+        }
+
+        return transactions;
+    }
+
+    private FinancialAnalysis criarAnalise(
+            AppUser usuario,
+            FinancialProfile perfil,
+            BigDecimal nivelEndividamento,
+            SavingFrequency frequenciaPoupanca,
+            BigDecimal probabilidade,
+            Source origem
+    ) {
+
+        FinancialAnalysis analysis = new FinancialAnalysis();
+
+        analysis.setUsuario(usuario);
+        analysis.setPerfilFinanceiro(perfil);
+        analysis.setNivelEndividamento(nivelEndividamento);
+        analysis.setFrequenciaPoupanca(frequenciaPoupanca);
+        analysis.setProbabilidade(probabilidade);
+        analysis.setDataAnalise(LocalDate.now());
+        analysis.setOrigem(origem);
+
+        return analysis;
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/service/FinancialProfileService.java
+========================================================================================================================
+
+package br.com.financeai.service;
+
+
+import br.com.financeai.dto.response.ExpenseSummaryResponse;
+import br.com.financeai.dto.response.FinancialAnalysisResponse;
+import br.com.financeai.entity.Transaction;
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.enums.TransactionType;
+import br.com.financeai.exception.BusinessException;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+public class FinancialProfileService {
+
+    private static final BigDecimal ALTA = BigDecimal.valueOf(40);
+    private static final BigDecimal MEDIA = BigDecimal.valueOf(20);
+
+    /**
+     * Gera uma anÃ¡lise simplificada baseada em regras determinÃ­sticas,
+     * usada como fallback quando o serviÃ§o de ML estÃ¡ indisponÃ­vel.
+     */
+    public FinancialAnalysisResponse gerarAnaliseFallback(List<Transaction> transactions) {
+
+        BigDecimal totalReceitas = somarPorTipo(transactions, TransactionType.RECEITA);
+        BigDecimal totalDespesas = somarPorTipo(transactions, TransactionType.DESPESA);
+
+        FinancialProfile perfilFinanceiro = totalDespesas.compareTo(totalReceitas) > 0
+                ? FinancialProfile.EM_RISCO
+                : FinancialProfile.EM_OBSERVACAO;
+
+        BigDecimal nivelEndividamento = totalReceitas.compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.ZERO
+                : totalDespesas
+                .divide(totalReceitas, 2, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+
+        SavingFrequency frequenciaPoupanca = getSavingFrequency(totalReceitas, totalDespesas);
+
+        List<String> recomendacoes = new ArrayList<>();
+        if (totalDespesas.compareTo(totalReceitas) > 0) {
+            recomendacoes.add("Suas despesas superaram suas receitas neste perÃ­odo.");
+        }
+        recomendacoes.add("AnÃ¡lise gerada em modo simplificado â€” serviÃ§o de IA indisponÃ­vel no momento.");
+
+        return new FinancialAnalysisResponse(
+                perfilFinanceiro,
+                nivelEndividamento,
+                frequenciaPoupanca,
+                BigDecimal.ZERO,
+                calcularResumoGastos(transactions),
+                recomendacoes
+        );
+    }
+
+    private static SavingFrequency getSavingFrequency(BigDecimal totalReceitas, BigDecimal totalDespesas) {
+        BigDecimal sobra = totalReceitas.subtract(totalDespesas);
+        BigDecimal percentualSobra;
+
+        if (totalReceitas.compareTo(BigDecimal.ZERO) == 0){
+           percentualSobra = BigDecimal.ZERO;
+        } else {
+            percentualSobra = sobra.divide(totalReceitas, 2, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+        }
+
+        SavingFrequency frequenciaPoupanca;
+
+        if (percentualSobra.compareTo(ALTA) >= 0){
+             frequenciaPoupanca = SavingFrequency.ALTA;
+        } else if (percentualSobra.compareTo(MEDIA) >= 0) {
+             frequenciaPoupanca = SavingFrequency.MEDIA;
+        } else {
+             frequenciaPoupanca = SavingFrequency.BAIXA;
+        }
+        return frequenciaPoupanca;
+    }
+
+    private BigDecimal somarPorTipo(List<Transaction> transactions, TransactionType tipo) {
+        return transactions.stream()
+                .filter(t -> t.getTipo() == tipo)
+                .map(Transaction::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public ExpenseSummaryResponse calcularResumoGastos(List<Transaction> transactions){
+        Map<TransactionCategory, BigDecimal> porCategoria = transactions.stream()
+                .filter(t -> t.getTipo() == TransactionType.DESPESA)
+                .collect(Collectors.groupingBy(
+                        Transaction::getCategoria,
+                        Collectors.reducing(BigDecimal.ZERO, Transaction::getValor, BigDecimal::add)));
+
+        return new ExpenseSummaryResponse(
+                porCategoria.getOrDefault(TransactionCategory.ALIMENTACAO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.MORADIA, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.UTILITARIOS, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.INVESTIMENTO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.COMPRAS, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.SAUDE, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.ENTRETENIMENTO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.TRAJETO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.SALARIO, BigDecimal.ZERO),
+                porCategoria.getOrDefault(TransactionCategory.OUTROS, BigDecimal.ZERO)
+        );
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/service/TransactionService.java
+========================================================================================================================
+
+package br.com.financeai.service;
+
+import br.com.financeai.dto.request.CreateTransactionRequest;
+import br.com.financeai.dto.request.UpdateTransactionRequest;
+import br.com.financeai.dto.response.TransactionResponse;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.entity.Transaction;
+import br.com.financeai.enums.Source;
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.enums.TransactionType;
+import br.com.financeai.exception.*;
+import br.com.financeai.integration.client.MlClient;
+import br.com.financeai.integration.dto.request.MlTransactionRequest;
+import br.com.financeai.integration.dto.response.MlTransactionResponse;
+import br.com.financeai.repository.TransactionRepository;
+import br.com.financeai.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * ResponsÃ¡vel pelo CRUD completo de transaÃ§Ãµes: criar (uma ou em lote),
+ * listar, buscar por id, atualizar e excluir.
+ *
+ * Toda transaÃ§Ã£o criada ou editada passa pela IA (MlClient) para receber
+ * uma categoria â€” o usuÃ¡rio nunca informa a categoria manualmente.
+ *
+ * O usuÃ¡rio Ã© identificado pelo header X-User-Id (placeholder provisÃ³rio,
+ * atÃ© existir autenticaÃ§Ã£o real via JWT), e toda operaÃ§Ã£o valida que a
+ * transaÃ§Ã£o pertence de fato ao usuÃ¡rio informado, evitando que alguÃ©m
+ * acesse/edite/exclua dados de outra pessoa sÃ³ adivinhando um ID.
+ */
+@Slf4j
+@Service
+public class TransactionService {
+
+    private final TransactionClassificationService transactionClassificationService;
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final MlClient mlClient;
+
+    public TransactionService(
+            TransactionClassificationService transactionClassificationService,
+            TransactionRepository transactionRepository,
+            UserRepository userRepository,
+            MlClient mlClient
+    ) {
+        this.transactionClassificationService = transactionClassificationService;
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+        this.mlClient = mlClient;
+    }
+
+    /**
+     * Cria e processa uma Ãºnica transaÃ§Ã£o para o usuÃ¡rio informado, enviando-a para classificaÃ§Ã£o automÃ¡tica.
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio dono da transaÃ§Ã£o.
+     * @param request dados da transaÃ§Ã£o que serÃ¡ criada (valor, descriÃ§Ã£o, data e tipo).
+     * @return resposta contendo os dados da transaÃ§Ã£o salva no banco, incluindo a categoria definida pela IA.
+     * @throws UserNotFoundException caso o usuÃ¡rio informado nÃ£o exista.
+     * @throws BusinessException caso jÃ¡ exista uma transaÃ§Ã£o idÃªntica cadastrada na mesma data.
+     */
+    @Transactional
+    public TransactionResponse create(Long usuarioId, CreateTransactionRequest request) {
+        return createBatch(usuarioId, List.of(request)).get(0);
+    }
+
+    /**
+     * Cria e processa um lote de transaÃ§Ãµes de uma Ãºnica vez para o usuÃ¡rio informado.
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio dono das transaÃ§Ãµes.
+     * @param requests lista contendo os dados das transaÃ§Ãµes que serÃ£o criadas.
+     * @return lista com as respostas de todas as transaÃ§Ãµes persistidas e classificadas com sucesso.
+     * @throws UserNotFoundException caso o usuÃ¡rio informado nÃ£o exista.
+     * @throws BusinessException caso exista alguma transaÃ§Ã£o idÃªntica cadastrada na mesma data no lote.
+     */
+    @Transactional
+    public List<TransactionResponse> createBatch(
+            Long usuarioId,
+            List<CreateTransactionRequest> requests
+    ) {
+        // Garante que o usuÃ¡rio existe antes de processar qualquer transaÃ§Ã£o
+        AppUser usuario = findUserById(usuarioId);
+
+        for (CreateTransactionRequest request : requests) {
+            boolean exists = transactionRepository.existsByUsuarioAndDescricaoAndValorAndData(
+                    usuario, request.descricao(), request.valor(), request.data()
+            );
+            if (exists) {
+                throw new BusinessException(
+                        "JÃ¡ existe uma transaÃ§Ã£o idÃªntica cadastrada para esta data."
+                );
+            }
+        }
+
+        // Para cada transaÃ§Ã£o recebida: classifica (chama a IA) e monta a entidade
+        // pronta para ser salva. O mapeamento acontece uma transaÃ§Ã£o por vez.
+        List<Transaction> transactions = requests.stream()
+                .map(request -> buildTransaction(
+                        request.descricao(),
+                        request.valor(),
+                        request.tipo(),
+                        request.data(),
+                        usuario
+                ))
+                .toList();
+
+        // Persiste todas de uma vez (uma Ãºnica operaÃ§Ã£o no banco, mesmo que
+        // sejam vÃ¡rias transaÃ§Ãµes), e converte cada entidade salva de volta
+        // para o formato de resposta da API.
+        return transactionRepository.saveAll(transactions)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
+     * Atualiza os dados editÃ¡veis de uma transaÃ§Ã£o e recalcula sua categoria com base nos novos valores.
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio dono da transaÃ§Ã£o.
+     * @param transactionId identificador Ãºnico da transaÃ§Ã£o que serÃ¡ atualizada.
+     * @param request dados atualizados da transaÃ§Ã£o.
+     * @return resposta contendo os dados da transaÃ§Ã£o apÃ³s a ediÃ§Ã£o e nova classificaÃ§Ã£o.
+     * @throws ResourceNotFoundException caso a transaÃ§Ã£o nÃ£o exista ou nÃ£o pertenÃ§a ao usuÃ¡rio.
+     * @throws BusinessException caso a transaÃ§Ã£o possua mais de 30 dias (fora da janela de ediÃ§Ã£o permitida).
+     */
+    @Transactional
+    public TransactionResponse update(Long usuarioId, Long transactionId, UpdateTransactionRequest request) {
+        // SÃ³ busca a transaÃ§Ã£o se ela realmente pertencer a esse usuÃ¡rio
+        Transaction transaction = findTransactionByIdAndUserId(transactionId, usuarioId);
+
+        validateEditableWindow(transaction);
+
+        // Atualiza os dados bÃ¡sicos
+        transaction.setDescricao(request.descricao().trim());
+        transaction.setValor(request.valor());
+        transaction.setTipo(request.tipo());
+        transaction.setData(request.data());
+
+        // Recalcula a categoria e seta a origem internamente na prÃ³pria entidade
+        classifyAndSetOrigin(
+                transaction,
+                request.descricao(),
+                request.valor(),
+                request.tipo(),
+                request.data()
+        );
+
+        Transaction updatedTransaction = transactionRepository.save(transaction);
+
+        return toResponse(updatedTransaction);
+    }
+
+    /**
+     * Remove permanentemente uma transaÃ§Ã£o do sistema, validando a posse pelo usuÃ¡rio.
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio dono da transaÃ§Ã£o.
+     * @param transactionId identificador Ãºnico da transaÃ§Ã£o que serÃ¡ excluÃ­da.
+     * @throws ResourceNotFoundException caso a transaÃ§Ã£o nÃ£o exista ou nÃ£o pertenÃ§a ao usuÃ¡rio.
+     * @throws BusinessException caso a transaÃ§Ã£o possua mais de 30 dias (fora da janela de exclusÃ£o permitida).
+     */
+    @Transactional
+    public void delete(Long usuarioId, Long transactionId) {
+        // Reaproveita a mesma validaÃ§Ã£o de posse usada em findById/update â€”
+        // se a transaÃ§Ã£o nÃ£o for do usuÃ¡rio, lanÃ§a ResourceNotFoundException.
+        Transaction transaction = findTransactionByIdAndUserId(transactionId, usuarioId);
+
+        validateEditableWindow(transaction);
+
+        transactionRepository.delete(transaction);
+    }
+
+    /**
+     * Recupera todo o histÃ³rico de transaÃ§Ãµes cadastradas para o usuÃ¡rio informado.
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio.
+     * @return lista de transaÃ§Ãµes ordenadas da mais recente para a mais antiga.
+     * @throws UserNotFoundException caso o usuÃ¡rio informado nÃ£o exista.
+     */
+    public List<TransactionResponse> findAll(Long usuarioId) {
+        findUserById(usuarioId);
+
+        return transactionRepository
+                .findAllByUsuarioIdOrderByDataDescIdDesc(usuarioId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
+     * Recupera o histÃ³rico de transaÃ§Ãµes do usuÃ¡rio filtrado por um intervalo de datas.
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio.
+     * @param dataInicial data de inÃ­cio para a filtragem.
+     * @param dataFinal data de tÃ©rmino para a filtragem.
+     * @return lista de transaÃ§Ãµes encontradas dentro do perÃ­odo, ordenadas por data decrescente.
+     * @throws UserNotFoundException caso o usuÃ¡rio informado nÃ£o exista.
+     * @throws InvalidRequestException caso alguma das datas seja nula ou a data inicial seja posterior Ã  final.
+     */
+    public List<TransactionResponse> findAllByPeriod(
+            Long usuarioId,
+            LocalDate dataInicial,
+            LocalDate dataFinal
+    ) {
+        findUserById(usuarioId);
+        // Garante que as duas datas foram informadas e que fazem sentido
+        // (dataInicial nÃ£o pode vir depois de dataFinal) antes de consultar.
+        validatePeriod(dataInicial, dataFinal);
+
+        return transactionRepository
+                .findAllByUsuarioIdAndDataBetweenOrderByDataDescIdDesc(
+                        usuarioId,
+                        dataInicial,
+                        dataFinal
+                )
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
+     * Busca os detalhes de uma transaÃ§Ã£o especÃ­fica, validando a posse pelo usuÃ¡rio.
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio.
+     * @param transactionId identificador Ãºnico da transaÃ§Ã£o desejada.
+     * @return resposta contendo os dados completos da transaÃ§Ã£o encontrada.
+     * @throws ResourceNotFoundException caso a transaÃ§Ã£o nÃ£o exista ou nÃ£o pertenÃ§a ao usuÃ¡rio informado.
+     */
+    public TransactionResponse findById(Long usuarioId, Long transactionId) {
+        // findTransactionByIdAndUserId jÃ¡ garante a posse do recurso:
+        // se a transaÃ§Ã£o existir mas for de outro usuÃ¡rio, Ã© tratada
+        // como "nÃ£o encontrada" (nÃ£o vaza a existÃªncia do dado de terceiros).
+        Transaction transaction = findTransactionByIdAndUserId(transactionId, usuarioId);
+
+        return toResponse(transaction);
+    }
+
+    /**
+     * ConstrÃ³i a entidade de transaÃ§Ã£o pronta para persistÃªncia, realizando a
+     * classificaÃ§Ã£o automÃ¡tica da categoria via integraÃ§Ã£o com a IA ou fallback.
+     *
+     * @param descricao descriÃ§Ã£o detalhada da transaÃ§Ã£o.
+     * @param valor montante financeiro da transaÃ§Ã£o.
+     * @param tipo indica se a transaÃ§Ã£o Ã© uma RECEITA ou DESPESA.
+     * @param dataTransacao data em que a transaÃ§Ã£o ocorreu.
+     * @param usuario entidade do usuÃ¡rio dono da transaÃ§Ã£o.
+     * @return a entidade {@link Transaction} montada e classificada.
+     */
+    private Transaction buildTransaction(
+            String descricao,
+            BigDecimal valor,
+            TransactionType tipo,
+            LocalDate dataTransacao,
+            AppUser usuario
+    ) {
+        Transaction transaction = new Transaction();
+        transaction.setDescricao(descricao.trim());
+        transaction.setValor(valor);
+        transaction.setTipo(tipo);
+        transaction.setData(dataTransacao);
+        transaction.setUsuario(usuario);
+
+        // Aplica a classificaÃ§Ã£o e define a origem direto na entidade
+        classifyAndSetOrigin(transaction, descricao, valor, tipo, dataTransacao);
+
+        return transaction;
+    }
+
+    /**
+     * Comunica-se com o serviÃ§o de Machine Learning para obter a categoria da transaÃ§Ã£o.
+     * Em caso de falha de comunicaÃ§Ã£o, aciona automaticamente o mecanismo de fallback local.
+     * Altera a prÃ³pria entidade Transaction, definindo a categoria e a origem.
+     *
+     * @param transaction a entidade que serÃ¡ atualizada com a categoria e origem.
+     * @param descricao descriÃ§Ã£o da transaÃ§Ã£o.
+     * @param valor montante financeiro da transaÃ§Ã£o.
+     * @param tipo indica se a transaÃ§Ã£o Ã© uma RECEITA ou DESPESA.
+     * @param dataTransacao data em que a transaÃ§Ã£o ocorreu.
+     */
+    private void classifyAndSetOrigin(
+            Transaction transaction,
+            String descricao,
+            BigDecimal valor,
+            TransactionType tipo,
+            LocalDate dataTransacao
+    ) {
+        MlTransactionRequest mlRequest = new MlTransactionRequest(descricao, valor, tipo, dataTransacao);
+
+        try {
+            MlTransactionResponse mlResponse = mlClient.classifyTransaction(mlRequest);
+
+            transaction.setCategoria(mlResponse.categoria());
+            transaction.setOrigem(Source.ML);
+
+        } catch (ExternalServiceException ex) {
+
+            log.warn("IA indisponÃ­vel. ClassificaÃ§Ã£o realizada utilizando fallback.");
+
+            MlTransactionResponse fallbackResponse = transactionClassificationService.classifyTransactionFallback(mlRequest);
+
+            transaction.setCategoria(fallbackResponse.categoria());
+            transaction.setOrigem(Source.FALLBACK);
+        }
+    }
+
+    /**
+     * Recupera um usuÃ¡rio no banco de dados atravÃ©s do seu identificador Ãºnico.
+     *
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio.
+     * @return a entidade {@link AppUser} correspondente.
+     * @throws UserNotFoundException caso nÃ£o exista usuÃ¡rio com o ID fornecido.
+     */
+    private AppUser findUserById(Long usuarioId) {
+        return userRepository
+                .findById(usuarioId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "UsuÃ¡rio nÃ£o encontrado com o ID: " + usuarioId
+                ));
+    }
+
+    /**
+     * Busca uma transaÃ§Ã£o no banco de dados garantindo que ela pertenÃ§a ao usuÃ¡rio especificado.
+     * Essa validaÃ§Ã£o conjunta evita acessos indevidos a dados de terceiros.
+     *
+     * @param transactionId identificador Ãºnico da transaÃ§Ã£o.
+     * @param usuarioId identificador Ãºnico do usuÃ¡rio que estÃ¡ solicitando o recurso.
+     * @return a entidade {@link Transaction} encontrada.
+     * @throws ResourceNotFoundException caso a transaÃ§Ã£o nÃ£o exista ou pertenÃ§a a outro usuÃ¡rio.
+     */
+    private Transaction findTransactionByIdAndUserId(Long transactionId, Long usuarioId) {
+        return transactionRepository
+                .findByIdAndUsuarioId(transactionId, usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "TransaÃ§Ã£o nÃ£o encontrada para o usuÃ¡rio informado."
+                ));
+    }
+
+    /**
+     * Valida a consistÃªncia de um intervalo de datas fornecido para operaÃ§Ãµes de filtro.
+     *
+     * @param dataInicial data de inÃ­cio do intervalo.
+     * @param dataFinal data de tÃ©rmino do intervalo.
+     * @throws InvalidRequestException caso alguma data seja nula ou a data inicial seja posterior Ã  final.
+     */
+    private void validatePeriod(LocalDate dataInicial, LocalDate dataFinal) {
+        if (dataInicial == null || dataFinal == null) {
+            throw new InvalidRequestException(
+                    "A data inicial e a data final sÃ£o obrigatÃ³rias para o filtro."
+            );
+        }
+
+        if (dataInicial.isAfter(dataFinal)) {
+            throw new InvalidRequestException(
+                    "A data inicial nÃ£o pode ser posterior Ã  data final."
+            );
+        }
+    }
+
+    /**
+     * Converte uma entidade de transaÃ§Ã£o do banco de dados para o objeto de transferÃªncia
+     * de dados (DTO) utilizado nas respostas da API. A origem Ã© omitida para uso exclusivo interno.
+     *
+     * @param transaction a entidade {@link Transaction} que serÃ¡ convertida.
+     * @return o DTO {@link TransactionResponse} formatado para o frontend.
+     */
+    private TransactionResponse toResponse(Transaction transaction) {
+        return new TransactionResponse(
+                transaction.getId(),
+                transaction.getDescricao(),
+                transaction.getValor(),
+                transaction.getTipo(),
+                transaction.getCategoria(),
+                transaction.getData(),
+                transaction.getUsuario().getId()
+        );
+    }
+
+    /**
+     * Valida se uma transaÃ§Ã£o estÃ¡ dentro da janela de tempo permitida para ediÃ§Ãµes ou exclusÃµes.
+     *
+     * @param transaction a entidade da transaÃ§Ã£o a ser validada.
+     * @throws BusinessException caso a transaÃ§Ã£o possua uma data anterior aos Ãºltimos 30 dias.
+     */
+    private void validateEditableWindow(Transaction transaction) {
+        if (transaction.getData().isBefore(LocalDate.now().minusDays(30))) {
+            throw new BusinessException(
+                    "NÃ£o Ã© possÃ­vel editar ou excluir transaÃ§Ãµes com mais de 30 dias."
+            );
+        }
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/service/TransactionClassificationService.java
+========================================================================================================================
+
+package br.com.financeai.service;
+
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.integration.dto.request.MlTransactionRequest;
+import br.com.financeai.integration.dto.response.MlTransactionResponse;
+import org.springframework.stereotype.Service;
+
+import java.text.Normalizer;
+import java.util.Locale;
+
+@Service
+public class TransactionClassificationService {
+
+    private String normalizar(String texto) {
+        return Normalizer.normalize(texto, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(Locale.ROOT)
+                .trim();
+    }
+
+    /**
+     * Executa a classificaÃ§Ã£o de uma transaÃ§Ã£o utilizando regras estÃ¡ticas locais (fallback).
+     * Acionado exclusivamente quando o serviÃ§o externo de Machine Learning estÃ¡ indisponÃ­vel.
+     *
+     * @param request dados financeiros da transaÃ§Ã£o que requer classificaÃ§Ã£o.
+     * @return resposta com a transaÃ§Ã£o e a categoria inferida atravÃ©s do mapeamento interno de palavras-chave.
+     */
+    public MlTransactionResponse classifyTransactionFallback(
+            MlTransactionRequest request
+    ) {
+
+        TransactionCategory categoria = inferirCategoria(request.descricao());
+
+        return new MlTransactionResponse(
+                request.descricao(),
+                request.valor(),
+                request.tipo(),
+                categoria,
+                request.data()
+        );
+    }
+
+    private TransactionCategory inferirCategoria(String descricao) {
+
+        if (descricao == null || descricao.isBlank()) {
+            return TransactionCategory.OUTROS;
+        }
+
+
+        String texto = normalizar(descricao);
+
+        // AlimentaÃ§Ã£o
+        if (texto.contains("mercado")
+                || texto.contains("supermercado")
+                || texto.contains("padaria")
+                || texto.contains("restaurante")
+                || texto.contains("lanchonete")
+                || texto.contains("ifood")
+                || texto.contains("pizza")
+                || texto.contains("hamburguer")
+                || texto.contains("cafeteria")) {
+            return TransactionCategory.ALIMENTACAO;
+        }
+
+        // UtilitÃ¡rios
+        if (texto.contains("energia")
+                || texto.contains("luz")
+                || texto.contains("agua")
+                || texto.contains("internet")
+                || texto.contains("telefone")
+                || texto.contains("celular")
+                || texto.contains("gas")) {
+            return TransactionCategory.UTILITARIOS;
+        }
+
+        // Moradia
+        if (texto.contains("aluguel")
+                || texto.contains("condominio")
+                || texto.contains("imovel")) {
+            return TransactionCategory.MORADIA;
+        }
+
+        // Investimentos
+        if (texto.contains("investimento")
+                || texto.contains("acao")
+                || texto.contains("acoes")
+                || texto.contains("tesouro")
+                || texto.contains("cdb")
+                || texto.contains("fii")
+                || texto.contains("bitcoin")
+                || texto.contains("cripto")) {
+            return TransactionCategory.INVESTIMENTO;
+        }
+
+        // Compras
+        if (texto.contains("amazon")
+                || texto.contains("mercado livre")
+                || texto.contains("magalu")
+                || texto.contains("shopping")
+                || texto.contains("loja")
+                || texto.contains("roupa")
+                || texto.contains("tenis")
+                || texto.contains("sapato")) {
+            return TransactionCategory.COMPRAS;
+        }
+
+        // SaÃºde
+        if (texto.contains("farmacia")
+                || texto.contains("consulta")
+                || texto.contains("hospital")
+                || texto.contains("clinica")
+                || texto.contains("dentista")
+                || texto.contains("plano de saude")
+                || texto.contains("exame")) {
+            return TransactionCategory.SAUDE;
+        }
+
+        // Entretenimento
+        if (texto.contains("cinema")
+                || texto.contains("netflix")
+                || texto.contains("spotify")
+                || texto.contains("show")
+                || texto.contains("bar")
+                || texto.contains("viagem")
+                || texto.contains("jogo")
+                || texto.contains("steam")) {
+            return TransactionCategory.ENTRETENIMENTO;
+        }
+
+        // Transporte
+        if (texto.contains("uber")
+                || texto.contains("99")
+                || texto.contains("taxi")
+                || texto.contains("onibus")
+                || texto.contains("metro")
+                || texto.contains("combustivel")
+                || texto.contains("gasolina")
+                || texto.contains("estacionamento")
+                || texto.contains("pedagio")) {
+            return TransactionCategory.TRAJETO;
+        }
+
+        // SalÃ¡rio
+        if (texto.contains("salario")
+                || texto.contains("pagamento")
+                || texto.contains("empresa")
+                || texto.contains("folha")
+                || texto.contains("bonus")) {
+            return TransactionCategory.SALARIO;
+        }
+
+        return TransactionCategory.OUTROS;
+    }
+
+}
+
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/request/FinancialAnalysisRequest.java
+========================================================================================================================
+
+package br.com.financeai.dto.request;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record FinancialAnalysisRequest(
+        @NotNull(message = "A data inicial Ã© obrigatÃ³ria.")
+        @JsonProperty("data_inicial")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate dataInicial,
+
+       @NotNull(message = "A data final Ã© obrigatÃ³ria.")
+       @JsonProperty("data_final")
+       @JsonFormat(pattern = "yyyy-MM-dd")
+       LocalDate dataFinal
+) {
+    @JsonIgnore
+    @AssertTrue(message = "A data inicial nÃ£o pode ser posterior Ã  data final.")
+    public boolean isPeriodoValido(){
+        if(dataInicial == null || dataFinal == null){
+            return true;
+        }
+
+        return !dataInicial.isAfter(dataFinal);
+    }
+}
+
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/request/CreateTransactionRequest.java
+========================================================================================================================
+
+package br.com.financeai.dto.request;
+
+import br.com.financeai.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+/**
+ * Dados recebidos para criaÃ§Ã£o de uma nova transaÃ§Ã£o.
+ *
+ * A categoria nÃ£o Ã© enviada pelo frontend neste momento,
+ * pois serÃ¡ definida pelo serviÃ§o de classificaÃ§Ã£o.
+ */
+public record CreateTransactionRequest(
+
+
+        @NotBlank(message = "A descriÃ§Ã£o da transaÃ§Ã£o Ã© obrigatÃ³ria.")
+        @Size(max = 255, message = "A descriÃ§Ã£o da transaÃ§Ã£o deve possuir no mÃ¡ximo 255 caracteres.")
+        String descricao,
+
+
+        @NotNull(message = "O valor da transaÃ§Ã£o Ã© obrigatÃ³rio.")
+        @Positive(message = "O valor da transaÃ§Ã£o deve ser maior que zero.")
+        BigDecimal valor,
+
+
+        @NotNull(message = "O tipo da transaÃ§Ã£o Ã© obrigatÃ³rio.")
+        TransactionType tipo,
+
+        @NotNull(message = "A data da transaÃ§Ã£o Ã© obrigatÃ³ria.")
+        @PastOrPresent(message = "A data da transaÃ§Ã£o nÃ£o pode estar no futuro.")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate data
+
+) {
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/request/UpdateTransactionRequest.java
+========================================================================================================================
+
+package br.com.financeai.dto.request;
+
+import br.com.financeai.enums.TransactionType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+/**
+ * Dados recebidos para atualizaÃ§Ã£o completa de uma transaÃ§Ã£o.
+ *
+ * Como o endpoint utilizarÃ¡ PUT, todos os campos permanecem
+ * obrigatÃ³rios nesta primeira versÃ£o do CRUD.
+ */
+public record UpdateTransactionRequest(
+
+        @NotBlank(message = "A descriÃ§Ã£o da transaÃ§Ã£o Ã© obrigatÃ³ria.")
+        @Size(
+                max = 255,
+                message = "A descriÃ§Ã£o da transaÃ§Ã£o deve possuir no mÃ¡ximo 255 caracteres."
+        )
+        String descricao,
+
+        @NotNull(message = "O valor da transaÃ§Ã£o Ã© obrigatÃ³rio.")
+        @Positive(message = "O valor da transaÃ§Ã£o deve ser maior que zero.")
+        BigDecimal valor,
+
+        @NotNull(message = "O tipo da transaÃ§Ã£o Ã© obrigatÃ³rio.")
+        TransactionType tipo,
+
+        @NotNull(message = "A data da transaÃ§Ã£o Ã© obrigatÃ³ria.")
+        @PastOrPresent(
+                message = "A data da transaÃ§Ã£o nÃ£o pode estar no futuro."
+        )
+        LocalDate data
+
+) {
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisResponse.java
+========================================================================================================================
+
+package br.com.financeai.dto.response;
+
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+public record FinancialAnalysisResponse(
+
+        @JsonProperty("perfil_financeiro")
+        FinancialProfile perfilFinanceiro,
+
+        @JsonProperty("nivel_endividamento")
+        BigDecimal nivelEndividamento,
+
+        @JsonProperty("frequencia_poupanca")
+        SavingFrequency frequenciaPoupanca,
+
+        @JsonProperty("probabilidade")
+        BigDecimal probabilidade,
+
+        @JsonProperty("resumo_gastos")
+        ExpenseSummaryResponse resumoGastos,
+
+        @JsonProperty("recomendacoes")
+        List<String> recomendacoes
+) {}
+
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/response/FinancialAnalysisHistoryResponse.java
+========================================================================================================================
+
+package br.com.financeai.dto.response;
+
+import br.com.financeai.entity.FinancialAnalysis;
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record FinancialAnalysisHistoryResponse(
+
+        Long id,
+
+        BigDecimal nivelEndividamento,
+
+        SavingFrequency frequenciaPoupanca,
+
+        FinancialProfile perfilFinanceiro,
+
+        BigDecimal probabilidade,
+
+        LocalDate dataAnalise
+
+) {
+
+    public FinancialAnalysisHistoryResponse(FinancialAnalysis analysis) {
+        this(
+                analysis.getId(),
+                analysis.getNivelEndividamento(),
+                analysis.getFrequenciaPoupanca(),
+                analysis.getPerfilFinanceiro(),
+                analysis.getProbabilidade(),
+                analysis.getDataAnalise()
+        );
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/response/ExpenseSummaryResponse.java
+========================================================================================================================
+
+package br.com.financeai.dto.response;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.math.BigDecimal;
+
+public record ExpenseSummaryResponse(
+        @JsonProperty("AlimentaÃ§Ã£o")
+        BigDecimal alimentacao,
+
+        @JsonProperty("Moradia")
+        BigDecimal moradia,
+
+        @JsonProperty("Compras")
+        BigDecimal compras,
+
+        @JsonProperty("Entretenimento")
+        BigDecimal entretenimento,
+
+        @JsonProperty("Investimento")
+        BigDecimal investimento,
+
+        @JsonProperty("SalÃ¡rio")
+        BigDecimal salario,
+
+        @JsonProperty("SaÃºde")
+        BigDecimal saude,
+
+        @JsonProperty("Trajeto")
+        BigDecimal trajeto,
+
+        @JsonProperty("UtilitÃ¡rios")
+        BigDecimal utilitarios,
+
+        @JsonProperty("Outros")
+        BigDecimal outros
+) {}
+
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/response/TransactionResponse.java
+========================================================================================================================
+
+package br.com.financeai.dto.response;
+
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.enums.TransactionType;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+/**
+ * RepresentaÃ§Ã£o pÃºblica de uma transaÃ§Ã£o.
+ *
+ * O objeto AppUser nÃ£o Ã© retornado para evitar exposiÃ§Ã£o de
+ * informaÃ§Ãµes sensÃ­veis, como senha e dados internos da entidade.
+ */
+public record TransactionResponse(
+
+        Long id,
+
+        String descricao,
+
+        BigDecimal valor,
+
+        TransactionType tipo,
+
+        TransactionCategory categoria,
+
+        LocalDate data,
+
+        Long usuarioId
+
+) {
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/entity/FinancialAnalysis.java
+========================================================================================================================
+
+package br.com.financeai.entity;
+
+import br.com.financeai.enums.Source;
+import br.com.financeai.enums.FinancialProfile;
+import br.com.financeai.enums.SavingFrequency;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "analises_financeiras")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class FinancialAnalysis {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, precision = 5, scale = 3)
+    private BigDecimal nivelEndividamento;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SavingFrequency frequenciaPoupanca;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private FinancialProfile perfilFinanceiro;
+
+    @Column(nullable = false, precision = 3, scale = 2)
+    private BigDecimal probabilidade;
+
+    @Column(nullable = false)
+    private LocalDate dataAnalise;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private AppUser usuario;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Source origem;
+
+}
+
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/entity/Transaction.java
+========================================================================================================================
+
+package br.com.financeai.entity;
+
+import br.com.financeai.enums.Source;
+import br.com.financeai.enums.TransactionCategory;
+import br.com.financeai.enums.TransactionType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "transacoes")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class Transaction {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "descricao", nullable = false, length = 255)
+    private String descricao;
+
+    @Column(name = "valor", nullable = false, precision = 10, scale = 2)
+    private BigDecimal valor;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false, length = 20)
+    private TransactionType tipo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria", nullable = false, length = 30)
+    private TransactionCategory categoria;
+
+    @Column(name = "data_transacao", nullable = false)
+    private LocalDate data;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private AppUser usuario;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Source origem;
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/enums/Source.java
+========================================================================================================================
+
+package br.com.financeai.enums;
+
+public enum Source {
+    ML,
+    FALLBACK
+}
+
+
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/enums/TransactionType.java
+========================================================================================================================
+
+package br.com.financeai.enums;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+
+/**
+ * Identifica a natureza da movimentaÃ§Ã£o financeira.
+ *
+ * RECEITA representa uma entrada de dinheiro.
+ * DESPESA representa uma saÃ­da de dinheiro.
+ */
+public enum TransactionType {
+    RECEITA("Receita"),
+    DESPESA("Despesa");
+    private final String label;
+
+    TransactionType(String label) {
+        this.label = label;
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/enums/TransactionCategory.java
+========================================================================================================================
+
+package br.com.financeai.enums;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public enum TransactionCategory {
+
+    ALIMENTACAO("AlimentaÃ§Ã£o"),
+
+    UTILITARIOS("UtilitÃ¡rios"),
+
+    MORADIA("Moradia"),
+
+    INVESTIMENTO("Investimento"),
+
+    COMPRAS("Compras"),
+
+    SAUDE("SaÃºde"),
+
+    ENTRETENIMENTO("Entretenimento"),
+
+    TRAJETO("Trajeto"),
+
+    SALARIO("SalÃ¡rio"),
+
+    OUTROS("Outros");
+
+    private final String label;
+
+    TransactionCategory(String label) {
+        this.label = label;
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
+
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/enums/FinancialProfile.java
+========================================================================================================================
+
+package br.com.financeai.enums;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public enum FinancialProfile {
+
+    SAUDAVEL("SaudÃ¡vel"),
+
+    EM_OBSERVACAO("Em observaÃ§Ã£o"),
+
+    EM_RISCO("Em risco");
+
+    private final String label;
+
+    FinancialProfile(String label) {
+        this.label = label;
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
+}
+
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/enums/SavingFrequency.java
+========================================================================================================================
+
+package br.com.financeai.enums;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public enum SavingFrequency {
+
+    BAIXA("Baixa"),
+
+    MEDIA("MÃ©dia"),
+
+    ALTA("Alta");
+
+    private final String label;
+
+    SavingFrequency(String label) {
+        this.label = label;
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
+
+    }
+
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/repository/FinancialAnalysisRepository.java
+========================================================================================================================
+
+package br.com.financeai.repository;
+
+import br.com.financeai.entity.FinancialAnalysis;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface FinancialAnalysisRepository extends JpaRepository<FinancialAnalysis, Long> {
+
+
+    Optional<FinancialAnalysis> findByIdAndUsuarioId(
+            Long analysisId,
+            Long usuarioId
+    );
+
+    List<FinancialAnalysis> findAllByUsuarioIdOrderByDataAnaliseDescIdDesc(
+            Long usuarioId
+    );
+
+}
+
+
+

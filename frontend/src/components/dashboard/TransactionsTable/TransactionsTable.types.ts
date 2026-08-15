@@ -1,7 +1,9 @@
-import type { Transaction } from "@/types/dashboard";
+import type {
+  DashboardTransaction,
+} from "@/types/dashboard";
 
 export interface TransactionsTableProps {
-  transactions?: readonly Transaction[];
+  transactions?: readonly DashboardTransaction[];
   title?: string;
   description?: string;
   onViewAll?: () => void;
@@ -14,5 +16,5 @@ export interface TransactionsTableSearchProps {
 }
 
 export interface TransactionsTableRowProps {
-  transaction: Transaction;
+  transaction: DashboardTransaction;
 }

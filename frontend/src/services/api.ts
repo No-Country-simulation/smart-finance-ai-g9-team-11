@@ -3,11 +3,9 @@ import type { AxiosError } from "axios";
 
 import type { ApiError } from "@/types/api";
 
-const DEFAULT_API_BASE_URL =
-  "http://localhost:8080";
+const DEFAULT_API_BASE_URL = "http://137.131.252.166:8080";
 
-const ACCESS_TOKEN_STORAGE_KEY =
-  "finance-ai:access-token";
+const ACCESS_TOKEN_STORAGE_KEY = "finance-ai:access-token";
 
 const configuredApiBaseUrl =
   import.meta.env.VITE_API_BASE_URL?.trim();
@@ -21,6 +19,7 @@ export const api = axios.create({
   timeout: 15_000,
   headers: {
     Accept: "application/json",
+    "Content-Type": "application/json",
   },
 });
 
@@ -34,8 +33,7 @@ api.interceptors.request.use((config) => {
   );
 
   if (accessToken) {
-    config.headers.Authorization =
-      `Bearer ${accessToken}`;
+    config.headers.Authorization = `Bearer ${accessToken}`;
   }
 
   return config;
@@ -43,13 +41,10 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<ApiError>) =>
-    Promise.reject(error),
+  (error: AxiosError<ApiError>) => Promise.reject(error),
 );
 
-export function saveAccessToken(
-  accessToken: string,
-): void {
+export function saveAccessToken(accessToken: string): void {
   window.localStorage.setItem(
     ACCESS_TOKEN_STORAGE_KEY,
     accessToken,
@@ -57,12 +52,20 @@ export function saveAccessToken(
 }
 
 export function getAccessToken(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   return window.localStorage.getItem(
     ACCESS_TOKEN_STORAGE_KEY,
   );
 }
 
 export function removeAccessToken(): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
   window.localStorage.removeItem(
     ACCESS_TOKEN_STORAGE_KEY,
   );
@@ -70,8 +73,7 @@ export function removeAccessToken(): void {
 
 export function getApiErrorMessage(
   error: unknown,
-  fallbackMessage =
-    "Não foi possível concluir a solicitação.",
+  fallbackMessage = "Não foi possível concluir a solicitação.",
 ): string {
   if (!axios.isAxiosError<ApiError>(error)) {
     return fallbackMessage;

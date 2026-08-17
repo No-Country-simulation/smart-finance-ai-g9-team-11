@@ -13,23 +13,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.access.AccessDeniedHandler;
 
 import java.util.List;
 
 /**
  * Configuração central de segurança da aplicação.
- * <p>
- * Define a política de sessão (stateless, já que a autenticação é via JWT,
- * sem estado de sessão no servidor), as rotas públicas (login, cadastro,
- * reativação de conta e documentação Swagger) e registra o
- * {@link SecurityFilter} antes do filtro padrão de autenticação do Spring.
+ *
+ * Define a política de sessão stateless para autenticação JWT,
+ * as rotas públicas da aplicação e a configuração de CORS.
  */
 @Configuration
 @EnableWebSecurity
@@ -46,18 +40,29 @@ public class SecurityConfigurations {
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(
+                        sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, "/auth/login").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/auth/reactivate").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/users").permitAll();
-                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+
+                    req.requestMatchers(
+                            "/v3/api-docs/**",
+                            "/swagger-ui.html",
+                            "/swagger-ui/**"
+                    ).permitAll();
+
                     req.anyRequest().authenticated();
                 })
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)
                 )
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        securityFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 .build();
     }
 
@@ -66,7 +71,11 @@ public class SecurityConfigurations {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost", "http://localhost:5173")
+                List.of(
+                        "http://localhost",
+                        "http://localhost:5173",
+                        "http://137.131.252.166"
+                )
         );
 
         configuration.setAllowedMethods(
@@ -98,7 +107,9 @@ public class SecurityConfigurations {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration
+    ) throws Exception {
         return configuration.getAuthenticationManager();
     }
 

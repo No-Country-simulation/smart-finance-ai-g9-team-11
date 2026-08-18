@@ -1,0 +1,1869 @@
+﻿RELATORIO - ROTAS DO SIDEBAR
+
+========================================================================================================================
+ARQUIVO: frontend/src/routes/AppRouter.tsx
+========================================================================================================================
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { PublicRoute } from "@/components/auth/PublicRoute";
+
+import { AppLayout } from "@/layouts/AppLayout";
+
+import { AnalysisPage } from "@/pages/Analysis";
+import { DashboardPage } from "@/pages/Dashboard";
+import { LandingPage } from "@/pages/Landing";
+import { LoginPage } from "@/pages/Login";
+import { ProfilePage } from "@/pages/Profile";
+import { RegisterPage } from "@/pages/Register";
+import { SettingsPage } from "@/pages/Settings";
+import { TransactionsPage } from "@/pages/Transactions";
+
+export default function AppRouter() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={<LandingPage />}
+        />
+
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/app"
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            element={<DashboardPage />}
+          />
+
+          <Route
+            path="transactions"
+            element={<TransactionsPage />}
+          />
+
+          <Route
+            path="analysis"
+            element={<AnalysisPage />}
+          />
+
+          <Route
+            path="profile"
+            element={<ProfilePage />}
+          />
+
+          <Route
+            path="settings"
+            element={<SettingsPage />}
+          />
+        </Route>
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/routes/index.ts
+========================================================================================================================
+export { default as AppRouter } from "./AppRouter";
+
+========================================================================================================================
+ARQUIVO: frontend/src/layouts/AppLayout.tsx
+========================================================================================================================
+import { useState } from "react";
+import {
+  Outlet,
+  useLocation,
+} from "react-router-dom";
+
+import { Header } from "@/components/layout/Header";
+import { Sidebar } from "@/components/layout/Sidebar/Sidebar";
+import {
+  SIDEBAR_MAX_WIDTH,
+  SIDEBAR_MIN_WIDTH,
+} from "@/components/layout/Sidebar/Sidebar.constants";
+import { cn } from "@/lib/utils";
+
+export function AppLayout() {
+  const [
+    isMobileSidebarOpen,
+    setIsMobileSidebarOpen,
+  ] = useState(false);
+
+  const [
+    sidebarWidth,
+    setSidebarWidth,
+  ] = useState(
+    SIDEBAR_MIN_WIDTH,
+  );
+
+  const location = useLocation();
+
+  const openMobileSidebar = (): void => {
+    setIsMobileSidebarOpen(true);
+  };
+
+  const closeMobileSidebar = (): void => {
+    setIsMobileSidebarOpen(false);
+  };
+
+  const handleOpenSidebar = (): void => {
+    const isMobile = window.matchMedia(
+      "(max-width: 767px)",
+    ).matches;
+
+    if (isMobile) {
+      openMobileSidebar();
+      return;
+    }
+
+    setSidebarWidth(SIDEBAR_MAX_WIDTH);
+  };
+
+  return (
+    <div
+      className={cn(
+        "app-shell relative isolate",
+        "min-h-dvh w-full",
+        "overflow-x-hidden",
+        "bg-background text-text",
+      )}
+    >
+      <div
+        className="app-shell__ambient"
+        aria-hidden="true"
+      />
+
+      <div
+        className={cn(
+          "relative z-10",
+          "flex min-h-dvh w-full min-w-0",
+          "md:gap-2 md:p-2",
+          "xl:gap-3 xl:p-3",
+        )}
+      >
+        <Sidebar
+          isMobileOpen={
+            isMobileSidebarOpen
+          }
+          onCloseMobile={
+            closeMobileSidebar
+          }
+          width={sidebarWidth}
+          onWidthChange={
+            setSidebarWidth
+          }
+        />
+
+        <div
+          className={cn(
+            "flex min-h-dvh",
+            "w-full min-w-0 flex-1",
+            "flex-col",
+            "bg-background/70",
+            "md:min-h-[calc(100dvh-1rem)]",
+            "md:overflow-hidden",
+            "md:rounded-[20px]",
+            "md:border md:border-border",
+            "md:shadow-card",
+            "xl:min-h-[calc(100dvh-1.5rem)]",
+          )}
+        >
+          <Header
+            onOpenMobileSidebar={
+              openMobileSidebar
+            }
+            onOpenSidebar={
+              handleOpenSidebar
+            }
+          />
+
+          <main
+            key={location.pathname}
+            className={cn(
+              "relative flex-1",
+              "w-full min-w-0",
+              "overflow-x-hidden",
+              "px-4 pb-6 pt-4",
+              "sm:px-5 sm:pb-7 sm:pt-5",
+              "lg:px-6 lg:pb-8",
+              "lg:pt-5",
+              "2xl:px-7",
+            )}
+          >
+            <div
+              className={cn(
+                "mx-auto",
+                "w-full min-w-0",
+                "max-w-[1920px]",
+              )}
+            >
+              <Outlet />
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/layout/Sidebar/Sidebar.tsx
+========================================================================================================================
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+import {
+  BrainCircuit,
+  ChevronLeft,
+  CircleHelp,
+  LogOut,
+  Sparkles,
+  X,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import {
+  Avatar,
+  AvatarFallback,
+} from "@/components/ui/avatar";
+import { NAVIGATION_ITEMS } from "@/constants/navigation.constants";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
+
+import {
+  clampSidebarWidth,
+  SIDEBAR_COLLAPSED_LIMIT,
+  SIDEBAR_KEYBOARD_STEP,
+  SIDEBAR_MAX_WIDTH,
+  SIDEBAR_MIN_WIDTH,
+} from "./Sidebar.constants";
+import { SidebarItem } from "./SidebarItem";
+
+interface SidebarProps {
+  isMobileOpen: boolean;
+  onCloseMobile: () => void;
+  width: number;
+  onWidthChange: (width: number) => void;
+}
+
+interface SidebarStyle extends CSSProperties {
+  "--sidebar-width": string;
+}
+
+function getUserInitials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) =>
+      part.charAt(0).toUpperCase(),
+    )
+    .join("");
+}
+
+function isInteractiveElement(
+  target: EventTarget | null,
+): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return Boolean(
+    target.closest(
+      [
+        "a",
+        "button",
+        "input",
+        "select",
+        "textarea",
+        '[role="button"]',
+        '[role="menuitem"]',
+        "[data-sidebar-resize-handle]",
+        "[data-prevent-sidebar-toggle]",
+      ].join(","),
+    ),
+  );
+}
+
+export function Sidebar({
+  isMobileOpen,
+  onCloseMobile,
+  width,
+  onWidthChange,
+}: Readonly<SidebarProps>) {
+  const navigate = useNavigate();
+
+  const {
+    user,
+    logout,
+  } = useAuth();
+
+  const [isResizing, setIsResizing] =
+    useState(false);
+
+  const sidebarRef =
+    useRef<HTMLElement>(null);
+
+  const closeButtonRef =
+    useRef<HTMLButtonElement>(null);
+
+  const resizeStartXRef =
+    useRef(0);
+
+  const resizeStartWidthRef = useRef(
+    SIDEBAR_MIN_WIDTH,
+  );
+
+  const didResizeRef =
+    useRef(false);
+
+  const userName =
+    user?.nome?.trim() ||
+    user?.email ||
+    "UsuÃ¡rio";
+
+  const userEmail =
+    user?.email ?? "";
+
+  const initials =
+    getUserInitials(userName);
+
+  const sidebarWidth =
+    clampSidebarWidth(width);
+
+  const isCollapsed =
+    sidebarWidth <
+    SIDEBAR_COLLAPSED_LIMIT;
+
+  const sidebarStyle: SidebarStyle = {
+    "--sidebar-width": `${sidebarWidth}px`,
+  };
+
+  const expandSidebar = (): void => {
+    onWidthChange(
+      SIDEBAR_MAX_WIDTH,
+    );
+  };
+
+  const collapseSidebar = (): void => {
+    onWidthChange(
+      SIDEBAR_MIN_WIDTH,
+    );
+  };
+
+  const toggleCollapsed = (): void => {
+    if (isCollapsed) {
+      expandSidebar();
+      return;
+    }
+
+    collapseSidebar();
+  };
+
+  const handleLogout = (): void => {
+    logout();
+
+    onCloseMobile();
+
+    navigate(
+      "/login",
+      {
+        replace: true,
+      },
+    );
+  };
+
+  useEffect(() => {
+    if (!isMobileOpen) {
+      return;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow =
+      "hidden";
+
+    closeButtonRef.current?.focus();
+
+    const handleEscape = (
+      event: globalThis.KeyboardEvent,
+    ): void => {
+      if (event.key === "Escape") {
+        onCloseMobile();
+      }
+    };
+
+    document.addEventListener(
+      "keydown",
+      handleEscape,
+    );
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+
+      document.removeEventListener(
+        "keydown",
+        handleEscape,
+      );
+    };
+  }, [
+    isMobileOpen,
+    onCloseMobile,
+  ]);
+
+  useEffect(() => {
+    if (!isResizing) {
+      return;
+    }
+
+    const previousCursor =
+      document.body.style.cursor;
+
+    const previousUserSelect =
+      document.body.style.userSelect;
+
+    document.body.style.cursor =
+      "col-resize";
+
+    document.body.style.userSelect =
+      "none";
+
+    const handlePointerMove = (
+      event: globalThis.PointerEvent,
+    ): void => {
+      const deltaX =
+        event.clientX -
+        resizeStartXRef.current;
+
+      if (
+        Math.abs(deltaX) > 2
+      ) {
+        didResizeRef.current = true;
+      }
+
+      const nextWidth =
+        clampSidebarWidth(
+          resizeStartWidthRef.current +
+            deltaX,
+        );
+
+      onWidthChange(nextWidth);
+    };
+
+    const finishResizing =
+      (): void => {
+        setIsResizing(false);
+
+        window.setTimeout(() => {
+          didResizeRef.current =
+            false;
+        }, 0);
+      };
+
+    window.addEventListener(
+      "pointermove",
+      handlePointerMove,
+    );
+
+    window.addEventListener(
+      "pointerup",
+      finishResizing,
+    );
+
+    window.addEventListener(
+      "pointercancel",
+      finishResizing,
+    );
+
+    return () => {
+      document.body.style.cursor =
+        previousCursor;
+
+      document.body.style.userSelect =
+        previousUserSelect;
+
+      window.removeEventListener(
+        "pointermove",
+        handlePointerMove,
+      );
+
+      window.removeEventListener(
+        "pointerup",
+        finishResizing,
+      );
+
+      window.removeEventListener(
+        "pointercancel",
+        finishResizing,
+      );
+    };
+  }, [
+    isResizing,
+    onWidthChange,
+  ]);
+
+  const handleResizePointerDown = (
+    event:
+      ReactPointerEvent<HTMLButtonElement>,
+  ): void => {
+    if (
+      event.pointerType === "touch"
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    resizeStartXRef.current =
+      event.clientX;
+
+    resizeStartWidthRef.current =
+      sidebarWidth;
+
+    didResizeRef.current =
+      false;
+
+    setIsResizing(true);
+  };
+
+  const handleResizeKeyDown = (
+    event:
+      ReactKeyboardEvent<HTMLButtonElement>,
+  ): void => {
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+
+        onWidthChange(
+          clampSidebarWidth(
+            sidebarWidth -
+              SIDEBAR_KEYBOARD_STEP,
+          ),
+        );
+        break;
+
+      case "ArrowRight":
+        event.preventDefault();
+
+        onWidthChange(
+          clampSidebarWidth(
+            sidebarWidth +
+              SIDEBAR_KEYBOARD_STEP,
+          ),
+        );
+        break;
+
+      case "Home":
+        event.preventDefault();
+        collapseSidebar();
+        break;
+
+      case "End":
+        event.preventDefault();
+        expandSidebar();
+        break;
+
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        toggleCollapsed();
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const handleSidebarClick = (
+    event:
+      ReactMouseEvent<HTMLElement>,
+  ): void => {
+    if (
+      window.innerWidth < 768 ||
+      isResizing ||
+      didResizeRef.current ||
+      isInteractiveElement(
+        event.target,
+      )
+    ) {
+      return;
+    }
+
+    toggleCollapsed();
+  };
+
+  const handleSidebarKeyDown = (
+    event:
+      ReactKeyboardEvent<HTMLElement>,
+  ): void => {
+    if (
+      event.key !== "Tab" ||
+      !isMobileOpen
+    ) {
+      return;
+    }
+
+    const sidebar =
+      sidebarRef.current;
+
+    if (!sidebar) {
+      return;
+    }
+
+    const focusableElements =
+      Array.from(
+        sidebar.querySelectorAll<HTMLElement>(
+          [
+            "a[href]",
+            "button:not([disabled])",
+            "input:not([disabled])",
+            "select:not([disabled])",
+            "textarea:not([disabled])",
+            '[tabindex]:not([tabindex="-1"])',
+          ].join(","),
+        ),
+      ).filter(
+        (element) =>
+          !element.hasAttribute(
+            "disabled",
+          ) &&
+          element.getAttribute(
+            "aria-hidden",
+          ) !== "true",
+      );
+
+    if (
+      focusableElements.length === 0
+    ) {
+      return;
+    }
+
+    const firstElement =
+      focusableElements[0];
+
+    const lastElement =
+      focusableElements[
+        focusableElements.length - 1
+      ];
+
+    if (
+      event.shiftKey &&
+      document.activeElement ===
+        firstElement
+    ) {
+      event.preventDefault();
+      lastElement?.focus();
+      return;
+    }
+
+    if (
+      !event.shiftKey &&
+      document.activeElement ===
+        lastElement
+    ) {
+      event.preventDefault();
+      firstElement?.focus();
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        className={cn(
+          "fixed inset-0 z-40 bg-black/70 backdrop-blur-[2px]",
+          "transition-opacity duration-300 md:hidden",
+          isMobileOpen
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
+        )}
+        onClick={onCloseMobile}
+        aria-label="Fechar menu principal"
+        aria-hidden={!isMobileOpen}
+        tabIndex={
+          isMobileOpen ? 0 : -1
+        }
+      />
+
+      <aside
+        ref={sidebarRef}
+        style={sidebarStyle}
+        onClick={
+          handleSidebarClick
+        }
+        onKeyDown={
+          handleSidebarKeyDown
+        }
+        className={cn(
+          "fixed inset-y-0 left-0 z-50",
+          "flex min-h-dvh flex-col overflow-hidden",
+          "border-r border-border bg-surface/98",
+          "shadow-elevated backdrop-blur-xl",
+          "transition-[width,transform] duration-300 ease-out",
+          "motion-reduce:transition-none",
+          "w-[min(18rem,calc(100vw-1rem))]",
+          isMobileOpen
+            ? "translate-x-0"
+            : "-translate-x-full",
+          "md:static md:min-h-0 md:translate-x-0",
+          "md:w-[var(--sidebar-width)]",
+          "md:rounded-[20px] md:border",
+          "md:border-border-highlight/60",
+          isResizing &&
+            "md:transition-none",
+        )}
+        aria-label="Menu principal"
+      >
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 top-0 h-40",
+            "bg-[radial-gradient(circle_at_top,var(--glow-primary),transparent_70%)]",
+            "opacity-60",
+          )}
+          aria-hidden="true"
+        />
+
+        <button
+          type="button"
+          data-sidebar-resize-handle
+          onPointerDown={
+            handleResizePointerDown
+          }
+          onKeyDown={
+            handleResizeKeyDown
+          }
+          className={cn(
+            "absolute inset-y-5 -right-1 z-20 hidden w-2",
+            "cursor-col-resize rounded-full md:block",
+            "focus-visible:ring-2 focus-visible:ring-primary",
+            "focus-visible:ring-offset-2",
+            "focus-visible:ring-offset-background",
+            "after:absolute after:inset-y-0",
+            "after:left-1/2 after:w-px",
+            "after:-translate-x-1/2",
+            "after:bg-transparent",
+            "hover:after:bg-primary/45",
+            "focus-visible:after:bg-primary/70",
+            isResizing &&
+              "after:bg-primary-bright",
+          )}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Redimensionar menu lateral"
+          aria-valuemin={
+            SIDEBAR_MIN_WIDTH
+          }
+          aria-valuemax={
+            SIDEBAR_MAX_WIDTH
+          }
+          aria-valuenow={Math.round(
+            sidebarWidth,
+          )}
+          title="Arraste para redimensionar. Use as setas do teclado para ajustar."
+        />
+
+        <div
+          className={cn(
+            "relative flex min-h-[82px] shrink-0 items-center",
+            "border-b border-border-muted",
+            isCollapsed
+              ? "justify-between px-4 md:justify-center md:px-2"
+              : "justify-between px-4",
+          )}
+        >
+          <div
+            className={cn(
+              "flex min-w-0 items-center",
+              isCollapsed
+                ? "gap-3 md:justify-center"
+                : "gap-3",
+            )}
+          >
+            <div
+              className={cn(
+                "relative flex size-11 shrink-0 items-center",
+                "justify-center rounded-[25px]",
+                "border border-primary/35",
+                "bg-gradient-to-br from-primary/25",
+                "via-primary/10 to-secondary/20",
+                "text-primary-bright",
+                "shadow-[0_0_24px_-8px_var(--glow-primary)]",
+              )}
+            >
+              <BrainCircuit
+                size={25}
+                strokeWidth={2}
+                aria-hidden="true"
+              />
+
+              <Sparkles
+                size={10}
+                className="absolute right-1 top-1 text-secondary-bright"
+                aria-hidden="true"
+              />
+            </div>
+
+            <div
+              className={cn(
+                "min-w-0 transition-[opacity,transform,width]",
+                "duration-200 motion-reduce:transition-none",
+                isCollapsed
+                  ? [
+                      "md:pointer-events-none md:w-0",
+                      "md:-translate-x-2 md:opacity-0",
+                    ]
+                  : [
+                      "w-auto translate-x-0",
+                      "opacity-100",
+                    ],
+              )}
+            >
+              <p className="truncate text-sm font-semibold tracking-tight text-text">
+                FINANCE AI
+              </p>
+            </div>
+          </div>
+
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={
+              onCloseMobile
+            }
+            className={cn(
+              "flex size-10 shrink-0 items-center justify-center",
+              "rounded-xl border border-border",
+              "bg-surface-elevated text-text-muted",
+              "transition-colors",
+              "hover:border-border-highlight",
+              "hover:text-text",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary",
+              "md:hidden",
+            )}
+            aria-label="Fechar menu principal"
+          >
+            <X
+              size={19}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+
+        <nav
+          className={cn(
+            "relative flex min-h-0 flex-1 flex-col",
+            "gap-2 overflow-y-auto overflow-x-hidden",
+            "px-3 py-5",
+          )}
+          aria-label="NavegaÃ§Ã£o da aplicaÃ§Ã£o"
+        >
+          {NAVIGATION_ITEMS.map(
+            (item) => (
+              <SidebarItem
+                key={item.id}
+                item={item}
+                isCollapsed={
+                  isCollapsed
+                }
+                onNavigate={
+                  onCloseMobile
+                }
+              />
+            ),
+          )}
+        </nav>
+
+        <div className="relative shrink-0 space-y-2 px-3 pb-3">
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            title="Central de ajuda â€” Em breve"
+            className={cn(
+              "flex min-h-11 w-full items-center rounded-xl",
+              "border border-border-muted",
+              "bg-surface-elevated/45",
+              "text-text-muted",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-70",
+              isCollapsed
+                ? [
+                    "justify-start gap-3 px-3",
+                    "md:justify-center md:gap-0",
+                    "md:px-2",
+                  ]
+                : "justify-start gap-3 px-3",
+            )}
+          >
+            <CircleHelp
+              size={19}
+              className="shrink-0"
+              aria-hidden="true"
+            />
+
+            <span
+              className={cn(
+                "min-w-0 truncate text-sm font-medium",
+                isCollapsed &&
+                  "md:hidden",
+              )}
+            >
+              Ajuda
+            </span>
+
+            {!isCollapsed && (
+              <span className="ml-auto text-[9px] uppercase tracking-wide text-text-subtle">
+                Em breve
+              </span>
+            )}
+          </button>
+
+          <div
+            data-prevent-sidebar-toggle
+            className={cn(
+              "flex min-h-[62px] items-center",
+              "rounded-[15px] border border-border",
+              "bg-card shadow-card",
+              isCollapsed
+                ? [
+                    "gap-3 px-3",
+                    "md:justify-center md:gap-0",
+                    "md:px-2",
+                  ]
+                : "gap-3 px-3",
+            )}
+          >
+            <div className="relative shrink-0">
+              <Avatar className="size-9 border border-border-highlight">
+                <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary-bright">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+
+              <span
+                className={cn(
+                  "absolute -bottom-0.5 -right-0.5",
+                  "size-2.5 rounded-full",
+                  "border-2 border-surface bg-success",
+                )}
+                aria-hidden="true"
+              />
+
+              <span className="sr-only">
+                UsuÃ¡rio online
+              </span>
+            </div>
+
+            {!isCollapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-semibold text-text">
+                  {userName}
+                </p>
+
+                <p className="mt-0.5 truncate text-[10px] font-medium text-primary-bright">
+                  {userEmail}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Encerrar sessÃ£o"
+            className={cn(
+              "flex min-h-10 w-full items-center rounded-xl",
+              "text-text-muted",
+              "transition-colors duration-200",
+              "hover:bg-red-500/10",
+              "hover:text-red-400",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-red-400/70",
+              isCollapsed
+                ? [
+                    "justify-start gap-3 px-3",
+                    "md:justify-center md:gap-0",
+                    "md:px-2",
+                  ]
+                : "justify-start gap-3 px-3",
+            )}
+          >
+            <LogOut
+              size={18}
+              className="shrink-0"
+              aria-hidden="true"
+            />
+
+            <span
+              className={cn(
+                "truncate text-sm font-medium",
+                isCollapsed &&
+                  "md:hidden",
+              )}
+            >
+              Sair
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={
+              toggleCollapsed
+            }
+            className={cn(
+              "hidden min-h-10 w-full items-center rounded-xl",
+              "border border-transparent text-sm font-medium",
+              "text-text-muted transition-colors duration-200",
+              "hover:border-border",
+              "hover:bg-surface-elevated",
+              "hover:text-text",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary",
+              "motion-reduce:transition-none md:flex",
+              isCollapsed
+                ? "justify-center px-2"
+                : "justify-start gap-3 px-3",
+            )}
+            aria-label={
+              isCollapsed
+                ? "Expandir menu lateral"
+                : "Recolher menu lateral"
+            }
+            aria-expanded={
+              !isCollapsed
+            }
+          >
+            <ChevronLeft
+              size={18}
+              className={cn(
+                "shrink-0 transition-transform duration-300",
+                "motion-reduce:transition-none",
+                isCollapsed &&
+                  "rotate-180",
+              )}
+              aria-hidden="true"
+            />
+
+            {!isCollapsed && (
+              <span>
+                Recolher menu
+              </span>
+            )}
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/layout/Sidebar/SidebarNav.tsx
+========================================================================================================================
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/layout/Sidebar/SidebarItem.tsx
+========================================================================================================================
+import { NavLink } from "react-router-dom";
+
+import { cn } from "@/lib/utils";
+import type { NavigationItem } from "@/types/navigation.types";
+
+interface SidebarItemProps {
+  item: NavigationItem;
+  isCollapsed: boolean;
+  onNavigate?: () => void;
+}
+
+export function SidebarItem({
+  item,
+  isCollapsed,
+  onNavigate,
+}: Readonly<SidebarItemProps>) {
+  const Icon = item.icon;
+
+  return (
+    <NavLink
+      to={item.path}
+      end={item.path === "/"}
+      onClick={onNavigate}
+      title={isCollapsed ? item.label : undefined}
+      aria-label={isCollapsed ? item.label : undefined}
+      className={({ isActive }) =>
+        cn(
+          "group relative flex min-h-12 w-full min-w-0",
+          "items-center overflow-hidden rounded-[14px]",
+          "border px-3 py-2.5",
+          "transition-[background-color,border-color,color,box-shadow]",
+          "duration-200 motion-reduce:transition-none",
+          "focus-visible:ring-2 focus-visible:ring-primary",
+          "focus-visible:ring-offset-2",
+          "focus-visible:ring-offset-surface",
+          isCollapsed
+            ? "justify-start gap-3 md:justify-center md:gap-0 md:px-2"
+            : "justify-start gap-3",
+          isActive
+            ? [
+                "border-primary/35 text-text",
+                "bg-gradient-to-r from-primary/30",
+                "via-primary/15 to-secondary/10",
+                "shadow-[0_0_26px_-12px_var(--glow-primary)]",
+              ]
+            : [
+                "border-transparent text-text-muted",
+                "hover:border-border",
+                "hover:bg-surface-elevated/75",
+                "hover:text-text",
+              ],
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          {isActive && (
+            <span
+              className={cn(
+                "absolute inset-y-2 left-0 w-0.5",
+                "rounded-r-full bg-primary-bright",
+                "shadow-[0_0_12px_var(--glow-primary)]",
+              )}
+              aria-hidden="true"
+            />
+          )}
+
+          <span
+            className={cn(
+              "flex size-8 shrink-0 items-center justify-center",
+              "rounded-[10px] transition-colors duration-200",
+              "motion-reduce:transition-none",
+              isActive
+                ? "bg-primary/20 text-primary-bright"
+                : [
+                    "bg-surface-elevated/55 text-text-muted",
+                    "group-hover:bg-surface-elevated",
+                    "group-hover:text-text",
+                  ],
+            )}
+          >
+            <Icon
+              size={18}
+              strokeWidth={isActive ? 2.25 : 2}
+              aria-hidden="true"
+            />
+          </span>
+
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate text-sm",
+              "transition-[opacity,transform] duration-200",
+              "motion-reduce:transition-none",
+              isActive ? "font-semibold" : "font-medium",
+              isCollapsed && "md:hidden",
+            )}
+          >
+            {item.label}
+          </span>
+        </>
+      )}
+    </NavLink>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/layout/Sidebar/index.ts
+========================================================================================================================
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/layout/Sidebar/sidebar.data.ts
+========================================================================================================================
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/layout/Sidebar/sidebar.config.ts
+========================================================================================================================
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/data/sidebar.ts
+========================================================================================================================
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+ARQUIVO: frontend/src/data/navigation.ts
+========================================================================================================================
+ARQUIVO NAO ENCONTRADO
+
+========================================================================================================================
+REFERENCIAS DE NAVEGACAO
+========================================================================================================================
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIConfidenceGauge.tsx:5
+import type { AIConfidenceGaugeProps } from "./AIProfileCard.types";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:31
+  AIProfileCardProps,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:32
+} from "./AIProfileCard.types";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:126
+export function AIProfileCard({
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:131
+  profile = null,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:133
+}: Readonly<AIProfileCardProps>) {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:134
+  if (!profile) {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:186
+        profile.confidence,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:194
+      profile.classification
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:199
+      profile.classification
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:286
+                  {profile.riskLabel}
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.tsx:304
+          {profile.indicators.map(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.types.ts:18
+export interface AIFinancialProfile {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.types.ts:25
+export interface AIProfileCardProps {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\AIProfileCard.types.ts:28
+  profile?: AIFinancialProfile | null;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\index.ts:2
+export * from "./AIProfileCard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\AIProfileCard\index.ts:3
+export * from "./AIProfileCard.types";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart\BalanceChart.tsx:30
+  DashboardCashFlowItem,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart\BalanceChart.tsx:31
+} from "@/types/dashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\BalanceChart\BalanceChart.tsx:34
+  data: readonly DashboardCashFlowItem[];
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashbordGrid\DashboardGrid.tsx:33
+  DashboardData,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashbordGrid\DashboardGrid.tsx:34
+} from "@/types/dashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashbordGrid\DashboardGrid.tsx:40
+interface DashboardGridProps {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashbordGrid\DashboardGrid.tsx:41
+  data: DashboardData;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashbordGrid\DashboardGrid.tsx:146
+export function DashboardGrid({
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashbordGrid\DashboardGrid.tsx:151
+}: Readonly<DashboardGridProps>) {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashbordGrid\DashboardGrid.tsx:250
+              profile={
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\DashbordGrid\index.ts:1
+export * from "./DashboardGrid"
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseChart\ExpenseChart.tsx:13
+import { dashboardService } from "@/services/dashboard.service";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ExpenseChart\ExpenseChart.tsx:24
+  const data = dashboardService.getCategories();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:18
+  AIProfileCard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:19
+} from "../AIProfileCard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:31
+  AIFinancialProfile,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:32
+} from "../AIProfileCard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:40
+  FinancialProfile,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:87
+  profile: FinancialProfile,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:88
+): AIFinancialProfile["classification"] {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:89
+  switch (profile) {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:159
+function createProfile(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:161
+): AIFinancialProfile {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:342
+  const profile =
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:344
+      ? createProfile(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:468
+          <AIProfileCard
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:469
+            profile={
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialAnalysis\FinancialAnalysisGrid.tsx:470
+              profile
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCards\FinancialCards.tsx:13
+  DashboardSummary,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCards\FinancialCards.tsx:14
+} from "@/types/dashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\FinancialCards\FinancialCards.tsx:17
+  summary: DashboardSummary;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions\index.ts:3
+export { dashboardQuickActions } from "./quickActions.data";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions\quickActions.data.ts:10
+export const dashboardQuickActions = [
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions\QuickActions.tsx:15
+import { dashboardQuickActions } from "./quickActions.data";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\QuickActions\QuickActions.tsx:20
+  actions = dashboardQuickActions,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.tsx:81
+  profile = null,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.tsx:92
+    profile !== null;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.tsx:184
+                  {profile}
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.types.ts:2
+  FinancialProfile,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\ScoreCard\ScoreCard.types.ts:13
+  profile?: FinancialProfile | null;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\dashboard\TransactionsTable\TransactionsTable.types.ts:1
+import type { Transaction } from "@/types/dashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\landing\HowItWorksSection\HowItWorksSection.tsx:5
+  LayoutDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\landing\HowItWorksSection\HowItWorksSection.tsx:28
+    icon: LayoutDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\landing\ProductPreview\ProductPreview.tsx:169
+              app.finance-ai.com/dashboard
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\landing\ProductPreview\ProductPreview.tsx:186
+                src="/dashboard-preview.png"
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\landing\ProductPreview\ProductPreview.tsx:187
+                alt="Dashboard do Finance AI mostrando indicadores, gráficos e recomendações financeiras"
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\landing\ProductPreview\ProductPreview.tsx:238
+                  Adicione a captura do Dashboard
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\landing\ProductPreview\ProductPreview.tsx:241
+                    public/dashboard-preview.png
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Header\HeaderActions.tsx:42
+            financialProfile: "Regular",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:2
+  LayoutDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:3
+  Settings,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:11
+    id: "dashboard",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:12
+    label: "Dashboard",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:14
+    icon: LayoutDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:17
+    id: "profile",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:19
+    path: "/profile",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:23
+    id: "settings",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:25
+    path: "/settings",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\components\layout\Navigation\navigation.constants.ts:26
+    icon: Settings,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:2
+  LayoutDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:3
+  Settings,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:11
+    id: "dashboard",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:12
+    label: "Dashboard",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:13
+    path: "/dashboard",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:14
+    icon: LayoutDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:17
+    id: "profile",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:19
+    path: "/profile",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:23
+    id: "settings",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:25
+    path: "/settings",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\constants\navigation.constants.ts:26
+    icon: Settings,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\contexts\AuthContext\AuthContext.tsx:11
+  getProfile,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\contexts\AuthContext\AuthContext.tsx:66
+        const user = await getProfile();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\contexts\AuthContext\AuthContext.tsx:96
+        const user = await getProfile();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\data\team.ts:71
+      "Construção do dashboard financeiro e da Landing Page.",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:10
+import { dashboardService } from "@/services/dashboard.service";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:13
+  DashboardData,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:14
+} from "@/types/dashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:16
+const INITIAL_DASHBOARD_DATA: DashboardData = {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:28
+interface UseDashboardReturn {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:29
+  data: DashboardData;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:35
+export function useDashboard(): UseDashboardReturn {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:37
+    useState<DashboardData>(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:38
+      INITIAL_DASHBOARD_DATA,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:47
+  const loadDashboard =
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:53
+        const dashboardData =
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:54
+          await dashboardService.getDashboardData();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:56
+        setData(dashboardData);
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:62
+            "Não foi possível carregar os dados do dashboard.",
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:72
+    void loadDashboard();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:73
+  }, [loadDashboard]);
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\hooks\useDashboard.ts:79
+    reload: loadDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Analysis\AnalysisPage.tsx:37
+  FinancialProfile,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Analysis\AnalysisPage.tsx:95
+function getProfileClasses(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Analysis\AnalysisPage.tsx:96
+  profile: FinancialProfile,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Analysis\AnalysisPage.tsx:98
+  switch (profile) {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Analysis\AnalysisPage.tsx:610
+                getProfileClasses(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Analysis\AnalysisPage.tsx:1049
+                            getProfileClasses(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\DashboardPage.tsx:8
+  DashboardGrid,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\DashboardPage.tsx:9
+} from "@/components/dashboard/DashbordGrid/DashboardGrid";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\DashboardPage.tsx:12
+  useDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\DashboardPage.tsx:13
+} from "@/hooks/useDashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\DashboardPage.tsx:23
+export function DashboardPage() {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\DashboardPage.tsx:29
+  } = useDashboard();
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\DashboardPage.tsx:104
+            Não foi possível carregar o dashboard
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\DashboardPage.tsx:145
+      <DashboardGrid
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\DashboardPage.tsx:159
+export default DashboardPage;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Dashboard\index.ts:1
+export { default as DashboardPage } from "./DashboardPage";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Profile\index.ts:1
+export { ProfilePage } from "./ProfilePage";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Profile\ProfilePage.tsx:32
+export function ProfilePage() {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Profile\ProfilePage.tsx:66
+            navigate("/settings")
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\index.ts:1
+export { SettingsPage } from "./SettingsPage";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:30
+interface SettingsSectionProps {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:36
+interface SettingsRowProps {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:44
+function SettingsSection({
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:48
+}: Readonly<SettingsSectionProps>) {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:68
+function SettingsRow({
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:74
+}: Readonly<SettingsRowProps>) {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:110
+export function SettingsPage() {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:132
+      <SettingsSection
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:136
+        <SettingsRow
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:146
+        <SettingsRow
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:155
+      </SettingsSection>
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:157
+      <SettingsSection
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:161
+        <SettingsRow
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:168
+        <SettingsRow
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:174
+      </SettingsSection>
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:176
+      <SettingsSection
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:202
+      </SettingsSection>
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:204
+      <SettingsSection
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:208
+        <SettingsRow
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:219
+        <SettingsRow
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\pages\Settings\SettingsPage.tsx:226
+      </SettingsSection>
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\routes\AppRouter.tsx:14
+import { DashboardPage } from "@/pages/Dashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\routes\AppRouter.tsx:17
+import { ProfilePage } from "@/pages/Profile";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\routes\AppRouter.tsx:19
+import { SettingsPage } from "@/pages/Settings";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\routes\AppRouter.tsx:59
+            element={<DashboardPage />}
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\routes\AppRouter.tsx:73
+            path="profile"
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\routes\AppRouter.tsx:74
+            element={<ProfilePage />}
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\routes\AppRouter.tsx:78
+            path="settings"
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\routes\AppRouter.tsx:79
+            element={<SettingsPage />}
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\routes\AppRouter.tsx:87
+              to="/"
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\auth.service.ts:17
+const PROFILE_ENDPOINT = "/users/me";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\auth.service.ts:49
+export async function getProfile(): Promise<AuthUser> {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\auth.service.ts:52
+      PROFILE_ENDPOINT,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:2
+  mapTransactionToDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:3
+  type DashboardCashFlowItem,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:4
+  type DashboardData,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:5
+  type DashboardExpenseCategory,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:6
+  type DashboardMonthlyAccumulator,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:7
+  type DashboardSummary,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:8
+} from "@/types/dashboard";
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:35
+): DashboardSummary {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:83
+): DashboardExpenseCategory[] {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:141
+): DashboardCashFlowItem[] {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:145
+      DashboardMonthlyAccumulator
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:311
+      mapTransactionToDashboard,
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:315
+function createDashboardData(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:317
+): DashboardData {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:341
+export const dashboardService = {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:342
+  async getDashboardData(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:344
+  ): Promise<DashboardData> {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\dashboard.service.ts:350
+    return createDashboardData(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\userService.ts:1
+export type UserFinancialProfile =
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\services\userService.ts:26
+  financialProfile: UserFinancialProfile;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\styles\spacing.ts:4
+ * across dashboard components so padding never drifts card to card.
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\styles\spacing.ts:10
+  sectionGap: "1.5rem", // gap-6 — space between dashboard cards/widgets
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:6
+export interface DashboardSummary {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:13
+export interface DashboardCashFlowItem {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:21
+export interface DashboardExpenseCategory {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:26
+export type DashboardTransactionType =
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:30
+export type DashboardTransactionStatus =
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:33
+export interface DashboardTransaction {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:39
+  type: DashboardTransactionType;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:40
+  status: DashboardTransactionStatus;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:43
+export interface DashboardData {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:44
+  summary: DashboardSummary;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:45
+  cashFlow: DashboardCashFlowItem[];
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:46
+  categories: DashboardExpenseCategory[];
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:47
+  transactions: DashboardTransaction[];
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:50
+export interface DashboardPeriod {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:55
+export interface DashboardMonthlyAccumulator {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:62
+export function mapTransactionToDashboard(
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\dashboard.ts:64
+): DashboardTransaction {
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\financial-analysis.ts:1
+export const FINANCIAL_PROFILES = [
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\financial-analysis.ts:7
+export type FinancialProfile =
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\financial-analysis.ts:8
+  (typeof FINANCIAL_PROFILES)[number];
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\financial-analysis.ts:38
+  perfil_financeiro: FinancialProfile;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\financial-analysis.ts:50
+  perfilFinanceiro: FinancialProfile;
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\user.ts:1
+export type UserFinancialProfile =
+
+C:\projetos\smart-finance-ai-g9-team-11\frontend\src\types\user.ts:26
+  financialProfile: UserFinancialProfile;
+

@@ -1,0 +1,702 @@
+﻿RELATORIO - AUTH PROXIMA ETAPA
+========================================================================================================================
+ARQUIVO: frontend/src/services/api.ts
+========================================================================================================================
+
+import axios from "axios";
+import type { AxiosError } from "axios";
+
+import type { ApiError } from "@/types/api";
+
+const DEFAULT_API_BASE_URL =
+  "http://localhost:8080";
+
+const ACCESS_TOKEN_STORAGE_KEY =
+  "finance-ai:access-token";
+
+const configuredApiBaseUrl =
+  import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const API_BASE_URL = (
+  configuredApiBaseUrl || DEFAULT_API_BASE_URL
+).replace(/\/+$/, "");
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15_000,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+api.interceptors.request.use((config) => {
+  if (typeof window === "undefined") {
+    return config;
+  }
+
+  api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiError>) =>
+    Promise.reject(error),
+  );
+
+  const accessToken = window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+
+  if (accessToken) {
+    config.headers.Authorization =
+      `Bearer ${accessToken}`;
+  }
+
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiError>) =>
+    Promise.reject(error),
+);
+
+export function saveAccessToken(
+  accessToken: string,
+): void {
+  window.localStorage.setItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+    accessToken,
+  );
+}
+
+export function getAccessToken(): string | null {
+  return window.localStorage.getItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function removeAccessToken(): void {
+  window.localStorage.removeItem(
+    ACCESS_TOKEN_STORAGE_KEY,
+  );
+}
+
+export function getApiErrorMessage(
+  error: unknown,
+  fallbackMessage =
+    "Não foi possível concluir a solicitação.",
+): string {
+  if (!axios.isAxiosError<ApiError>(error)) {
+    return fallbackMessage;
+  }
+
+  return (
+    error.response?.data?.message ||
+    error.message ||
+    fallbackMessage
+  );
+}
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/auth.service.ts
+========================================================================================================================
+
+import {
+  api,
+  saveAccessToken,
+  removeAccessToken,
+  getAccessToken,
+} from "@/services/api";
+import type {
+  LoginRequest,
+  LoginResponse,
+  AuthUser,
+} from "@/types/auth";
+
+const AUTH_ENDPOINT = "/auth/login";
+
+export async function login(
+  credentials: LoginRequest,
+): Promise<void> {
+  const { data } = await api.post<LoginResponse>(
+    AUTH_ENDPOINT,
+    credentials,
+  );
+
+  saveAccessToken(data.token);
+}
+
+export async function getProfile(): Promise<AuthUser> {
+  const { data } = await api.get<AuthUser>("/users/me");
+  return data;
+}
+
+export function logout(): void {
+  removeAccessToken();
+}
+
+export function hasStoredToken(): boolean {
+  return !!getAccessToken();
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/contexts/AuthContext/AuthContext.tsx
+========================================================================================================================
+
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+
+import {
+  getProfile,
+  hasStoredToken,
+  login as loginService,
+  logout as logoutService,
+} from "@/services/auth.service";
+
+import type {
+  AuthContextData,
+  AuthState,
+  LoginRequest,
+} from "@/types/auth";
+
+export const AuthContext =
+  createContext<AuthContextData | undefined>(undefined);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthContextProvider({
+  children,
+}: Readonly<AuthProviderProps>) {
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    isAuthenticated: false,
+    isLoading: true,
+  });
+
+  const logout = useCallback(() => {
+    logoutService();
+
+    setState({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+    });
+  }, []);
+
+  const checkAuth = useCallback(async () => {
+    if (!hasStoredToken()) {
+      setState({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
+      return;
+    }
+
+    try {
+      const user = await getProfile();
+
+      setState({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+    } catch {
+      logout();
+    }
+  }, [logout]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  const login = useCallback(
+    async (credentials: LoginRequest): Promise<void> => {
+      setState((prev) => ({ ...prev, isLoading: true }));
+
+      try {
+        await loginService(credentials);
+        const user = await getProfile();
+
+        setState({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } catch (error) {
+        setState({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
+        throw error;
+      }
+    },
+    [],
+  );
+
+  const value = useMemo<AuthContextData>(
+    () => ({
+      ...state,
+      login,
+      logout,
+      checkAuth,
+    }),
+    [state, login, logout, checkAuth],
+  );
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/ProtectedRoute/ProtectedRoute.tsx
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/auth/ProtectedRoute/index.ts
+========================================================================================================================
+
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Login/LoginPage.tsx
+========================================================================================================================
+
+import {
+  ArrowLeft,
+  BrainCircuit,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+import { BrandLogo } from "@/components/landing/BrandLogo";
+import { cn } from "@/lib/utils";
+
+export function LoginPage() {
+  return (
+    <main
+      className={cn(
+        "relative flex min-h-dvh",
+        "items-center justify-center",
+        "overflow-hidden",
+        "bg-background px-4 py-10",
+        "text-text",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none",
+          "absolute inset-0",
+          "bg-[radial-gradient(circle_at_top,var(--glow-primary),transparent_65%)]",
+          "opacity-45",
+        )}
+        aria-hidden="true"
+      />
+
+      <Link
+        to="/"
+        className={cn(
+          "absolute left-4 top-4",
+          "inline-flex items-center gap-2",
+          "rounded-xl px-3 py-2",
+          "text-sm font-medium",
+          "text-text-muted",
+          "hover:bg-surface-elevated",
+          "hover:text-text",
+          "sm:left-6 sm:top-6",
+        )}
+      >
+        <ArrowLeft
+          size={16}
+          aria-hidden="true"
+        />
+
+        Voltar
+      </Link>
+
+      <section
+        className={cn(
+          "relative w-full max-w-md",
+          "rounded-[24px] border",
+          "border-border-highlight/60",
+          "bg-surface/85 p-6",
+          "shadow-elevated",
+          "backdrop-blur-xl",
+          "sm:p-8",
+        )}
+      >
+        <BrandLogo />
+
+        <div className="mt-8">
+          <div
+            className={cn(
+              "flex size-11 items-center",
+              "justify-center rounded-2xl",
+              "bg-primary/10",
+              "text-primary-bright",
+            )}
+          >
+            <BrainCircuit
+              size={22}
+              aria-hidden="true"
+            />
+          </div>
+
+          <h1 className="mt-5 text-2xl font-bold tracking-tight text-text">
+            Bem-vindo de volta
+          </h1>
+
+          <p className="mt-2 text-sm leading-6 text-text-muted">
+            Entre para acessar seu painel
+            financeiro.
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "mt-8 rounded-2xl",
+            "border border-border-muted",
+            "bg-background/40 p-4",
+            "text-sm leading-6",
+            "text-text-muted",
+          )}
+        >
+          O formulÃ¡rio de autenticaÃ§Ã£o serÃ¡
+          conectado na prÃ³xima etapa.
+        </div>
+
+        <p className="mt-6 text-center text-sm text-text-muted">
+          Ainda nÃ£o possui uma conta?{" "}
+          <Link
+            to="/register"
+            className="font-semibold text-primary-bright hover:underline"
+          >
+            Cadastre-se
+          </Link>
+        </p>
+      </section>
+    </main>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Register/RegisterPage.tsx
+========================================================================================================================
+
+import {
+  ArrowLeft,
+  Sparkles,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+import { BrandLogo } from "@/components/landing/BrandLogo";
+import { cn } from "@/lib/utils";
+
+export function RegisterPage() {
+  return (
+    <main
+      className={cn(
+        "relative flex min-h-dvh",
+        "items-center justify-center",
+        "overflow-hidden",
+        "bg-background px-4 py-10",
+        "text-text",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none",
+          "absolute inset-0",
+          "bg-[radial-gradient(circle_at_top,var(--glow-primary),transparent_65%)]",
+          "opacity-45",
+        )}
+        aria-hidden="true"
+      />
+
+      <Link
+        to="/"
+        className={cn(
+          "absolute left-4 top-4",
+          "inline-flex items-center gap-2",
+          "rounded-xl px-3 py-2",
+          "text-sm font-medium",
+          "text-text-muted",
+          "hover:bg-surface-elevated",
+          "hover:text-text",
+          "sm:left-6 sm:top-6",
+        )}
+      >
+        <ArrowLeft
+          size={16}
+          aria-hidden="true"
+        />
+
+        Voltar
+      </Link>
+
+      <section
+        className={cn(
+          "relative w-full max-w-md",
+          "rounded-[24px] border",
+          "border-border-highlight/60",
+          "bg-surface/85 p-6",
+          "shadow-elevated",
+          "backdrop-blur-xl",
+          "sm:p-8",
+        )}
+      >
+        <BrandLogo />
+
+        <div className="mt-8">
+          <div
+            className={cn(
+              "flex size-11 items-center",
+              "justify-center rounded-2xl",
+              "bg-secondary/10",
+              "text-secondary-bright",
+            )}
+          >
+            <Sparkles
+              size={22}
+              aria-hidden="true"
+            />
+          </div>
+
+          <h1 className="mt-5 text-2xl font-bold tracking-tight text-text">
+            Crie sua conta
+          </h1>
+
+          <p className="mt-2 text-sm leading-6 text-text-muted">
+            Comece a acompanhar sua vida
+            financeira com inteligÃªncia.
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "mt-8 rounded-2xl",
+            "border border-border-muted",
+            "bg-background/40 p-4",
+            "text-sm leading-6",
+            "text-text-muted",
+          )}
+        >
+          O formulÃ¡rio de cadastro e o acesso
+          com Google serÃ£o conectados na prÃ³xima
+          etapa.
+        </div>
+
+        <p className="mt-6 text-center text-sm text-text-muted">
+          JÃ¡ possui uma conta?{" "}
+          <Link
+            to="/login"
+            className="font-semibold text-primary-bright hover:underline"
+          >
+            Entrar
+          </Link>
+        </p>
+      </section>
+    </main>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/routes/AppRouter.tsx
+========================================================================================================================
+
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
+import { AppLayout } from "@/layouts/AppLayout";
+
+import { LandingPage } from "@/pages/Landing";
+import { LoginPage } from "@/pages/Login";
+import { RegisterPage } from "@/pages/Register";
+
+import { DashboardPage } from "@/pages/Dashboard";
+import { ProfilePage } from "@/pages/Profile";
+import { SettingsPage } from "@/pages/Settings";
+
+import { PrivateRoute } from "./PrivateRoute";
+
+export default function AppRouter() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* ========================= */}
+        {/* Rotas PÃºblicas            */}
+        {/* ========================= */}
+
+        <Route
+          path="/"
+          element={<LandingPage />}
+        />
+
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+
+        {/* ========================= */}
+        {/* Rotas Privadas            */}
+        {/* ========================= */}
+
+        <Route
+          path="/app"
+          element={
+            <PrivateRoute>
+              <AppLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route
+            index
+            element={<DashboardPage />}
+          />
+
+          <Route
+            path="profile"
+            element={<ProfilePage />}
+          />
+
+          <Route
+            path="settings"
+            element={<SettingsPage />}
+          />
+        </Route>
+
+        {/* ========================= */}
+        {/* Fallback                  */}
+        {/* ========================= */}
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/auth.ts
+========================================================================================================================
+
+export interface LoginRequest {
+  email: string;
+  senha: string;
+}
+
+export interface LoginResponse {
+  token: string;
+}
+
+export interface AuthUser {
+  id?: string | number;
+  nome?: string;
+  email: string;
+  ativo?: boolean;
+  roles?: string[];
+}
+
+export interface AuthState {
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
+
+export interface AuthContextData extends AuthState {
+  login: (credentials: LoginRequest) => Promise<void>;
+  logout: () => void;
+  checkAuth: () => Promise<void>;
+}
+
+
+========================================================================================================================
+ARQUIVO: frontend/package.json
+========================================================================================================================
+
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.6.0",
+    "@fontsource-variable/manrope": "^5.2.9",
+    "@hookform/resolvers": "^5.4.0",
+    "@radix-ui/react-dialog": "^1.1.19",
+    "axios": "^1.18.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.24.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-hook-form": "^7.81.0",
+    "react-router-dom": "^7.18.1",
+    "recharts": "^3.9.2",
+    "shadcn": "^4.13.0",
+    "tailwind-merge": "^3.6.0",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "autoprefixer": "^10.5.2",
+    "eslint": "^10.6.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^4.3.2",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.62.0",
+    "vite": "^8.1.1",
+    "vite-tsconfig-paths": "^6.1.1"
+  }
+}
+
+

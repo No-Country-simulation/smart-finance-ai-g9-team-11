@@ -1,0 +1,1569 @@
+﻿RELATORIO - LIMPEZA FINAL USER MOCK
+Gerado em: 14/08/2026 19:25:55
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/layout/Header/HeaderActions.tsx
+========================================================================================================================
+
+import { SearchBar } from "@/components/layout/SearchBar";
+import { userMock } from "@/mocks/user.mock";
+
+import { UserMenu } from "../UserMenu";
+
+import { DateRangePicker } from "./DateRangePicker";
+import { NotificationButton } from "./NotificationButton";
+import { ThemeToggle } from "./ThemeToggle";
+
+interface HeaderActionsProps {
+  onOpenSidebar?: () => void;
+}
+
+export function HeaderActions({
+  onOpenSidebar,
+}: Readonly<HeaderActionsProps>) {
+  return (
+    <div className="flex min-w-0 shrink-0 items-center gap-2">
+      <SearchBar className="hidden w-[240px] 2xl:block" />
+
+      <div className="hidden lg:block">
+        <DateRangePicker />
+      </div>
+
+      <div className="hidden sm:block">
+        <ThemeToggle />
+      </div>
+
+      <NotificationButton />
+
+      <UserMenu
+        user={userMock}
+        isOnline
+        onOpenSidebar={onOpenSidebar}
+      />
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/components/layout/Header/HeaderGreeting.tsx
+========================================================================================================================
+
+import { Sparkles } from "lucide-react";
+
+import { useAuth } from "@/hooks/useAuth";
+
+export function HeaderGreeting() {
+  const {
+    user,
+  } = useAuth();
+
+  const firstName =
+    user?.nome
+      ?.trim()
+      .split(/\s+/)[0] ??
+    "";
+
+  return (
+    <div className="min-w-0">
+      <div className="flex min-w-0 items-center gap-2">
+        <p className="truncate text-[11px] font-medium text-text-muted sm:text-xs">
+          Bem-vindo de volta
+        </p>
+
+        <span
+          className="
+            hidden size-6 shrink-0 items-center justify-center
+            rounded-lg border border-primary/25
+            bg-primary/10 text-primary-bright
+            sm:flex
+          "
+          aria-hidden="true"
+        >
+          <Sparkles size={13} />
+        </span>
+      </div>
+
+      <h1 className="mt-0.5 truncate text-lg font-semibold tracking-tight text-text sm:text-xl lg:text-[22px]">
+        {firstName
+          ? `OlÃ¡, ${firstName}`
+          : "OlÃ¡"}
+      </h1>
+
+      <p className="mt-0.5 hidden truncate text-xs text-text-subtle lg:block">
+        Acompanhe sua saÃºde financeira e os insights da sua IA.
+      </p>
+    </div>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Profile/ProfilePage.tsx
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  CalendarDays,
+  Mail,
+  Phone,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { userMock } from "@/mocks/user.mock";
+import { cn } from "@/lib/utils";
+
+function getUserInitials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+function formatMemberSince(date: string): string {
+  const parsedDate = new Date(`${date}T00:00:00`);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Data nÃ£o informada";
+  }
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    month: "long",
+    year: "numeric",
+  }).format(parsedDate);
+}
+
+interface ProfileInformationProps {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+}
+
+function ProfileInformation({
+  icon: Icon,
+  label,
+  value,
+}: Readonly<ProfileInformationProps>) {
+  return (
+    <div className="flex min-w-0 items-start gap-3 bg-surface p-5 sm:p-6">
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-text-muted">
+        <Icon size={17} aria-hidden="true" />
+      </div>
+
+      <div className="min-w-0">
+        <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
+          {label}
+        </p>
+
+        <p className="mt-1 break-words text-sm font-semibold text-text">
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export function ProfilePage() {
+  const navigate = useNavigate();
+  const initials = getUserInitials(userMock.name);
+
+  return (
+    <section className="mx-auto w-full max-w-5xl space-y-6">
+      <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-primary">
+            Conta
+          </p>
+
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-text sm:text-3xl">
+            Meu perfil
+          </h1>
+
+          <p className="mt-2 text-sm text-text-muted sm:text-base">
+            Consulte seus dados e preferÃªncias da conta.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => navigate("/settings")}
+          className={cn(
+            "inline-flex h-10 items-center justify-center",
+            "rounded-xl bg-primary px-4",
+            "text-sm font-semibold text-primary-foreground",
+            "transition-opacity hover:opacity-90",
+            "focus-visible:outline-none focus-visible:ring-2",
+            "focus-visible:ring-primary focus-visible:ring-offset-2",
+          )}
+        >
+          Editar configuraÃ§Ãµes
+        </button>
+      </header>
+
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
+        <div className="border-b border-border bg-primary/5 p-5 sm:p-8">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <Avatar className="size-20 border-4 border-surface shadow-card sm:size-24">
+              <AvatarImage
+                src={userMock.avatar}
+                alt={`Foto de ${userMock.name}`}
+              />
+
+              <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="min-w-0">
+              <h2 className="truncate text-2xl font-bold text-text">
+                {userMock.name}
+              </h2>
+
+              <p className="mt-1 truncate text-sm text-text-muted">
+                {userMock.email}
+              </p>
+
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">
+                <ShieldCheck size={14} aria-hidden="true" />
+                Perfil financeiro {userMock.financialProfile}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-px bg-border md:grid-cols-2">
+          <ProfileInformation
+            icon={Mail}
+            label="E-mail"
+            value={userMock.email}
+          />
+
+          <ProfileInformation
+            icon={Phone}
+            label="Telefone"
+            value={userMock.phone ?? "NÃ£o informado"}
+          />
+
+          <ProfileInformation
+            icon={BriefcaseBusiness}
+            label="ProfissÃ£o"
+            value={userMock.occupation ?? "NÃ£o informada"}
+          />
+
+          <ProfileInformation
+            icon={CalendarDays}
+            label="Membro desde"
+            value={formatMemberSince(userMock.memberSince)}
+          />
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-surface p-5 shadow-card sm:p-6">
+        <div className="flex items-start gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <UserRound size={19} aria-hidden="true" />
+          </div>
+
+          <div>
+            <h2 className="text-base font-semibold text-text">
+              Dados da conta
+            </h2>
+
+            <p className="mt-1 text-sm leading-6 text-text-muted">
+              Nesta versÃ£o do MVP, os dados sÃ£o demonstrativos.
+              A ediÃ§Ã£o persistente serÃ¡ conectada ao Spring Boot
+              em uma etapa futura.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/pages/Settings/SettingsPage.tsx
+========================================================================================================================
+
+import type { LucideIcon } from "lucide-react";
+import {
+  BellRing,
+  BrainCircuit,
+  Globe2,
+  MoonStar,
+  ShieldCheck,
+  WalletCards,
+} from "lucide-react";
+import type { ReactNode } from "react";
+
+import { ThemeToggle } from "@/components/layout/Header/ThemeToggle";
+import { userMock } from "@/mocks/user.mock";
+import { cn } from "@/lib/utils";
+
+interface SettingsSectionProps {
+  title: string;
+  description: string;
+  children: ReactNode;
+}
+
+interface SettingsRowProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  value: string;
+  muted?: boolean;
+}
+
+interface SettingsToggleProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  defaultChecked: boolean;
+}
+
+function SettingsSection({
+  title,
+  description,
+  children,
+}: Readonly<SettingsSectionProps>) {
+  return (
+    <section className="overflow-hidden rounded-2xl border border-border bg-surface shadow-card">
+      <header className="border-b border-border px-5 py-4 sm:px-6">
+        <h2 className="text-base font-semibold text-text">
+          {title}
+        </h2>
+
+        <p className="mt-1 text-sm text-text-muted">
+          {description}
+        </p>
+      </header>
+
+      <div className="divide-y divide-border">
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function SettingsRow({
+  icon: Icon,
+  title,
+  description,
+  value,
+  muted = false,
+}: Readonly<SettingsRowProps>) {
+  return (
+    <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div className="flex min-w-0 items-start gap-3">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Icon size={19} aria-hidden="true" />
+        </div>
+
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-text">
+            {title}
+          </h3>
+
+          <p className="mt-1 text-sm leading-6 text-text-muted">
+            {description}
+          </p>
+        </div>
+      </div>
+
+      <span
+        className={cn(
+          "shrink-0 text-sm font-semibold",
+          muted ? "text-text-muted" : "text-text",
+        )}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function SettingsToggle({
+  icon: Icon,
+  title,
+  description,
+  defaultChecked,
+}: Readonly<SettingsToggleProps>) {
+  return (
+    <div className="flex items-start justify-between gap-4 p-5 sm:items-center sm:p-6">
+      <div className="flex min-w-0 items-start gap-3">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Icon size={19} aria-hidden="true" />
+        </div>
+
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-text">
+            {title}
+          </h3>
+
+          <p className="mt-1 text-sm leading-6 text-text-muted">
+            {description}
+          </p>
+        </div>
+      </div>
+
+      <label className="relative mt-1 inline-flex shrink-0 cursor-pointer items-center sm:mt-0">
+        <input
+          type="checkbox"
+          defaultChecked={defaultChecked}
+          className="peer sr-only"
+          aria-label={title}
+        />
+
+        <span
+          className={cn(
+            "relative h-6 w-11 rounded-full bg-surface-muted",
+            "transition-colors duration-200",
+            "peer-checked:bg-primary",
+            "peer-focus-visible:ring-2",
+            "peer-focus-visible:ring-primary",
+            "peer-focus-visible:ring-offset-2",
+            "after:absolute after:left-1 after:top-1",
+            "after:size-4 after:rounded-full after:bg-white",
+            "after:shadow-sm after:transition-transform",
+            "peer-checked:after:translate-x-5",
+          )}
+        />
+      </label>
+    </div>
+  );
+}
+
+export function SettingsPage() {
+  const languageLabel =
+    userMock.preferences.language === "pt-BR"
+      ? "PortuguÃªs (Brasil)"
+      : "English";
+
+  return (
+    <section className="mx-auto w-full max-w-5xl space-y-6">
+      <header>
+        <p className="text-sm font-medium text-primary">
+          PreferÃªncias
+        </p>
+
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-text sm:text-3xl">
+          ConfiguraÃ§Ãµes
+        </h1>
+
+        <p className="mt-2 max-w-2xl text-sm text-text-muted sm:text-base">
+          Personalize a experiÃªncia e escolha quais informaÃ§Ãµes deseja
+          receber do Finance AI.
+        </p>
+      </header>
+
+      <SettingsSection
+        title="Geral"
+        description="PreferÃªncias bÃ¡sicas de idioma e moeda."
+      >
+        <SettingsRow
+          icon={Globe2}
+          title="Idioma"
+          description="Idioma utilizado na interface."
+          value={languageLabel}
+        />
+
+        <SettingsRow
+          icon={WalletCards}
+          title="Moeda principal"
+          description="Moeda utilizada nos indicadores financeiros."
+          value={userMock.preferences.currency}
+        />
+      </SettingsSection>
+
+      <SettingsSection
+        title="AparÃªncia"
+        description="Escolha como a interface serÃ¡ exibida."
+      >
+        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <MoonStar size={19} aria-hidden="true" />
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-text">
+                Tema da interface
+              </h3>
+
+              <p className="mt-1 text-sm leading-6 text-text-muted">
+                Alterne entre os modos claro e escuro.
+              </p>
+            </div>
+          </div>
+
+          <ThemeToggle />
+        </div>
+      </SettingsSection>
+
+      <SettingsSection
+        title="NotificaÃ§Ãµes"
+        description="Controle as comunicaÃ§Ãµes financeiras."
+      >
+        <SettingsToggle
+          icon={BellRing}
+          title="Alertas financeiros"
+          description="Receber avisos sobre gastos elevados e riscos."
+          defaultChecked={
+            userMock.preferences.receiveFinancialAlerts
+          }
+        />
+
+        <SettingsToggle
+          icon={BrainCircuit}
+          title="RecomendaÃ§Ãµes da IA"
+          description="Receber orientaÃ§Ãµes personalizadas do Finance AI."
+          defaultChecked={
+            userMock.preferences.receiveAiRecommendations
+          }
+        />
+
+        <SettingsToggle
+          icon={WalletCards}
+          title="Resumo mensal"
+          description="Receber um resumo da evoluÃ§Ã£o financeira."
+          defaultChecked={
+            userMock.preferences.receiveMonthlySummary
+          }
+        />
+      </SettingsSection>
+
+      <SettingsSection
+        title="Privacidade e seguranÃ§a"
+        description="Recursos de seguranÃ§a da conta."
+      >
+        <SettingsRow
+          icon={ShieldCheck}
+          title="SeguranÃ§a da conta"
+          description="AlteraÃ§Ã£o de senha e autenticaÃ§Ã£o em duas etapas."
+          value="Em breve"
+          muted
+        />
+      </SettingsSection>
+    </section>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/auth.ts
+========================================================================================================================
+
+export interface LoginRequest {
+  email: string;
+  senha: string;
+}
+
+export interface LoginResponse {
+  token: string;
+}
+
+export interface RegisterRequest {
+  nome: string;
+  email: string;
+  senha: string;
+}
+
+export interface AuthUser {
+  id: number;
+  nome: string;
+  email: string;
+  ativo: boolean;
+}
+
+export interface AuthState {
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
+
+export interface AuthContextData extends AuthState {
+  login: (
+    credentials: LoginRequest,
+  ) => Promise<void>;
+
+  logout: () => void;
+
+  checkAuth: () => Promise<void>;
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/types/user.ts
+========================================================================================================================
+
+export type UserFinancialProfile =
+  | "Excelente"
+  | "Bom"
+  | "Regular"
+  | "Baixo";
+
+export type UserCurrency = "BRL" | "USD" | "EUR";
+
+export type UserLanguage = "pt-BR" | "en-US";
+
+export interface UserPreferences {
+  currency: UserCurrency;
+  language: UserLanguage;
+  receiveFinancialAlerts: boolean;
+  receiveAiRecommendations: boolean;
+  receiveMonthlySummary: boolean;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  phone?: string;
+  occupation?: string;
+  financialProfile: UserFinancialProfile;
+  memberSince: string;
+  preferences: UserPreferences;
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/services/auth.service.ts
+========================================================================================================================
+
+import {
+  api,
+  getAccessToken,
+  removeAccessToken,
+  saveAccessToken,
+} from "@/services/api";
+
+import type {
+  AuthUser,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+} from "@/types/auth";
+
+const LOGIN_ENDPOINT = "/auth/login";
+const USERS_ENDPOINT = "/users";
+const PROFILE_ENDPOINT = "/users/me";
+
+export async function login(
+  credentials: LoginRequest,
+): Promise<void> {
+  const { data } =
+    await api.post<LoginResponse>(
+      LOGIN_ENDPOINT,
+      credentials,
+    );
+
+  if (!data.token) {
+    throw new Error(
+      "Token de autenticaÃ§Ã£o nÃ£o retornado pelo servidor.",
+    );
+  }
+
+  saveAccessToken(data.token);
+}
+
+export async function registerUser(
+  payload: RegisterRequest,
+): Promise<AuthUser> {
+  const { data } =
+    await api.post<AuthUser>(
+      USERS_ENDPOINT,
+      payload,
+    );
+
+  return data;
+}
+
+export async function getProfile(): Promise<AuthUser> {
+  const { data } =
+    await api.get<AuthUser>(
+      PROFILE_ENDPOINT,
+    );
+
+  return data;
+}
+
+export function logout(): void {
+  removeAccessToken();
+}
+
+export function hasStoredToken(): boolean {
+  return Boolean(
+    getAccessToken(),
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/contexts/AuthContext/AuthContext.tsx
+========================================================================================================================
+
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+
+import {
+  getProfile,
+  hasStoredToken,
+  login as loginService,
+  logout as logoutService,
+} from "@/services/auth.service";
+
+import type {
+  AuthContextData,
+  AuthState,
+  LoginRequest,
+} from "@/types/auth";
+
+export const AuthContext =
+  createContext<AuthContextData | undefined>(
+    undefined,
+  );
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+const ANONYMOUS_STATE: AuthState = {
+  user: null,
+  isAuthenticated: false,
+  isLoading: false,
+};
+
+export function AuthContextProvider({
+  children,
+}: Readonly<AuthProviderProps>) {
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    isAuthenticated: false,
+    isLoading: true,
+  });
+
+  const logout = useCallback((): void => {
+    logoutService();
+
+    setState(ANONYMOUS_STATE);
+  }, []);
+
+  const checkAuth =
+    useCallback(async (): Promise<void> => {
+      if (!hasStoredToken()) {
+        setState(ANONYMOUS_STATE);
+        return;
+      }
+
+      setState((currentState) => ({
+        ...currentState,
+        isLoading: true,
+      }));
+
+      try {
+        const user = await getProfile();
+
+        setState({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } catch {
+        logoutService();
+
+        setState(ANONYMOUS_STATE);
+      }
+    }, []);
+
+  useEffect(() => {
+    void checkAuth();
+  }, [checkAuth]);
+
+  const login = useCallback(
+    async (
+      credentials: LoginRequest,
+    ): Promise<void> => {
+      setState((currentState) => ({
+        ...currentState,
+        isLoading: true,
+      }));
+
+      try {
+        await loginService(credentials);
+
+        const user = await getProfile();
+
+        setState({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } catch (error) {
+        logoutService();
+
+        setState(ANONYMOUS_STATE);
+
+        throw error;
+      }
+    },
+    [],
+  );
+
+  const value = useMemo<AuthContextData>(
+    () => ({
+      ...state,
+      login,
+      logout,
+      checkAuth,
+    }),
+    [
+      state,
+      login,
+      logout,
+      checkAuth,
+    ],
+  );
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+========================================================================================================================
+ARQUIVO: frontend/src/mocks/user.mock.ts
+========================================================================================================================
+
+import type { User } from "@/types/user";
+
+export const userMock: User = {
+  id: "user-001",
+  name: "Mariana Costa",
+  email: "mariana.costa@email.com",
+  avatar: "",
+  phone: "(98) 99999-9999",
+  occupation: "Analista financeira",
+  financialProfile: "Excelente",
+  memberSince: "2026-01-15",
+
+  preferences: {
+    currency: "BRL",
+    language: "pt-BR",
+    receiveFinancialAlerts: true,
+    receiveAiRecommendations: true,
+    receiveMonthlySummary: true,
+  },
+};
+
+========================================================================================================================
+ARQUIVO: frontend/src/mocks/dashboard.mock.tsx
+========================================================================================================================
+
+import {
+  ArrowDownCircle,
+  ArrowUpCircle,
+  DollarSign,
+  Wallet,
+} from "lucide-react";
+
+import type { FinancialAlert } from "@/components/dashboard/Alerts";
+import type { DashboardMock } from "@/types/dashboard";
+
+export const dashboardMock: DashboardMock = {
+  summary: [
+    {
+      id: "balance",
+      title: "Saldo atual",
+      value: "R$ 18.540,25",
+      variation: "+8,4% este mÃªs",
+      trend: "up",
+      icon: (
+        <Wallet
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
+    },
+    {
+      id: "income",
+      title: "Receitas",
+      value: "R$ 24.300,00",
+      variation: "+12,8%",
+      trend: "up",
+      icon: (
+        <ArrowUpCircle
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
+    },
+    {
+      id: "expenses",
+      title: "Despesas",
+      value: "R$ 5.759,75",
+      variation: "-3,2%",
+      trend: "down",
+      icon: (
+        <ArrowDownCircle
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
+    },
+    {
+      id: "score",
+      title: "Score financeiro",
+      value: "91",
+      variation: "Excelente",
+      trend: "up",
+      icon: (
+        <DollarSign
+          className="size-5"
+          aria-hidden="true"
+        />
+      ),
+    },
+  ],
+
+  cashFlow: [
+    {
+      month: "Jan",
+      income: 42000,
+      expenses: 21000,
+    },
+    {
+      month: "Fev",
+      income: 38000,
+      expenses: 19000,
+    },
+    {
+      month: "Mar",
+      income: 45000,
+      expenses: 22000,
+    },
+    {
+      month: "Abr",
+      income: 47000,
+      expenses: 24000,
+    },
+    {
+      month: "Mai",
+      income: 50000,
+      expenses: 26000,
+    },
+    {
+      month: "Jun",
+      income: 52000,
+      expenses: 28000,
+    },
+  ],
+
+  categories: [
+    {
+      name: "Moradia",
+      value: 24000,
+    },
+    {
+      name: "AlimentaÃ§Ã£o",
+      value: 16000,
+    },
+    {
+      name: "EducaÃ§Ã£o",
+      value: 12000,
+    },
+    {
+      name: "Transporte",
+      value: 8000,
+    },
+    {
+      name: "Lazer",
+      value: 6000,
+    },
+  ],
+
+  transactions: [
+    {
+      id: 1,
+      description: "SalÃ¡rio",
+      category: "Receita",
+      amount: 12000,
+      date: "2026-07-05",
+      type: "income",
+      status: "completed",
+    },
+    {
+      id: 2,
+      description: "Supermercado Mateus",
+      category: "AlimentaÃ§Ã£o",
+      amount: -350.45,
+      date: "2026-07-08",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 3,
+      description: "Netflix",
+      category: "Assinatura",
+      amount: -39.9,
+      date: "2026-07-09",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 4,
+      description: "Posto Shell",
+      category: "Transporte",
+      amount: -220,
+      date: "2026-07-10",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 5,
+      description: "Aluguel",
+      category: "Moradia",
+      amount: -1800,
+      date: "2026-07-01",
+      type: "expense",
+      status: "completed",
+    },
+    {
+      id: 6,
+      description: "Freelance React",
+      category: "Receita",
+      amount: 2800,
+      date: "2026-07-12",
+      type: "income",
+      status: "completed",
+    },
+    {
+      id: 7,
+      description: "Conta de energia",
+      category: "Moradia",
+      amount: -245.8,
+      date: "2026-07-13",
+      type: "expense",
+      status: "pending",
+    },
+    {
+      id: 8,
+      description: "FarmÃ¡cia",
+      category: "SaÃºde",
+      amount: -89.5,
+      date: "2026-07-14",
+      type: "expense",
+      status: "completed",
+    },
+  ],
+
+  financialHealth: {
+    score: 91,
+    maxScore: 100,
+    classification: "Excelente",
+    variation: "+8 pontos este mÃªs",
+
+    insights: [
+      "VocÃª reduziu seus gastos com alimentaÃ§Ã£o em 12% neste mÃªs.",
+      "Sua renda aumentou 8% em relaÃ§Ã£o ao mÃªs anterior.",
+      "Seu score financeiro permanece acima da mÃ©dia dos usuÃ¡rios.",
+      "VocÃª pode economizar atÃ© R$ 420 reduzindo gastos recorrentes.",
+    ],
+
+    alerts: [
+      {
+        id: 1,
+        title: "Despesas recorrentes aumentaram",
+        description:
+          "Seus gastos recorrentes cresceram 12% em relaÃ§Ã£o ao mÃªs anterior.",
+        type: "warning",
+        actionLabel: "Ver despesas",
+      },
+      {
+        id: 2,
+        title: "Gastos com alimentaÃ§Ã£o acima da mÃ©dia",
+        description:
+          "A categoria alimentaÃ§Ã£o representa 28% das suas despesas deste mÃªs.",
+        type: "danger",
+        actionLabel: "Analisar categoria",
+      },
+      {
+        id: 3,
+        title: "Receita mensal aumentou",
+        description:
+          "Sua receita apresentou crescimento de 8% em comparaÃ§Ã£o ao mÃªs anterior.",
+        type: "success",
+      },
+    ] satisfies FinancialAlert[],
+  },
+};
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/controller/UserController.java
+========================================================================================================================
+
+package br.com.financeai.controller;
+
+import br.com.financeai.dto.request.UserRegisterDto;
+import br.com.financeai.dto.request.UserUpdateDto;
+import br.com.financeai.dto.response.UserResponseDto;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.ApiErrorResponse;
+import br.com.financeai.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+/**
+ * Endpoints de gestÃ£o do prÃ³prio perfil do usuÃ¡rio autenticado:
+ * consulta, atualizaÃ§Ã£o parcial e desativaÃ§Ã£o de conta.
+ */
+@Tag(
+        name = "Users",
+        description = "Protected endpoints for managing the authenticated user's profile."
+)
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+  
+   @Operation(
+            summary = "Register a new user",
+            description = """
+                Creates a new user account.
+
+                Authentication:
+                This endpoint is public and does not require a JWT token.
+
+                Behavior:
+                Validates the registration data, requires a unique email address
+                and encrypts the password before storing it. The password is never
+                included in the API response.
+                """
+    )
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "User registered successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid registration data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email address already registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+
+    @PostMapping
+    public ResponseEntity<UserResponseDto> cadastrar(@RequestBody @Valid UserRegisterDto dto, UriComponentsBuilder uriBuilder) {
+        UserResponseDto response = userService.cadastrar(dto);
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(response.id()).toUri();
+        return ResponseEntity.created(uri).body(response);
+    }
+
+    @Operation(
+            summary = "Get authenticated user",
+            description = """
+                Returns the profile information of the currently authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Identifies the user from the token and returns their profile data
+                without exposing sensitive information such as the password.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDto> obterPerfil(@AuthenticationPrincipal AppUser usuarioLogado) {
+        UserResponseDto response = userService.buscarPerfil(usuarioLogado);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Update authenticated user",
+            description = """
+                Updates the profile information of the currently authenticated user.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Allows the authenticated user to update their own account information.
+                If the email is changed, the new address must not already belong to
+                another user. A new password is encrypted before being stored.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User updated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email address already registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PutMapping("/me")
+    public ResponseEntity<UserResponseDto> atualizarPerfil(
+            @AuthenticationPrincipal AppUser usuarioLogado,
+            @RequestBody @Valid UserUpdateDto dto) {
+        UserResponseDto response = userService.atualizarPerfil(usuarioLogado, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Deactivate authenticated user",
+            description = """
+                Deactivates the currently authenticated user's account.
+
+                Authentication:
+                Requires a valid JWT access token in the Authorization header using
+                the format: Bearer {token}.
+
+                Behavior:
+                Performs a logical deletion by marking the account as inactive.
+                The user record remains stored in the database, but the account
+                must no longer be authorized to access protected endpoints.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "User deactivated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> desativarConta(@AuthenticationPrincipal AppUser usuarioLogado) {
+        userService.desativarConta(usuarioLogado);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/service/UserService.java
+========================================================================================================================
+
+package br.com.financeai.service;
+
+import br.com.financeai.dto.request.AuthenticationRequest;
+import br.com.financeai.dto.request.UserRegisterDto;
+import br.com.financeai.dto.request.UserUpdateDto;
+import br.com.financeai.dto.response.UserResponseDto;
+import br.com.financeai.entity.AppUser;
+import br.com.financeai.exception.*;
+import br.com.financeai.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * ResponsÃ¡vel pelo ciclo de vida da conta do usuÃ¡rio: cadastro, consulta
+ * e atualizaÃ§Ã£o de perfil, desativaÃ§Ã£o e reativaÃ§Ã£o de conta.
+ * <p>
+ * A conta Ã© removida via soft delete ({@code ativo = false}) em vez de
+ * exclusÃ£o fÃ­sica, preservando o histÃ³rico de transaÃ§Ãµes e anÃ¡lises
+ * vinculado ao usuÃ¡rio.
+ */
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    /**
+     * Cadastra um novo usuÃ¡rio, criptografando a senha antes de persistir.
+     *
+     * @param dto dados de cadastro (nome, e-mail e senha em texto puro).
+     * @return resposta contendo os dados pÃºblicos do usuÃ¡rio recÃ©m-criado.
+     * @throws BusinessException caso o e-mail informado pertenÃ§a a uma conta desativada.
+     * @throws UserAlreadyExistsException caso o e-mail jÃ¡ esteja em uso por uma conta ativa.
+     * @throws DatabaseException caso duas requisiÃ§Ãµes concorrentes cadastrem o mesmo e-mail
+     *         simultaneamente, e a constraint de unicidade do banco rejeite o registro.
+     */
+    @Transactional
+    public UserResponseDto cadastrar(UserRegisterDto dto) {
+        if (userRepository.existsByEmail(dto.email())) {
+            AppUser existente = userRepository.findByEmail(dto.email()).get();
+            if (!existente.isAtivo()) {
+                throw new BusinessException("Este e-mail pertence a uma conta desativada. Entre em contato com o suporte para reativaÃ§Ã£o.");
+            }
+            throw new UserAlreadyExistsException("E-mail jÃ¡ cadastrado no sistema.");
+        }
+
+        AppUser usuario = new AppUser();
+        usuario.setNome(dto.nome());
+        usuario.setEmail(dto.email());
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
+        usuario.setAtivo(true);
+
+        try {
+            userRepository.save(usuario);
+        } catch (DataIntegrityViolationException ex) {
+
+            throw new DatabaseException("E-mail jÃ¡ cadastrado no sistema.", ex);
+        }
+
+        return new UserResponseDto(usuario);
+    }
+
+    /**
+     * Retorna o perfil do usuÃ¡rio autenticado.
+     *
+     * @param usuarioLogado usuÃ¡rio extraÃ­do do token JWT.
+     * @return resposta contendo os dados pÃºblicos do usuÃ¡rio.
+     */
+    public UserResponseDto buscarPerfil(AppUser usuarioLogado) {
+        return new UserResponseDto(usuarioLogado);
+    }
+
+    /**
+     * Atualiza parcialmente o perfil do usuÃ¡rio autenticado â€” apenas os
+     * campos enviados (nÃ£o nulos e nÃ£o vazios) sÃ£o alterados.
+     *
+     * @param usuarioLogado usuÃ¡rio extraÃ­do do token JWT.
+     * @param dto campos a serem atualizados (nome, e-mail e/ou senha), todos opcionais.
+     * @return resposta contendo os dados pÃºblicos do usuÃ¡rio apÃ³s a atualizaÃ§Ã£o.
+     * @throws UserNotFoundException caso o usuÃ¡rio nÃ£o seja encontrado no banco de dados.
+     * @throws UserAlreadyExistsException caso o novo e-mail informado jÃ¡ esteja em uso por outra conta.
+     */
+    @Transactional
+    public UserResponseDto atualizarPerfil(AppUser usuarioLogado, UserUpdateDto dto) {
+        AppUser usuario = userRepository.findById(usuarioLogado.getId())
+                .orElseThrow(() -> new UserNotFoundException("UsuÃ¡rio nÃ£o encontrado."));
+
+        if (dto.email() != null && !dto.email().isBlank() && !dto.email().equalsIgnoreCase(usuario.getEmail())) {
+            if (userRepository.existsByEmail(dto.email())) {
+                throw new UserAlreadyExistsException("O e-mail informado jÃ¡ estÃ¡ em uso.");
+            }
+            usuario.setEmail(dto.email());
+        }
+
+        if (dto.nome() != null && !dto.nome().isBlank()) {
+            usuario.setNome(dto.nome());
+        }
+
+        if (dto.senha() != null && !dto.senha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(dto.senha()));
+        }
+
+        return new UserResponseDto(usuario);
+    }
+
+    /**
+     * Desativa a conta do usuÃ¡rio autenticado (soft delete).
+     *  <p>
+     * Uma conta desativada nÃ£o consegue mais autenticar â€” nem via login
+     * normal, nem atravÃ©s de um token JWT emitido antes da desativaÃ§Ã£o.
+     *
+     * @param usuarioLogado usuÃ¡rio extraÃ­do do token JWT.
+     * @throws UserNotFoundException caso o usuÃ¡rio nÃ£o seja encontrado no banco de dados.
+     * @throws BusinessException caso a conta jÃ¡ esteja desativada.
+     */
+    @Transactional
+    public void desativarConta(AppUser usuarioLogado) {
+        AppUser usuario = userRepository.findById(usuarioLogado.getId())
+                .orElseThrow(() -> new UserNotFoundException("UsuÃ¡rio nÃ£o encontrado."));
+
+        if (!usuario.isAtivo()) {
+            throw new BusinessException("Esta conta jÃ¡ estÃ¡ desativada.");
+        }
+
+        usuario.setAtivo(false);
+        userRepository.save(usuario);
+    }
+
+    /**
+     * Reativa uma conta desativada, validando a senha diretamente contra o
+     * hash salvo â€” nÃ£o passa pelo {@code AuthenticationManager}, jÃ¡ que ele
+     * rejeitaria a autenticaÃ§Ã£o de uma conta desabilitada por padrÃ£o.
+     *
+     * @param dados e-mail e senha da conta a ser reativada.
+     * @throws UserNotFoundException caso nÃ£o exista usuÃ¡rio com o e-mail informado.
+     * @throws BusinessException caso a conta jÃ¡ esteja ativa.
+     * @throws AuthenticationException caso a senha informada esteja incorreta.
+     */
+    @Transactional
+    public void reativarConta(AuthenticationRequest dados) {
+        AppUser usuario = userRepository.findByEmail(dados.email())
+                .orElseThrow(() -> new UserNotFoundException("UsuÃ¡rio nÃ£o encontrado."));
+
+        if (usuario.isAtivo()) {
+            throw new BusinessException("Esta conta jÃ¡ estÃ¡ ativa.");
+        }
+
+        if (!passwordEncoder.matches(dados.senha(), usuario.getSenha())) {
+            throw new AuthenticationException("E-mail ou senha invÃ¡lidos.");
+        }
+
+        usuario.setAtivo(true);
+        userRepository.save(usuario);
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/response/UserResponseDto.java
+========================================================================================================================
+
+package br.com.financeai.dto.response;
+
+import br.com.financeai.entity.AppUser;
+
+/** Dados pÃºblicos do usuÃ¡rio â€” nunca inclui a senha, mesmo criptografada. */
+public record UserResponseDto(
+        Long id,
+        String nome,
+        String email,
+        boolean ativo
+) {
+    public UserResponseDto(AppUser usuario) {
+        this(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.isAtivo());
+    }
+}
+
+
+========================================================================================================================
+ARQUIVO: backend/src/main/java/br/com/financeai/dto/request/UserUpdateDto.java
+========================================================================================================================
+
+package br.com.financeai.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
+
+/** Campos opcionais para atualizaÃ§Ã£o parcial do perfil do usuÃ¡rio. */
+public record UserUpdateDto(
+        @Size(max = 100, message = "O nome nÃ£o pode ter mais de 100 caracteres")
+        String nome,
+
+        @Email(message = "Formato de e-mail invÃ¡lido")
+        @Size(max = 150, message = "O e-mail nÃ£o pode ter mais de 150 caracteres")
+        String email,
+
+        @Size(min = 6, max = 20, message = "A senha deve conter entre 6 e 20 caracteres")
+        String senha
+) {}
+

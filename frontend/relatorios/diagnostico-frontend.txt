@@ -1,0 +1,1289 @@
+﻿
+====================================================================================================
+.\src\components\dashboard\AIProfileCard\AIProfileCard.tsx
+====================================================================================================
+import {
+  AlertTriangle,
+  ArrowRight,
+  BrainCircuit,
+  CheckCircle2,
+  ShieldAlert,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+import { AIConfidenceGauge } from "./AIConfidenceGauge";
+
+import type {
+  AIClassificationVisualConfig,
+  AIFinancialClassification,
+  AIFinancialIndicatorStatus,
+  AIFinancialProfile,
+  AIProfileCardProps,
+} from "./AIProfileCard.types";
+
+const defaultProfile: AIFinancialProfile = {
+  classification: "attention",
+  riskLabel: "Risco moderado",
+  confidence: 82,
+  indicators: [
+    {
+      id: "debt-level",
+      label: "NÃ­vel de endividamento",
+      value: 25,
+      status: "good",
+    },
+    {
+      id: "income-commitment",
+      label: "Comprometimento da renda",
+      value: 75,
+      status: "attention",
+    },
+    {
+      id: "savings-rate",
+      label: "Taxa de poupanÃ§a",
+      value: 25,
+      status: "good",
+    },
+  ],
+};
+
+const classificationConfig: Record<
+  AIFinancialClassification,
+  AIClassificationVisualConfig
+> = {
+  healthy: {
+    label: "SaudÃ¡vel",
+    description:
+      "Sua situaÃ§Ã£o financeira apresenta bons indicadores.",
+    accentClassName: "bg-success",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    iconClassName: "text-success",
+  },
+
+  attention: {
+    label: "Em observaÃ§Ã£o",
+    description:
+      "Alguns indicadores precisam de acompanhamento.",
+    accentClassName: "bg-warning",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+
+  risk: {
+    label: "Em risco",
+    description:
+      "Existem indicadores financeiros que exigem aÃ§Ã£o.",
+    accentClassName: "bg-danger",
+    badgeClassName:
+      "border-danger/20 bg-danger/10 text-danger",
+    iconContainerClassName:
+      "border-danger/20 bg-danger/10",
+    iconClassName: "text-danger",
+  },
+};
+
+const indicatorStatusConfig: Record<
+  AIFinancialIndicatorStatus,
+  {
+    label: string;
+    badgeClassName: string;
+    progressClassName: string;
+  }
+> = {
+  good: {
+    label: "Bom",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+    progressClassName: "bg-success",
+  },
+
+  attention: {
+    label: "AtenÃ§Ã£o",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+    progressClassName: "bg-warning",
+  },
+
+  critical: {
+    label: "CrÃ­tico",
+    badgeClassName:
+      "border-danger/20 bg-danger/10 text-danger",
+    progressClassName: "bg-danger",
+  },
+};
+
+function getClassificationIcon(
+  classification: AIFinancialClassification,
+) {
+  switch (classification) {
+    case "healthy":
+      return ShieldCheck;
+
+    case "attention":
+      return ShieldAlert;
+
+    case "risk":
+      return AlertTriangle;
+  }
+}
+
+export function AIProfileCard({
+  title = "Como a IA classificou sua situaÃ§Ã£o?",
+  description = "Perfil financeiro gerado pela anÃ¡lise inteligente.",
+  profile = defaultProfile,
+  onViewDetails,
+}: Readonly<AIProfileCardProps>) {
+  const safeConfidence = Math.min(
+    Math.max(profile.confidence, 0),
+    100,
+  );
+
+  const classification =
+    classificationConfig[
+      profile.classification
+    ];
+
+  const ClassificationIcon =
+    getClassificationIcon(
+      profile.classification,
+    );
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <CardTitle className="text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-primary/20",
+            "bg-primary/10 text-primary-bright",
+          )}
+          aria-hidden="true"
+        >
+          <BrainCircuit size={18} />
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        <div
+          className={cn(
+            "relative overflow-hidden",
+            "rounded-[16px] border border-border",
+            "bg-surface-elevated/55 p-4",
+          )}
+        >
+          <span
+            className={cn(
+              "absolute inset-y-0 left-0 w-0.5",
+              classification.accentClassName,
+            )}
+            aria-hidden="true"
+          />
+
+          <div
+            className={cn(
+              "grid min-w-0 grid-cols-1",
+              "items-center gap-4",
+              "sm:grid-cols-[minmax(0,1fr)_auto]",
+            )}
+          >
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-start gap-3">
+                <div
+                  className={cn(
+                    "flex size-10 shrink-0",
+                    "items-center justify-center",
+                    "rounded-[12px] border",
+                    classification.iconContainerClassName,
+                    classification.iconClassName,
+                  )}
+                  aria-hidden="true"
+                >
+                  <ClassificationIcon size={18} />
+                </div>
+
+                <div className="min-w-0">
+                  <span
+                    className={cn(
+                      "inline-flex rounded-full border",
+                      "px-2.5 py-1",
+                      "text-[9px] font-semibold",
+                      "uppercase tracking-[0.08em]",
+                      classification.badgeClassName,
+                    )}
+                  >
+                    {classification.label}
+                  </span>
+
+                  <p className="mt-2 text-xs font-semibold text-text">
+                    {profile.riskLabel}
+                  </p>
+
+                  <p className="mt-1 text-xs leading-5 text-text-muted">
+                    {classification.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <AIConfidenceGauge
+              value={safeConfidence}
+            />
+          </div>
+        </div>
+
+        <div
+          className="mt-4 space-y-2.5"
+          aria-label="Indicadores da classificaÃ§Ã£o financeira"
+        >
+          {profile.indicators.map(
+            (indicator) => {
+              const safeValue = Math.min(
+                Math.max(
+                  indicator.value,
+                  0,
+                ),
+                100,
+              );
+
+              const status =
+                indicatorStatusConfig[
+                  indicator.status
+                ];
+
+              return (
+                <div
+                  key={indicator.id}
+                  className={cn(
+                    "rounded-[12px]",
+                    "border border-border-muted",
+                    "bg-background/30",
+                    "px-3 py-2.5",
+                  )}
+                >
+                  <div className="flex min-w-0 items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <CheckCircle2
+                        size={14}
+                        className={cn(
+                          "shrink-0",
+                          indicator.status === "good"
+                            ? "text-success"
+                            : indicator.status ===
+                                "attention"
+                              ? "text-warning"
+                              : "text-danger",
+                        )}
+                        aria-hidden="true"
+                      />
+
+                      <span className="truncate text-[11px] font-medium text-text-muted">
+                        {indicator.label}
+                      </span>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="text-[10px] font-semibold tabular-nums text-text">
+                        {safeValue}%
+                      </span>
+
+                      <span
+                        className={cn(
+                          "rounded-full border",
+                          "px-2 py-0.5",
+                          "text-[9px] font-semibold",
+                          status.badgeClassName,
+                        )}
+                      >
+                        {status.label}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-muted">
+                    <div
+                      className={cn(
+                        "h-full rounded-full",
+                        "transition-[width] duration-500",
+                        status.progressClassName,
+                      )}
+                      style={{
+                        width: `${safeValue}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            },
+          )}
+        </div>
+
+        <div
+          className={cn(
+            "mt-4 flex items-center",
+            "justify-between gap-3",
+            "rounded-[12px]",
+            "border border-primary/15",
+            "bg-primary/5 px-3 py-2.5",
+          )}
+        >
+          <div className="flex min-w-0 items-center gap-2">
+            <BrainCircuit
+              size={14}
+              className="shrink-0 text-primary-bright"
+              aria-hidden="true"
+            />
+
+            <span className="text-[10px] leading-4 text-text-muted">
+              Resultado gerado pela anÃ¡lise do Finance AI.
+            </span>
+          </div>
+
+          <span className="shrink-0 text-[10px] font-semibold tabular-nums text-primary-bright">
+            {safeConfidence}% confiÃ¡vel
+          </span>
+        </div>
+
+        {onViewDetails && (
+          <button
+            type="button"
+            onClick={onViewDetails}
+            className={cn(
+              "mt-4 inline-flex h-10",
+              "w-full items-center",
+              "justify-center gap-2",
+              "rounded-[12px]",
+              "border border-primary/15",
+              "bg-primary/5",
+              "text-xs font-semibold",
+              "text-primary-bright",
+              "transition-[border-color,background-color]",
+              "hover:border-primary/30",
+              "hover:bg-primary/10",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary/40",
+            )}
+          >
+            Ver detalhes
+
+            <ArrowRight
+              size={14}
+              aria-hidden="true"
+            />
+          </button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+====================================================================================================
+.\src\components\dashboard\TransactionsTable\TransactionsTableRow.tsx
+====================================================================================================
+import type { LucideIcon } from "lucide-react";
+import {
+  Banknote,
+  CarFront,
+  CircleDollarSign,
+  CreditCard,
+  Dumbbell,
+  HeartPulse,
+  Home,
+  ReceiptText,
+  ShoppingBasket,
+  Utensils,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type { TransactionsTableRowProps } from "./TransactionsTable.types";
+
+interface CategoryVisual {
+  icon: LucideIcon;
+  iconContainerClassName: string;
+  iconClassName: string;
+}
+
+const currencyFormatter = new Intl.NumberFormat(
+  "pt-BR",
+  {
+    style: "currency",
+    currency: "BRL",
+  },
+);
+
+const dateFormatter = new Intl.DateTimeFormat(
+  "pt-BR",
+  {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  },
+);
+
+const categoryVisuals: Record<
+  string,
+  CategoryVisual
+> = {
+  receita: {
+    icon: CircleDollarSign,
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    iconClassName: "text-success",
+  },
+
+  alimentaÃ§Ã£o: {
+    icon: ShoppingBasket,
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+
+  assinatura: {
+    icon: CreditCard,
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+  },
+
+  transporte: {
+    icon: CarFront,
+    iconContainerClassName:
+      "border-info/20 bg-info/10",
+    iconClassName: "text-info",
+  },
+
+  moradia: {
+    icon: Home,
+    iconContainerClassName:
+      "border-secondary/20 bg-secondary/10",
+    iconClassName: "text-secondary-bright",
+  },
+
+  saÃºde: {
+    icon: HeartPulse,
+    iconContainerClassName:
+      "border-danger/20 bg-danger/10",
+    iconClassName: "text-danger",
+  },
+
+  academia: {
+    icon: Dumbbell,
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+  },
+
+  restaurante: {
+    icon: Utensils,
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+};
+
+const fallbackCategoryVisual: CategoryVisual = {
+  icon: ReceiptText,
+  iconContainerClassName:
+    "border-border bg-surface-muted",
+  iconClassName: "text-text-muted",
+};
+
+function normalizeCategory(
+  category: string,
+): string {
+  return category
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("pt-BR");
+}
+
+function getCategoryVisual(
+  category: string,
+): CategoryVisual {
+  const normalizedCategory =
+    normalizeCategory(category);
+
+  const matchingEntry = Object.entries(
+    categoryVisuals,
+  ).find(([key]) =>
+    normalizedCategory.includes(
+      normalizeCategory(key),
+    ),
+  );
+
+  return (
+    matchingEntry?.[1] ??
+    fallbackCategoryVisual
+  );
+}
+
+function parseLocalDate(
+  date: string,
+): Date {
+  return new Date(`${date}T00:00:00`);
+}
+
+export function TransactionsTableRow({
+  transaction,
+}: Readonly<TransactionsTableRowProps>) {
+  const isIncome =
+    transaction.type === "income";
+
+  const isCompleted =
+    transaction.status === "completed";
+
+  const categoryVisual =
+    getCategoryVisual(transaction.category);
+
+  const CategoryIcon =
+    categoryVisual.icon;
+
+  const formattedAmount =
+    currencyFormatter.format(
+      Math.abs(transaction.amount),
+    );
+
+  return (
+    <tr
+      className={cn(
+        "group transition-colors duration-150",
+        "hover:bg-surface-elevated/55",
+      )}
+    >
+      <td className="px-5 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className={cn(
+              "flex size-9 shrink-0",
+              "items-center justify-center",
+              "rounded-[11px] border",
+              categoryVisual.iconContainerClassName,
+              categoryVisual.iconClassName,
+            )}
+            aria-hidden="true"
+          >
+            <CategoryIcon size={16} />
+          </div>
+
+          <span className="truncate text-xs font-semibold text-text">
+            {transaction.category}
+          </span>
+        </div>
+      </td>
+
+      <td className="px-5 py-4">
+        <div className="min-w-0">
+          <p className="truncate text-xs font-medium text-text">
+            {transaction.description}
+          </p>
+
+          <p className="mt-1 text-[10px] text-text-subtle">
+            ID #{transaction.id}
+          </p>
+        </div>
+      </td>
+
+      <td className="px-5 py-4">
+        <time
+          dateTime={transaction.date}
+          className="whitespace-nowrap text-xs text-text-muted"
+        >
+          {dateFormatter.format(
+            parseLocalDate(transaction.date),
+          )}
+        </time>
+      </td>
+
+      <td className="px-5 py-4 text-right">
+        <span
+          className={cn(
+            "inline-flex items-center",
+            "justify-end gap-1",
+            "whitespace-nowrap text-xs",
+            "font-semibold tabular-nums",
+            isIncome
+              ? "text-success"
+              : "text-danger",
+          )}
+        >
+          {isIncome ? "+" : "âˆ’"}
+
+          {formattedAmount}
+        </span>
+      </td>
+
+      <td className="px-5 py-4 text-right">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5",
+            "rounded-full border",
+            "px-2.5 py-1",
+            "text-[10px] font-semibold",
+            isCompleted
+              ? [
+                  "border-success/20",
+                  "bg-success/10",
+                  "text-success",
+                ]
+              : [
+                  "border-warning/20",
+                  "bg-warning/10",
+                  "text-warning",
+                ],
+          )}
+        >
+          <span
+            className={cn(
+              "size-1.5 rounded-full",
+              isCompleted
+                ? "bg-success"
+                : "bg-warning",
+            )}
+            aria-hidden="true"
+          />
+
+          {isCompleted
+            ? "ConcluÃ­da"
+            : "Pendente"}
+        </span>
+      </td>
+    </tr>
+  );
+}
+
+====================================================================================================
+.\src\components\landing\HeroSection\HeroSection.tsx
+====================================================================================================
+import {
+  ArrowRight,
+  BadgeCheck,
+  Play,
+  Sparkles,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { cn } from "@/lib/utils";
+
+import { ProductPreview } from "../ProductPreview";
+
+export function HeroSection() {
+  const {
+    ref,
+    isVisible,
+  } = useScrollReveal<HTMLElement>({
+    threshold: 0.05,
+    rootMargin: "0px",
+  });
+
+  return (
+    <section
+      ref={ref}
+      className={cn(
+        "relative overflow-hidden",
+        "px-4 pb-24 pt-32",
+        "sm:px-6 sm:pt-40",
+        "lg:px-8 lg:pb-32",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none",
+          "absolute inset-x-0 top-0",
+          "h-[650px]",
+          "bg-[radial-gradient(circle_at_top,var(--glow-primary),transparent_68%)]",
+          "opacity-45",
+        )}
+        aria-hidden="true"
+      />
+
+      <div
+        className={cn(
+          "pointer-events-none",
+          "absolute left-1/2 top-28",
+          "h-72 w-72",
+          "-translate-x-1/2",
+          "rounded-full",
+          "bg-primary/15 blur-[110px]",
+        )}
+        aria-hidden="true"
+      />
+
+      <div
+        className={cn(
+          "relative mx-auto",
+          "w-full max-w-7xl",
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto max-w-4xl",
+            "text-center",
+          )}
+        >
+          <div
+            className={cn(
+              "scroll-reveal",
+              isVisible &&
+                "scroll-reveal--visible",
+            )}
+          >
+            <div
+              className={cn(
+                "mx-auto inline-flex",
+                "items-center gap-2",
+                "rounded-full border",
+                "border-primary/20",
+                "bg-primary/8",
+                "px-3 py-1.5",
+                "text-[11px]",
+                "text-primary-foreground",
+                "backdrop-blur-xl",
+              )}
+            >
+              InteligÃªncia financeira ao seu
+              alcance
+            </div>
+          </div>
+
+          <h1
+            className={cn(
+              "scroll-reveal",
+              isVisible &&
+                "scroll-reveal--visible",
+              "mx-auto mt-7",
+              "max-w-4xl",
+              "text-balance",
+              "text-4xl font-bold",
+              "leading-[1.04]",
+              "tracking-[-0.055em]",
+              "text-text",
+              "sm:text-5xl",
+              "lg:text-7xl",
+            )}
+            style={{
+              transitionDelay: "90ms",
+            }}
+          >
+            Transforme seus dados em{" "}
+            <span
+              className={cn(
+                "bg-gradient-to-r",
+                "from-primary-bright",
+                "via-secondary-bright",
+                "to-success",
+                "bg-clip-text text-transparent",
+              )}
+            >
+              decisÃµes financeiras
+            </span>{" "}
+            mais inteligentes.
+          </h1>
+
+          <p
+            className={cn(
+              "scroll-reveal",
+              isVisible &&
+                "scroll-reveal--visible",
+              "mx-auto mt-6",
+              "max-w-2xl",
+              "text-pretty",
+              "text-base leading-7",
+              "text-text-muted",
+              "sm:text-lg sm:leading-8",
+            )}
+            style={{
+              transitionDelay: "180ms",
+            }}
+          >
+            Organize suas transaÃ§Ãµes, acompanhe
+            sua saÃºde financeira e receba
+            recomendaÃ§Ãµes personalizadas com
+            inteligÃªncia artificial.
+          </p>
+
+          <div
+            className={cn(
+              "scroll-reveal",
+              isVisible &&
+                "scroll-reveal--visible",
+              "mt-8 flex flex-col",
+              "items-center justify-center",
+              "gap-3 sm:flex-row",
+            )}
+            style={{
+              transitionDelay: "270ms",
+            }}
+          >
+            <Link
+              to="/register"
+              className={cn(
+                "inline-flex h-12",
+                "w-full items-center",
+                "justify-center gap-2",
+                "rounded-[14px]",
+                "bg-primary px-6",
+                "text-sm font-semibold",
+                "text-primary-foreground",
+                "shadow-[0_20px_55px_-22px_var(--glow-primary)]",
+                "transition-[transform,opacity]",
+                "hover:-translate-y-0.5",
+                "hover:opacity-95",
+                "focus-visible:outline-none",
+                "focus-visible:ring-2",
+                "focus-visible:ring-primary",
+                "focus-visible:ring-offset-2",
+                "focus-visible:ring-offset-background",
+                "motion-reduce:transition-none",
+                "sm:w-auto",
+              )}
+            >
+              ComeÃ§ar gratuitamente
+
+              <ArrowRight
+                size={16}
+                aria-hidden="true"
+              />
+            </Link>
+
+            <a
+              href="#recursos"
+              className={cn(
+                "inline-flex h-12",
+                "w-full items-center",
+                "justify-center gap-2",
+                "rounded-[14px] border",
+                "border-border",
+                "bg-surface-elevated/60",
+                "px-6",
+                "text-sm font-semibold",
+                "text-text",
+                "backdrop-blur-xl",
+                "transition-colors",
+                "hover:border-border-highlight",
+                "hover:bg-surface-elevated",
+                "focus-visible:outline-none",
+                "focus-visible:ring-2",
+                "focus-visible:ring-primary",
+                "sm:w-auto",
+              )}
+            >
+              <Play
+                size={15}
+                aria-hidden="true"
+              />
+
+              Conhecer o projeto
+            </a>
+          </div>
+
+          <div
+            className={cn(
+              "scroll-reveal",
+              isVisible &&
+                "scroll-reveal--visible",
+              "mt-6 flex flex-wrap",
+              "items-center justify-center",
+              "gap-x-5 gap-y-2",
+              "text-[11px]",
+              "text-text-subtle",
+            )}
+            style={{
+              transitionDelay: "360ms",
+            }}
+          >
+            {[
+              "AnÃ¡lise automatizada",
+              "RecomendaÃ§Ãµes com IA",
+              "VisualizaÃ§Ã£o intuitiva",
+            ].map((item) => (
+              <span
+                key={item}
+                className="inline-flex items-center gap-1.5"
+              >
+                <BadgeCheck
+                  size={13}
+                  className="text-success"
+                  aria-hidden="true"
+                />
+
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-16 sm:mt-20">
+          <ProductPreview />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+====================================================================================================
+.\src\hooks\useScrollReveal.ts
+====================================================================================================
+import {
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
+
+interface UseScrollRevealOptions {
+  threshold?: number;
+  rootMargin?: string;
+  triggerOnce?: boolean;
+}
+
+interface UseScrollRevealResult<T extends HTMLElement> {
+  ref: RefObject<T | null>;
+  isVisible: boolean;
+}
+
+export function useScrollReveal<
+  T extends HTMLElement = HTMLDivElement,
+>({
+  threshold = 0.15,
+  rootMargin = "0px 0px -60px 0px",
+  triggerOnce = true,
+}: UseScrollRevealOptions = {}): UseScrollRevealResult<T> {
+  const ref = useRef<T>(null);
+  const [isVisible, setIsVisible] =
+    useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+
+    if (!element) {
+      return;
+    }
+
+    const prefersReducedMotion =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+    if (prefersReducedMotion) {
+      setIsVisible(true);
+      return;
+    }
+
+    if (
+      typeof IntersectionObserver ===
+      "undefined"
+    ) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) {
+          return;
+        }
+
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+
+          if (triggerOnce) {
+            observer.unobserve(element);
+          }
+
+          return;
+        }
+
+        if (!triggerOnce) {
+          setIsVisible(false);
+        }
+      },
+      {
+        threshold,
+        rootMargin,
+      },
+    );
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [
+    rootMargin,
+    threshold,
+    triggerOnce,
+  ]);
+
+  return {
+    ref,
+    isVisible,
+  };
+}
+
+====================================================================================================
+.\src\layouts\AppLayout.tsx
+====================================================================================================
+import {
+  useEffect,
+  useState,
+} from "react";
+import {
+  Outlet,
+  useLocation,
+} from "react-router-dom";
+
+import { Header } from "@/components/layout/Header";
+import { Sidebar } from "@/components/layout/Sidebar/Sidebar";
+import {
+  SIDEBAR_MAX_WIDTH,
+  SIDEBAR_MIN_WIDTH,
+} from "@/components/layout/Sidebar/Sidebar.constants";
+import { cn } from "@/lib/utils";
+
+export function AppLayout() {
+  const [
+    isMobileSidebarOpen,
+    setIsMobileSidebarOpen,
+  ] = useState(false);
+
+  const [
+    sidebarWidth,
+    setSidebarWidth,
+  ] = useState(
+    SIDEBAR_MIN_WIDTH,
+  );
+
+  const location = useLocation();
+
+  const openMobileSidebar = (): void => {
+    setIsMobileSidebarOpen(true);
+  };
+
+  const closeMobileSidebar = (): void => {
+    setIsMobileSidebarOpen(false);
+  };
+
+  const handleOpenSidebar = (): void => {
+    const isMobile = window.matchMedia(
+      "(max-width: 767px)",
+    ).matches;
+
+    if (isMobile) {
+      openMobileSidebar();
+      return;
+    }
+
+    setSidebarWidth(SIDEBAR_MAX_WIDTH);
+  };
+
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [location.pathname]);
+
+  return (
+    <div
+      className={cn(
+        "app-shell relative isolate",
+        "min-h-dvh w-full",
+        "overflow-x-hidden",
+        "bg-background text-text",
+      )}
+    >
+      <div
+        className="app-shell__ambient"
+        aria-hidden="true"
+      />
+
+      <div
+        className={cn(
+          "relative z-10",
+          "flex min-h-dvh w-full min-w-0",
+          "md:gap-2 md:p-2",
+          "xl:gap-3 xl:p-3",
+        )}
+      >
+        <Sidebar
+          isMobileOpen={
+            isMobileSidebarOpen
+          }
+          onCloseMobile={
+            closeMobileSidebar
+          }
+          width={sidebarWidth}
+          onWidthChange={
+            setSidebarWidth
+          }
+        />
+
+        <div
+          className={cn(
+            "flex min-h-dvh",
+            "w-full min-w-0 flex-1",
+            "flex-col",
+            "bg-background/70",
+            "md:min-h-[calc(100dvh-1rem)]",
+            "md:overflow-hidden",
+            "md:rounded-[20px]",
+            "md:border md:border-border",
+            "md:shadow-card",
+            "xl:min-h-[calc(100dvh-1.5rem)]",
+          )}
+        >
+          <Header
+            onOpenMobileSidebar={
+              openMobileSidebar
+            }
+            onOpenSidebar={
+              handleOpenSidebar
+            }
+          />
+
+          <main
+            key={location.pathname}
+            className={cn(
+              "relative flex-1",
+              "w-full min-w-0",
+              "overflow-x-hidden",
+              "px-4 pb-6 pt-4",
+              "sm:px-5 sm:pb-7 sm:pt-5",
+              "lg:px-6 lg:pb-8",
+              "lg:pt-5",
+              "2xl:px-7",
+            )}
+          >
+            <div
+              className={cn(
+                "mx-auto",
+                "w-full min-w-0",
+                "max-w-[1920px]",
+              )}
+            >
+              <Outlet />
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+====================================================================================================
+.\src\App.tsx
+====================================================================================================
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
+import { AppLayout } from "@/layouts/AppLayout";
+import { DashboardPage } from "@/pages/Dashboard";
+import { LandingPage } from "@/pages/Landing";
+import { LoginPage } from "@/pages/Login";
+import { ProfilePage } from "@/pages/Profile";
+import { RegisterPage } from "@/pages/Register";
+import { SettingsPage } from "@/pages/Settings";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+
+function App() {
+  return (
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={<LandingPage />}
+          />
+
+          <Route
+            path="/login"
+            element={<LoginPage />}
+          />
+
+          <Route
+            path="/register"
+            element={<RegisterPage />}
+          />
+
+          <Route element={<AppLayout />}>
+            <Route
+              path="/dashboard"
+              element={<DashboardPage />}
+            />
+
+            <Route
+              path="/profile"
+              element={<ProfilePage />}
+            />
+
+            <Route
+              path="/settings"
+              element={<SettingsPage />}
+            />
+          </Route>
+
+          <Route
+            path="*"
+            element={
+              <Navigate to="/" replace />
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
+  );
+}
+
+export default App;
+
+====================================================================================================
+.\src\main.tsx
+====================================================================================================
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+import App from "./App";
+import "./index.css";
+
+const rootElement = document.getElementById("root");
+
+if (!rootElement) {
+  throw new Error(
+    'Elemento raiz com id "root" nÃ£o foi encontrado no index.html.',
+  );
+}
+
+createRoot(rootElement).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);

@@ -1,0 +1,272 @@
+@import "@fontsource-variable/manrope";
+@import "tailwindcss";
+@import "./styles/theme.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans:
+    "Manrope Variable",
+    "Manrope",
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  --animate-slide-in: slide-in 0.35s ease-out forwards;
+  --animate-fade-up: fade-up 0.4s ease-out forwards;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility glass-panel {
+  background-color: color-mix(
+    in srgb,
+    var(--surface) 76%,
+    transparent
+  );
+  border: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+}
+
+@utility financial-number {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1;
+  letter-spacing: -0.025em;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background-color: var(--background);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  font-synthesis: none;
+  transition:
+    background-color 0.2s ease-out,
+    color 0.2s ease-out;
+}
+
+#root {
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+table,
+[role="grid"],
+[data-financial-value="true"] {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1;
+}
+
+::selection {
+  background-color: color-mix(
+    in srgb,
+    var(--primary) 36%,
+    transparent
+  );
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary-bright);
+  outline-offset: 3px;
+}
+
+.app-shell {
+  background:
+    radial-gradient(
+      circle at 18% 4%,
+      color-mix(
+        in srgb,
+        var(--glow-primary) 48%,
+        transparent
+      ) 0,
+      transparent 29rem
+    ),
+    radial-gradient(
+      circle at 82% 12%,
+      color-mix(
+        in srgb,
+        var(--glow-secondary) 42%,
+        transparent
+      ) 0,
+      transparent 32rem
+    ),
+    linear-gradient(
+      145deg,
+      var(--background) 0%,
+      color-mix(
+        in srgb,
+        var(--background) 93%,
+        var(--secondary) 7%
+      ) 52%,
+      var(--background) 100%
+    );
+}
+
+.app-shell__ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.app-shell__ambient::before,
+.app-shell__ambient::after {
+  position: absolute;
+  content: "";
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: 0.28;
+  transform: translateZ(0);
+}
+
+.app-shell__ambient::before {
+  top: -15rem;
+  left: 20%;
+  width: 34rem;
+  height: 34rem;
+  background: var(--glow-primary);
+}
+
+.app-shell__ambient::after {
+  right: -14rem;
+  bottom: -18rem;
+  width: 38rem;
+  height: 38rem;
+  background: var(--glow-secondary);
+}
+
+:root:not(.dark) .app-shell__ambient::before,
+:root:not(.dark) .app-shell__ambient::after {
+  opacity: 0.1;
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        color-mix(
+          in srgb,
+          var(--glow-primary) 30%,
+          transparent
+        ),
+        transparent 22rem
+      ),
+      var(--background);
+  }
+
+  .app-shell__ambient::before,
+  .app-shell__ambient::after {
+    opacity: 0.14;
+    filter: blur(72px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  };
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .scroll-reveal,
+  .scroll-reveal--visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+}

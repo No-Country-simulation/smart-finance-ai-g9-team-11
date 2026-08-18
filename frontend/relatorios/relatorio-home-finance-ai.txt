@@ -1,0 +1,5669 @@
+﻿
+============================================================
+ARQUIVO: src/index.css
+============================================================
+
+@import "@fontsource-variable/manrope";
+@import "tailwindcss";
+@import "./styles/theme.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans:
+    "Manrope Variable",
+    "Manrope",
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  --animate-slide-in: slide-in 0.35s ease-out forwards;
+  --animate-fade-up: fade-up 0.4s ease-out forwards;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility glass-panel {
+  background-color: color-mix(
+    in srgb,
+    var(--surface) 76%,
+    transparent
+  );
+  border: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+}
+
+@utility financial-number {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1;
+  letter-spacing: -0.025em;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background-color: var(--background);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  font-synthesis: none;
+  transition:
+    background-color 0.2s ease-out,
+    color 0.2s ease-out;
+}
+
+#root {
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+table,
+[role="grid"],
+[data-financial-value="true"] {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1;
+}
+
+::selection {
+  background-color: color-mix(
+    in srgb,
+    var(--primary) 36%,
+    transparent
+  );
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary-bright);
+  outline-offset: 3px;
+}
+
+.app-shell {
+  background:
+    radial-gradient(
+      circle at 18% 4%,
+      color-mix(
+        in srgb,
+        var(--glow-primary) 48%,
+        transparent
+      ) 0,
+      transparent 29rem
+    ),
+    radial-gradient(
+      circle at 82% 12%,
+      color-mix(
+        in srgb,
+        var(--glow-secondary) 42%,
+        transparent
+      ) 0,
+      transparent 32rem
+    ),
+    linear-gradient(
+      145deg,
+      var(--background) 0%,
+      color-mix(
+        in srgb,
+        var(--background) 93%,
+        var(--secondary) 7%
+      ) 52%,
+      var(--background) 100%
+    );
+}
+
+.app-shell__ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.app-shell__ambient::before,
+.app-shell__ambient::after {
+  position: absolute;
+  content: "";
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: 0.28;
+  transform: translateZ(0);
+}
+
+.app-shell__ambient::before {
+  top: -15rem;
+  left: 20%;
+  width: 34rem;
+  height: 34rem;
+  background: var(--glow-primary);
+}
+
+.app-shell__ambient::after {
+  right: -14rem;
+  bottom: -18rem;
+  width: 38rem;
+  height: 38rem;
+  background: var(--glow-secondary);
+}
+
+:root:not(.dark) .app-shell__ambient::before,
+:root:not(.dark) .app-shell__ambient::after {
+  opacity: 0.1;
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    background:
+      radial-gradient(
+        circle at 50% -8%,
+        color-mix(
+          in srgb,
+          var(--glow-primary) 30%,
+          transparent
+        ),
+        transparent 22rem
+      ),
+      var(--background);
+  }
+
+  .app-shell__ambient::before,
+  .app-shell__ambient::after {
+    opacity: 0.14;
+    filter: blur(72px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  };
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .scroll-reveal,
+  .scroll-reveal--visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+}
+
+============================================================
+ARQUIVO: src/App.css
+============================================================
+
+.counter {
+  font-size: 16px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+  margin-bottom: 24px;
+
+  &:hover {
+    border-color: var(--accent-border);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.hero {
+  position: relative;
+
+  .base,
+  .framework,
+  .vite {
+    inset-inline: 0;
+    margin: 0 auto;
+  }
+
+  .base {
+    width: 170px;
+    position: relative;
+    z-index: 0;
+  }
+
+  .framework,
+  .vite {
+    position: absolute;
+  }
+
+  .framework {
+    z-index: 1;
+    top: 34px;
+    height: 28px;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
+      scale(1.4);
+  }
+
+  .vite {
+    z-index: 0;
+    top: 107px;
+    height: 26px;
+    width: auto;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
+      scale(0.8);
+  }
+}
+
+#center {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  place-content: center;
+  place-items: center;
+  flex-grow: 1;
+
+  @media (max-width: 1024px) {
+    padding: 32px 20px 24px;
+    gap: 18px;
+  }
+}
+
+#next-steps {
+  display: flex;
+  border-top: 1px solid var(--border);
+  text-align: left;
+
+  & > div {
+    flex: 1 1 0;
+    padding: 32px;
+    @media (max-width: 1024px) {
+      padding: 24px 20px;
+    }
+  }
+
+  .icon {
+    margin-bottom: 16px;
+    width: 22px;
+    height: 22px;
+  }
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+#docs {
+  border-right: 1px solid var(--border);
+
+  @media (max-width: 1024px) {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+#next-steps ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  margin: 32px 0 0;
+
+  .logo {
+    height: 18px;
+  }
+
+  a {
+    color: var(--text-h);
+    font-size: 16px;
+    border-radius: 6px;
+    background: var(--social-bg);
+    display: flex;
+    padding: 6px 12px;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: box-shadow 0.3s;
+
+    &:hover {
+      box-shadow: var(--shadow);
+    }
+    .button-icon {
+      height: 18px;
+      width: 18px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    li {
+      flex: 1 1 calc(50% - 8px);
+    }
+
+    a {
+      width: 100%;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+  }
+}
+
+#spacer {
+  height: 88px;
+  border-top: 1px solid var(--border);
+  @media (max-width: 1024px) {
+    height: 48px;
+  }
+}
+
+.ticks {
+  position: relative;
+  width: 100%;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: -4.5px;
+    border: 5px solid transparent;
+  }
+
+  &::before {
+    left: 0;
+    border-left-color: var(--border);
+  }
+  &::after {
+    right: 0;
+    border-right-color: var(--border);
+  }
+}
+
+
+============================================================
+ARQUIVO: tailwind.config.js
+============================================================
+
+/** @type {import("tailwindcss").Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+
+============================================================
+ARQUIVO: src/App.tsx
+============================================================
+
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
+import { AppLayout } from "@/layouts/AppLayout";
+import { DashboardPage } from "@/pages/Dashboard";
+import { LandingPage } from "@/pages/Landing";
+import { LoginPage } from "@/pages/Login";
+import { ProfilePage } from "@/pages/Profile";
+import { RegisterPage } from "@/pages/Register";
+import { SettingsPage } from "@/pages/Settings";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+
+function App() {
+  return (
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={<LandingPage />}
+          />
+
+          <Route
+            path="/login"
+            element={<LoginPage />}
+          />
+
+          <Route
+            path="/register"
+            element={<RegisterPage />}
+          />
+
+          <Route element={<AppLayout />}>
+            <Route
+              path="/dashboard"
+              element={<DashboardPage />}
+            />
+
+            <Route
+              path="/profile"
+              element={<ProfilePage />}
+            />
+
+            <Route
+              path="/settings"
+              element={<SettingsPage />}
+            />
+          </Route>
+
+          <Route
+            path="*"
+            element={
+              <Navigate to="/" replace />
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
+  );
+}
+
+export default App;
+
+============================================================
+ARQUIVO: src/layouts/AppLayout.tsx
+============================================================
+
+import { useState } from "react";
+import {
+  Outlet,
+  useLocation,
+} from "react-router-dom";
+
+import { Header } from "@/components/layout/Header";
+import { Sidebar } from "@/components/layout/Sidebar/Sidebar";
+import {
+  SIDEBAR_MAX_WIDTH,
+  SIDEBAR_MIN_WIDTH,
+} from "@/components/layout/Sidebar/Sidebar.constants";
+import { cn } from "@/lib/utils";
+
+export function AppLayout() {
+  const [
+    isMobileSidebarOpen,
+    setIsMobileSidebarOpen,
+  ] = useState(false);
+
+  const [
+    sidebarWidth,
+    setSidebarWidth,
+  ] = useState(
+    SIDEBAR_MIN_WIDTH,
+  );
+
+  const location = useLocation();
+
+  const openMobileSidebar = (): void => {
+    setIsMobileSidebarOpen(true);
+  };
+
+  const closeMobileSidebar = (): void => {
+    setIsMobileSidebarOpen(false);
+  };
+
+  const handleOpenSidebar = (): void => {
+    const isMobile = window.matchMedia(
+      "(max-width: 767px)",
+    ).matches;
+
+    if (isMobile) {
+      openMobileSidebar();
+      return;
+    }
+
+    setSidebarWidth(SIDEBAR_MAX_WIDTH);
+  };
+
+  return (
+    <div
+      className={cn(
+        "app-shell relative isolate",
+        "min-h-dvh w-full",
+        "overflow-x-hidden",
+        "bg-background text-text",
+      )}
+    >
+      <div
+        className="app-shell__ambient"
+        aria-hidden="true"
+      />
+
+      <div
+        className={cn(
+          "relative z-10",
+          "flex min-h-dvh w-full min-w-0",
+          "md:gap-2 md:p-2",
+          "xl:gap-3 xl:p-3",
+        )}
+      >
+        <Sidebar
+          isMobileOpen={
+            isMobileSidebarOpen
+          }
+          onCloseMobile={
+            closeMobileSidebar
+          }
+          width={sidebarWidth}
+          onWidthChange={
+            setSidebarWidth
+          }
+        />
+
+        <div
+          className={cn(
+            "flex min-h-dvh",
+            "w-full min-w-0 flex-1",
+            "flex-col",
+            "bg-background/70",
+            "md:min-h-[calc(100dvh-1rem)]",
+            "md:overflow-hidden",
+            "md:rounded-[20px]",
+            "md:border md:border-border",
+            "md:shadow-card",
+            "xl:min-h-[calc(100dvh-1.5rem)]",
+          )}
+        >
+          <Header
+            onOpenMobileSidebar={
+              openMobileSidebar
+            }
+            onOpenSidebar={
+              handleOpenSidebar
+            }
+          />
+
+          <main
+            key={location.pathname}
+            className={cn(
+              "relative flex-1",
+              "w-full min-w-0",
+              "overflow-x-hidden",
+              "px-4 pb-6 pt-4",
+              "sm:px-5 sm:pb-7 sm:pt-5",
+              "lg:px-6 lg:pb-8",
+              "lg:pt-5",
+              "2xl:px-7",
+            )}
+          >
+            <div
+              className={cn(
+                "mx-auto",
+                "w-full min-w-0",
+                "max-w-[1920px]",
+              )}
+            >
+              <Outlet />
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+============================================================
+ARQUIVO: src/providers/ThemeProvider.tsx
+============================================================
+
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+
+import {
+  ThemeContext,
+  type ResolvedTheme,
+  type Theme,
+  type ThemeContextValue,
+} from "./ThemeContext";
+
+const STORAGE_KEY = "finance-ai:theme";
+const SYSTEM_THEME_QUERY = "(prefers-color-scheme: dark)";
+
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+function getSystemThemeSnapshot(): ResolvedTheme {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+
+  return window.matchMedia(SYSTEM_THEME_QUERY).matches
+    ? "dark"
+    : "light";
+}
+
+function getServerThemeSnapshot(): ResolvedTheme {
+  return "light";
+}
+
+function subscribeToSystemTheme(
+  onStoreChange: () => void,
+): () => void {
+  if (typeof window === "undefined") {
+    return () => undefined;
+  }
+
+  const mediaQuery = window.matchMedia(SYSTEM_THEME_QUERY);
+
+  mediaQuery.addEventListener("change", onStoreChange);
+
+  return () => {
+    mediaQuery.removeEventListener(
+      "change",
+      onStoreChange,
+    );
+  };
+}
+
+function readStoredTheme(): Theme {
+  if (typeof window === "undefined") {
+    return "system";
+  }
+
+  const storedTheme =
+    window.localStorage.getItem(STORAGE_KEY);
+
+  if (
+    storedTheme === "light" ||
+    storedTheme === "dark" ||
+    storedTheme === "system"
+  ) {
+    return storedTheme;
+  }
+
+  return "system";
+}
+
+function applyThemeClass(
+  resolvedTheme: ResolvedTheme,
+): void {
+  const root = document.documentElement;
+
+  root.classList.toggle(
+    "dark",
+    resolvedTheme === "dark",
+  );
+
+  root.style.colorScheme = resolvedTheme;
+}
+
+export function ThemeProvider({
+  children,
+}: Readonly<ThemeProviderProps>) {
+  const [theme, setThemeState] = useState<Theme>(
+    readStoredTheme,
+  );
+
+  const systemTheme = useSyncExternalStore(
+    subscribeToSystemTheme,
+    getSystemThemeSnapshot,
+    getServerThemeSnapshot,
+  );
+
+  const resolvedTheme: ResolvedTheme =
+    theme === "system" ? systemTheme : theme;
+
+  useEffect(() => {
+    applyThemeClass(resolvedTheme);
+  }, [resolvedTheme]);
+
+  const setTheme = useCallback(
+    (nextTheme: Theme): void => {
+      setThemeState(nextTheme);
+
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        nextTheme,
+      );
+    },
+    [],
+  );
+
+  const toggleTheme = useCallback((): void => {
+    setTheme(
+      resolvedTheme === "dark"
+        ? "light"
+        : "dark",
+    );
+  }, [resolvedTheme, setTheme]);
+
+  const value = useMemo<ThemeContextValue>(
+    () => ({
+      theme,
+      resolvedTheme,
+      setTheme,
+      toggleTheme,
+    }),
+    [
+      theme,
+      resolvedTheme,
+      setTheme,
+      toggleTheme,
+    ],
+  );
+
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+============================================================
+ARQUIVO: src/lib/utils.ts
+============================================================
+
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+
+============================================================
+ARQUIVO: src/pages/Dashboard/DashboardPage.tsx
+============================================================
+
+import { DashboardGrid } from "@/components/dashboard/DashobordGrid";
+
+export function DashboardPage() {
+  return (
+    <main className="space-y-2">
+     
+
+      <DashboardGrid />
+    </main>
+  );
+}
+
+export default DashboardPage;
+
+============================================================
+ARQUIVO: src/components/dashboard/DashboardGrid/DashboardGrid.tsx
+============================================================
+
+ARQUIVO NÃO ENCONTRADO
+
+============================================================
+ARQUIVO: src/components/layout/Sidebar/Sidebar.tsx
+============================================================
+
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+import {
+  BrainCircuit,
+  ChevronLeft,
+  CircleHelp,
+  LogOut,
+  Sparkles,
+  X,
+} from "lucide-react";
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { NAVIGATION_ITEMS } from "@/constants/navigation.constants";
+import { cn } from "@/lib/utils";
+import { userMock } from "@/mocks/user.mock";
+
+import {
+  clampSidebarWidth,
+  SIDEBAR_COLLAPSED_LIMIT,
+  SIDEBAR_KEYBOARD_STEP,
+  SIDEBAR_MAX_WIDTH,
+  SIDEBAR_MIN_WIDTH,
+} from "./Sidebar.constants";
+import { SidebarItem } from "./SidebarItem";
+
+interface SidebarProps {
+  isMobileOpen: boolean;
+  onCloseMobile: () => void;
+  width: number;
+  onWidthChange: (width: number) => void;
+}
+
+interface SidebarStyle extends CSSProperties {
+  "--sidebar-width": string;
+}
+
+function getUserInitials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+function isInteractiveElement(
+  target: EventTarget | null,
+): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return Boolean(
+    target.closest(
+      [
+        "a",
+        "button",
+        "input",
+        "select",
+        "textarea",
+        '[role="button"]',
+        '[role="menuitem"]',
+        "[data-sidebar-resize-handle]",
+        "[data-prevent-sidebar-toggle]",
+      ].join(","),
+    ),
+  );
+}
+
+export function Sidebar({
+  isMobileOpen,
+  onCloseMobile,
+  width,
+  onWidthChange,
+}: Readonly<SidebarProps>) {
+  const [isResizing, setIsResizing] = useState(false);
+
+  const sidebarRef = useRef<HTMLElement>(null);
+  const closeButtonRef =
+    useRef<HTMLButtonElement>(null);
+  const resizeStartXRef = useRef(0);
+  const resizeStartWidthRef = useRef(
+    SIDEBAR_MIN_WIDTH,
+  );
+  const didResizeRef = useRef(false);
+
+  const initials = getUserInitials(userMock.name);
+
+  const sidebarWidth = clampSidebarWidth(width);
+
+  const isCollapsed =
+    sidebarWidth < SIDEBAR_COLLAPSED_LIMIT;
+
+  const sidebarStyle: SidebarStyle = {
+    "--sidebar-width": `${sidebarWidth}px`,
+  };
+
+  const expandSidebar = (): void => {
+    onWidthChange(SIDEBAR_MAX_WIDTH);
+  };
+
+  const collapseSidebar = (): void => {
+    onWidthChange(SIDEBAR_MIN_WIDTH);
+  };
+
+  const toggleCollapsed = (): void => {
+    if (isCollapsed) {
+      expandSidebar();
+      return;
+    }
+
+    collapseSidebar();
+  };
+
+  useEffect(() => {
+    if (!isMobileOpen) {
+      return;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    const handleEscape = (
+      event: globalThis.KeyboardEvent,
+    ): void => {
+      if (event.key === "Escape") {
+        onCloseMobile();
+      }
+    };
+
+    document.addEventListener(
+      "keydown",
+      handleEscape,
+    );
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+
+      document.removeEventListener(
+        "keydown",
+        handleEscape,
+      );
+    };
+  }, [isMobileOpen, onCloseMobile]);
+
+  useEffect(() => {
+    if (!isResizing) {
+      return;
+    }
+
+    const previousCursor =
+      document.body.style.cursor;
+
+    const previousUserSelect =
+      document.body.style.userSelect;
+
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+
+    const handlePointerMove = (
+      event: globalThis.PointerEvent,
+    ): void => {
+      const deltaX =
+        event.clientX - resizeStartXRef.current;
+
+      if (Math.abs(deltaX) > 2) {
+        didResizeRef.current = true;
+      }
+
+      const nextWidth = clampSidebarWidth(
+        resizeStartWidthRef.current + deltaX,
+      );
+
+      onWidthChange(nextWidth);
+    };
+
+    const finishResizing = (): void => {
+      setIsResizing(false);
+
+      window.setTimeout(() => {
+        didResizeRef.current = false;
+      }, 0);
+    };
+
+    window.addEventListener(
+      "pointermove",
+      handlePointerMove,
+    );
+
+    window.addEventListener(
+      "pointerup",
+      finishResizing,
+    );
+
+    window.addEventListener(
+      "pointercancel",
+      finishResizing,
+    );
+
+    return () => {
+      document.body.style.cursor = previousCursor;
+      document.body.style.userSelect =
+        previousUserSelect;
+
+      window.removeEventListener(
+        "pointermove",
+        handlePointerMove,
+      );
+
+      window.removeEventListener(
+        "pointerup",
+        finishResizing,
+      );
+
+      window.removeEventListener(
+        "pointercancel",
+        finishResizing,
+      );
+    };
+  }, [isResizing, onWidthChange]);
+
+  const handleResizePointerDown = (
+    event: ReactPointerEvent<HTMLButtonElement>,
+  ): void => {
+    if (event.pointerType === "touch") {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    resizeStartXRef.current = event.clientX;
+    resizeStartWidthRef.current = sidebarWidth;
+    didResizeRef.current = false;
+
+    setIsResizing(true);
+  };
+
+  const handleResizeKeyDown = (
+    event: ReactKeyboardEvent<HTMLButtonElement>,
+  ): void => {
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+
+        onWidthChange(
+          clampSidebarWidth(
+            sidebarWidth - SIDEBAR_KEYBOARD_STEP,
+          ),
+        );
+        break;
+
+      case "ArrowRight":
+        event.preventDefault();
+
+        onWidthChange(
+          clampSidebarWidth(
+            sidebarWidth + SIDEBAR_KEYBOARD_STEP,
+          ),
+        );
+        break;
+
+      case "Home":
+        event.preventDefault();
+        collapseSidebar();
+        break;
+
+      case "End":
+        event.preventDefault();
+        expandSidebar();
+        break;
+
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        toggleCollapsed();
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const handleSidebarClick = (
+    event: ReactMouseEvent<HTMLElement>,
+  ): void => {
+    if (
+      window.innerWidth < 768 ||
+      isResizing ||
+      didResizeRef.current ||
+      isInteractiveElement(event.target)
+    ) {
+      return;
+    }
+
+    toggleCollapsed();
+  };
+
+  const handleSidebarKeyDown = (
+    event: ReactKeyboardEvent<HTMLElement>,
+  ): void => {
+    if (event.key !== "Tab" || !isMobileOpen) {
+      return;
+    }
+
+    const sidebar = sidebarRef.current;
+
+    if (!sidebar) {
+      return;
+    }
+
+    const focusableElements = Array.from(
+      sidebar.querySelectorAll<HTMLElement>(
+        [
+          "a[href]",
+          "button:not([disabled])",
+          "input:not([disabled])",
+          "select:not([disabled])",
+          "textarea:not([disabled])",
+          '[tabindex]:not([tabindex="-1"])',
+        ].join(","),
+      ),
+    ).filter(
+      (element) =>
+        !element.hasAttribute("disabled") &&
+        element.getAttribute("aria-hidden") !==
+          "true",
+    );
+
+    if (focusableElements.length === 0) {
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement =
+      focusableElements[
+        focusableElements.length - 1
+      ];
+
+    if (
+      event.shiftKey &&
+      document.activeElement === firstElement
+    ) {
+      event.preventDefault();
+      lastElement?.focus();
+      return;
+    }
+
+    if (
+      !event.shiftKey &&
+      document.activeElement === lastElement
+    ) {
+      event.preventDefault();
+      firstElement?.focus();
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        className={cn(
+          "fixed inset-0 z-40 bg-black/70 backdrop-blur-[2px]",
+          "transition-opacity duration-300 md:hidden",
+          isMobileOpen
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
+        )}
+        onClick={onCloseMobile}
+        aria-label="Fechar menu principal"
+        aria-hidden={!isMobileOpen}
+        tabIndex={isMobileOpen ? 0 : -1}
+      />
+
+      <aside
+        ref={sidebarRef}
+        style={sidebarStyle}
+        onClick={handleSidebarClick}
+        onKeyDown={handleSidebarKeyDown}
+        className={cn(
+          "fixed inset-y-0 left-0 z-50",
+          "flex min-h-dvh flex-col overflow-hidden",
+          "border-r border-border bg-surface/98",
+          "shadow-elevated backdrop-blur-xl",
+          "transition-[width,transform] duration-300 ease-out",
+          "motion-reduce:transition-none",
+          "w-[min(18rem,calc(100vw-1rem))]",
+          isMobileOpen
+            ? "translate-x-0"
+            : "-translate-x-full",
+          "md:static md:min-h-0 md:translate-x-0",
+          "md:w-[var(--sidebar-width)]",
+          "md:rounded-[20px] md:border",
+          "md:border-border-highlight/60",
+          isResizing && "md:transition-none",
+        )}
+        aria-label="Menu principal"
+      >
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 top-0 h-40",
+            "bg-[radial-gradient(circle_at_top,var(--glow-primary),transparent_70%)]",
+            "opacity-60",
+          )}
+          aria-hidden="true"
+        />
+
+        <button
+          type="button"
+          data-sidebar-resize-handle
+          onPointerDown={handleResizePointerDown}
+          onKeyDown={handleResizeKeyDown}
+          className={cn(
+            "absolute inset-y-5 -right-1 z-20 hidden w-2",
+            "cursor-col-resize rounded-full md:block",
+            "focus-visible:ring-2 focus-visible:ring-primary",
+            "focus-visible:ring-offset-2",
+            "focus-visible:ring-offset-background",
+            "after:absolute after:inset-y-0",
+            "after:left-1/2 after:w-px",
+            "after:-translate-x-1/2",
+            "after:bg-transparent",
+            "hover:after:bg-primary/45",
+            "focus-visible:after:bg-primary/70",
+            isResizing &&
+              "after:bg-primary-bright",
+          )}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Redimensionar menu lateral"
+          aria-valuemin={SIDEBAR_MIN_WIDTH}
+          aria-valuemax={SIDEBAR_MAX_WIDTH}
+          aria-valuenow={Math.round(sidebarWidth)}
+          title="Arraste para redimensionar. Use as setas do teclado para ajustar."
+        />
+
+        <div
+          className={cn(
+            "relative flex min-h-[82px] shrink-0 items-center",
+            "border-b border-border-muted",
+            isCollapsed
+              ? "justify-between px-4 md:justify-center md:px-2"
+              : "justify-between px-4",
+          )}
+        >
+          <div
+            className={cn(
+              "flex min-w-0 items-center",
+              isCollapsed
+                ? "gap-3 md:justify-center"
+                : "gap-3",
+            )}
+          >
+            <div
+              className={cn(
+                "relative flex size-11 shrink-0 items-center",
+                "justify-center rounded-[25px]",
+                "border border-primary/35",
+                "bg-gradient-to-br from-primary/25",
+                "via-primary/10 to-secondary/20",
+                "text-primary-bright",
+                "shadow-[0_0_24px_-8px_var(--glow-primary)]",
+              )}
+            >
+              <BrainCircuit
+                size={25}
+                strokeWidth={2}
+                aria-hidden="true"
+              />
+
+              <Sparkles
+                size={10}
+                className="absolute right-1 top-1 text-secondary-bright"
+                aria-hidden="true"
+              />
+            </div>
+
+            <div
+              className={cn(
+                "min-w-0 transition-[opacity,transform,width]",
+                "duration-200 motion-reduce:transition-none",
+                isCollapsed
+                  ? [
+                      "md:pointer-events-none md:w-0",
+                      "md:-translate-x-2 md:opacity-0",
+                    ]
+                  : [
+                      "w-auto translate-x-0",
+                      "opacity-100",
+                    ],
+              )}
+            >
+              <p className="truncate text-sm font-semibold tracking-tight text-text">
+                FINANCE AI
+              </p>
+            </div>
+          </div>
+
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={onCloseMobile}
+            className={cn(
+              "flex size-10 shrink-0 items-center justify-center",
+              "rounded-xl border border-border",
+              "bg-surface-elevated text-text-muted",
+              "transition-colors",
+              "hover:border-border-highlight",
+              "hover:text-text",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary",
+              "md:hidden",
+            )}
+            aria-label="Fechar menu principal"
+          >
+            <X size={19} aria-hidden="true" />
+          </button>
+        </div>
+
+        <nav
+          className={cn(
+            "relative flex min-h-0 flex-1 flex-col",
+            "gap-2 overflow-y-auto overflow-x-hidden",
+            "px-3 py-5",
+          )}
+          aria-label="NavegaÃ§Ã£o da aplicaÃ§Ã£o"
+        >
+          {NAVIGATION_ITEMS.map((item) => (
+            <SidebarItem
+              key={item.id}
+              item={item}
+              isCollapsed={isCollapsed}
+              onNavigate={onCloseMobile}
+            />
+          ))}
+        </nav>
+
+        <div className="relative shrink-0 space-y-2 px-3 pb-3">
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            title="Central de ajuda â€” Em breve"
+            className={cn(
+              "flex min-h-11 w-full items-center rounded-xl",
+              "border border-border-muted",
+              "bg-surface-elevated/45",
+              "text-text-muted",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-70",
+              isCollapsed
+                ? [
+                    "justify-start gap-3 px-3",
+                    "md:justify-center md:gap-0",
+                    "md:px-2",
+                  ]
+                : "justify-start gap-3 px-3",
+            )}
+          >
+            <CircleHelp
+              size={19}
+              className="shrink-0"
+              aria-hidden="true"
+            />
+
+            <span
+              className={cn(
+                "min-w-0 truncate text-sm font-medium",
+                isCollapsed && "md:hidden",
+              )}
+            >
+              Ajuda
+            </span>
+
+            {!isCollapsed && (
+              <span className="ml-auto text-[9px] uppercase tracking-wide text-text-subtle">
+                Em breve
+              </span>
+            )}
+          </button>
+
+          <div
+            data-prevent-sidebar-toggle
+            className={cn(
+              "flex min-h-[62px] items-center",
+              "rounded-[15px] border border-border",
+              "bg-card shadow-card",
+              isCollapsed
+                ? [
+                    "gap-3 px-3",
+                    "md:justify-center md:gap-0",
+                    "md:px-2",
+                  ]
+                : "gap-3 px-3",
+            )}
+          >
+            <div className="relative shrink-0">
+              <Avatar className="size-9 border border-border-highlight">
+                <AvatarImage
+                  src={userMock.avatar}
+                  alt={`Foto de ${userMock.name}`}
+                />
+
+                <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary-bright">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+
+              <span
+                className={cn(
+                  "absolute -bottom-0.5 -right-0.5",
+                  "size-2.5 rounded-full",
+                  "border-2 border-surface bg-success",
+                )}
+                aria-hidden="true"
+              />
+
+              <span className="sr-only">
+                UsuÃ¡rio online
+              </span>
+            </div>
+
+            {!isCollapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-semibold text-text">
+                  {userMock.name}
+                </p>
+
+                <p className="mt-0.5 truncate text-[10px] font-medium text-primary-bright">
+                  Premium
+                </p>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            title="Sair â€” autenticaÃ§Ã£o ainda nÃ£o integrada"
+            className={cn(
+              "flex min-h-10 w-full items-center rounded-xl",
+              "text-text-muted transition-colors",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-65",
+              isCollapsed
+                ? [
+                    "justify-start gap-3 px-3",
+                    "md:justify-center md:gap-0",
+                    "md:px-2",
+                  ]
+                : "justify-start gap-3 px-3",
+            )}
+          >
+            <LogOut
+              size={18}
+              className="shrink-0"
+              aria-hidden="true"
+            />
+
+            <span
+              className={cn(
+                "truncate text-sm font-medium",
+                isCollapsed && "md:hidden",
+              )}
+            >
+              Sair
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            className={cn(
+              "hidden min-h-10 w-full items-center rounded-xl",
+              "border border-transparent text-sm font-medium",
+              "text-text-muted transition-colors duration-200",
+              "hover:border-border",
+              "hover:bg-surface-elevated",
+              "hover:text-text",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary",
+              "motion-reduce:transition-none md:flex",
+              isCollapsed
+                ? "justify-center px-2"
+                : "justify-start gap-3 px-3",
+            )}
+            aria-label={
+              isCollapsed
+                ? "Expandir menu lateral"
+                : "Recolher menu lateral"
+            }
+            aria-expanded={!isCollapsed}
+          >
+            <ChevronLeft
+              size={18}
+              className={cn(
+                "shrink-0 transition-transform duration-300",
+                "motion-reduce:transition-none",
+                isCollapsed && "rotate-180",
+              )}
+              aria-hidden="true"
+            />
+
+            {!isCollapsed && (
+              <span>Recolher menu</span>
+            )}
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/layout/Sidebar/SidebarMain.tsx
+============================================================
+
+import { NAVIGATION_ITEMS } from "@/constants/navigation.constants";
+import { cn } from "@/lib/utils";
+
+import { SidebarItem } from "./SidebarItem";
+
+interface SidebarProps {
+  isMobileOpen: boolean;
+  onCloseMobile?: () => void;
+}
+
+export function Sidebar({
+  isMobileOpen,
+  onCloseMobile,
+}: Readonly<SidebarProps>) {
+  return (
+    <aside
+      className={cn(
+        "fixed inset-y-0 left-0 z-20",
+        "flex w-72 flex-col gap-4",
+        "border-r border-border bg-background p-4",
+        "transition-transform duration-300 ease-out",
+        "md:static md:translate-x-0",
+        isMobileOpen ? "translate-x-0" : "-translate-x-full",
+      )}
+      aria-label="NavegaÃ§Ã£o principal"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-muted">
+          Menu
+        </p>
+
+        {onCloseMobile ? (
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className={cn(
+              "rounded-lg px-2 py-1",
+              "text-sm font-medium text-text-muted",
+              "transition-colors duration-200",
+              "hover:bg-surface-muted hover:text-text",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2 focus-visible:ring-primary",
+              "md:hidden",
+            )}
+          >
+            Fechar
+          </button>
+        ) : null}
+      </div>
+
+      <nav
+        className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto"
+        aria-label="Links principais"
+      >
+        {NAVIGATION_ITEMS.map((item) => (
+          <SidebarItem
+            key={item.id}
+            item={item}
+            isCollapsed={false}
+            onNavigate={onCloseMobile}
+          />
+        ))}
+      </nav>
+    </aside>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/layout/Sidebar/SidebarItem.tsx
+============================================================
+
+import { NavLink } from "react-router-dom";
+
+import { cn } from "@/lib/utils";
+import type { NavigationItem } from "@/types/navigation.types";
+
+interface SidebarItemProps {
+  item: NavigationItem;
+  isCollapsed: boolean;
+  onNavigate?: () => void;
+}
+
+export function SidebarItem({
+  item,
+  isCollapsed,
+  onNavigate,
+}: Readonly<SidebarItemProps>) {
+  const Icon = item.icon;
+
+  return (
+    <NavLink
+      to={item.path}
+      end={item.path === "/"}
+      onClick={onNavigate}
+      title={isCollapsed ? item.label : undefined}
+      aria-label={isCollapsed ? item.label : undefined}
+      className={({ isActive }) =>
+        cn(
+          "group relative flex min-h-12 w-full min-w-0",
+          "items-center overflow-hidden rounded-[14px]",
+          "border px-3 py-2.5",
+          "transition-[background-color,border-color,color,box-shadow]",
+          "duration-200 motion-reduce:transition-none",
+          "focus-visible:ring-2 focus-visible:ring-primary",
+          "focus-visible:ring-offset-2",
+          "focus-visible:ring-offset-surface",
+          isCollapsed
+            ? "justify-start gap-3 md:justify-center md:gap-0 md:px-2"
+            : "justify-start gap-3",
+          isActive
+            ? [
+                "border-primary/35 text-text",
+                "bg-gradient-to-r from-primary/30",
+                "via-primary/15 to-secondary/10",
+                "shadow-[0_0_26px_-12px_var(--glow-primary)]",
+              ]
+            : [
+                "border-transparent text-text-muted",
+                "hover:border-border",
+                "hover:bg-surface-elevated/75",
+                "hover:text-text",
+              ],
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          {isActive && (
+            <span
+              className={cn(
+                "absolute inset-y-2 left-0 w-0.5",
+                "rounded-r-full bg-primary-bright",
+                "shadow-[0_0_12px_var(--glow-primary)]",
+              )}
+              aria-hidden="true"
+            />
+          )}
+
+          <span
+            className={cn(
+              "flex size-8 shrink-0 items-center justify-center",
+              "rounded-[10px] transition-colors duration-200",
+              "motion-reduce:transition-none",
+              isActive
+                ? "bg-primary/20 text-primary-bright"
+                : [
+                    "bg-surface-elevated/55 text-text-muted",
+                    "group-hover:bg-surface-elevated",
+                    "group-hover:text-text",
+                  ],
+            )}
+          >
+            <Icon
+              size={18}
+              strokeWidth={isActive ? 2.25 : 2}
+              aria-hidden="true"
+            />
+          </span>
+
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate text-sm",
+              "transition-[opacity,transform] duration-200",
+              "motion-reduce:transition-none",
+              isActive ? "font-semibold" : "font-medium",
+              isCollapsed && "md:hidden",
+            )}
+          >
+            {item.label}
+          </span>
+        </>
+      )}
+    </NavLink>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/layout/Header/Header.tsx
+============================================================
+
+import { Menu } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import { HeaderActions } from "./HeaderActions";
+import { HeaderGreeting } from "./HeaderGreeting";
+
+interface HeaderProps {
+  onOpenMobileSidebar?: () => void;
+  onOpenSidebar?: () => void;
+}
+
+export function Header({
+  onOpenMobileSidebar,
+  onOpenSidebar,
+}: Readonly<HeaderProps>) {
+  return (
+    <header
+      className={cn(
+        "sticky top-0 z-30",
+        "w-full min-w-0",
+
+        /*
+         * Mobile:
+         * mantÃ©m contraste e legibilidade.
+         */
+        "border-b border-border-muted",
+        "bg-background/82 backdrop-blur-xl",
+        "supports-[backdrop-filter]:bg-background/68",
+
+        /*
+         * Desktop:
+         * mantÃ©m o Header no topo,
+         * mas deixa o fundo transparente.
+         */
+        "md:border-b-transparent",
+        "md:bg-transparent",
+        "md:backdrop-blur-none",
+        "md:supports-[backdrop-filter]:bg-transparent",
+      )}
+    >
+      <div
+        className={cn(
+          "flex min-h-16 w-full min-w-0",
+          "items-center justify-between",
+          "gap-2 px-4 py-2.5",
+
+          "sm:min-h-[72px]",
+          "sm:gap-3 sm:px-5 sm:py-3",
+
+          "lg:min-h-[78px]",
+          "lg:px-6",
+
+          "2xl:px-7",
+        )}
+      >
+        <div
+          className={cn(
+            "flex min-w-0 flex-1",
+            "items-center gap-2.5",
+            "sm:gap-3",
+          )}
+        >
+          {onOpenMobileSidebar && (
+            <button
+              type="button"
+              onClick={onOpenMobileSidebar}
+              className={cn(
+                "flex size-10 shrink-0",
+                "items-center justify-center",
+                "rounded-[14px]",
+                "border border-border",
+                "bg-card text-text shadow-card",
+
+                "transition-[background-color,border-color,color,transform]",
+                "duration-200 ease-out",
+
+                "hover:-translate-y-px",
+                "hover:border-border-highlight",
+                "hover:bg-card-hover",
+
+                "focus-visible:outline-none",
+                "focus-visible:ring-2",
+                "focus-visible:ring-primary",
+                "focus-visible:ring-offset-2",
+                "focus-visible:ring-offset-background",
+
+                "motion-reduce:transition-none",
+                "motion-reduce:hover:translate-y-0",
+
+                "md:hidden",
+              )}
+              aria-label="Abrir menu principal"
+              aria-haspopup="dialog"
+            >
+              <Menu
+                size={19}
+                aria-hidden="true"
+              />
+            </button>
+          )}
+
+          <div className="min-w-0 flex-1">
+            <HeaderGreeting />
+          </div>
+        </div>
+
+        <div className="min-w-0 shrink-0">
+          <HeaderActions
+            onOpenSidebar={onOpenSidebar}
+          />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/layout/Header/HeaderActions.tsx
+============================================================
+
+import { SearchBar } from "@/components/layout/SearchBar";
+import { userMock } from "@/mocks/user.mock";
+
+import { UserMenu } from "../UserMenu";
+
+import { DateRangePicker } from "./DateRangePicker";
+import { NotificationButton } from "./NotificationButton";
+import { ThemeToggle } from "./ThemeToggle";
+
+interface HeaderActionsProps {
+  onOpenSidebar?: () => void;
+}
+
+export function HeaderActions({
+  onOpenSidebar,
+}: Readonly<HeaderActionsProps>) {
+  return (
+    <div className="flex min-w-0 shrink-0 items-center gap-2">
+      <SearchBar className="hidden w-[240px] 2xl:block" />
+
+      <div className="hidden lg:block">
+        <DateRangePicker />
+      </div>
+
+      <div className="hidden sm:block">
+        <ThemeToggle />
+      </div>
+
+      <NotificationButton />
+
+      <UserMenu
+        user={userMock}
+        isOnline
+        onOpenSidebar={onOpenSidebar}
+      />
+    </div>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/layout/Header/HeaderGreeting.tsx
+============================================================
+
+import { Sparkles } from "lucide-react";
+
+import { userMock } from "@/mocks/user.mock";
+
+export function HeaderGreeting() {
+  const firstName =
+    userMock.name.trim().split(/\s+/)[0] ?? "usuÃ¡rio";
+
+  return (
+    <div className="min-w-0">
+      <div className="flex min-w-0 items-center gap-2">
+        
+
+        <p className="truncate text-[11px] font-medium text-text-muted sm:text-xs">
+          Bem-vindo de volta
+        </p>
+
+        <span
+          className="
+            hidden size-6 shrink-0 items-center justify-center
+            rounded-lg border border-primary/25
+            bg-primary/10 text-primary-bright
+            sm:flex
+          "
+          aria-hidden="true"
+        >
+          <Sparkles size={13} />
+        </span>
+
+      </div>
+
+      <h1 className="mt-0.5 truncate text-lg font-semibold tracking-tight text-text sm:text-xl lg:text-[22px]">
+        OlÃ¡, {firstName}
+      </h1>
+
+      <p className="mt-0.5 hidden truncate text-xs text-text-subtle lg:block">
+        Acompanhe sua saÃºde financeira e os insights da sua IA.
+      </p>
+    </div>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/layout/Header/DateRangePicker.tsx
+============================================================
+
+import { CalendarDays, ChevronDown } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+export function DateRangePicker() {
+  return (
+    <button
+      type="button"
+      disabled
+      aria-disabled="true"
+      title="Filtro de perÃ­odo â€” Em breve"
+      className={cn(
+        "flex h-10 items-center gap-2.5",
+        "rounded-[14px] border border-border",
+        "bg-card px-3.5 text-xs font-medium",
+        "text-text-muted shadow-card",
+        "disabled:cursor-not-allowed disabled:opacity-90",
+      )}
+    >
+      <span
+        className={cn(
+          "flex size-7 items-center justify-center",
+          "rounded-[10px] bg-surface-elevated",
+          "text-secondary-bright",
+        )}
+      >
+        <CalendarDays size={15} aria-hidden="true" />
+      </span>
+
+      <span className="whitespace-nowrap">
+        01 Mai â€“ 31 Mai 2026
+      </span>
+
+      <ChevronDown
+        size={14}
+        className="text-text-subtle"
+        aria-hidden="true"
+      />
+    </button>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/layout/Header/NotificationButton.tsx
+============================================================
+
+import { Bell } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+export function NotificationButton() {
+  return (
+    <button
+      type="button"
+      aria-label="Abrir notificaÃ§Ãµes"
+      title="NotificaÃ§Ãµes"
+      className={cn(
+        "relative flex size-10 shrink-0 items-center",
+        "justify-center rounded-[14px]",
+        "border border-border bg-card",
+        "text-text-muted shadow-card",
+        "transition-[background-color,border-color,color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-px",
+        "hover:border-border-highlight",
+        "hover:bg-card-hover hover:text-text",
+        "hover:shadow-elevated",
+        "focus-visible:ring-2 focus-visible:ring-primary",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+      )}
+    >
+      <Bell size={18} aria-hidden="true" />
+
+      <span
+        className={cn(
+          "absolute right-2.5 top-2.5 size-2",
+          "rounded-full border-2 border-card",
+          "bg-danger",
+          "shadow-[0_0_10px_var(--danger)]",
+        )}
+        aria-hidden="true"
+      />
+
+      <span className="sr-only">
+        Existem notificaÃ§Ãµes nÃ£o lidas
+      </span>
+    </button>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/layout/Header/SyncButton.tsx
+============================================================
+
+import { RefreshCw } from "lucide-react";
+
+export function SyncButton() {
+  return (
+    <button
+      className="
+      flex
+      items-center
+      gap-2
+      rounded-xl
+      border
+      border-border
+      bg-surface
+      px-5
+      py-3
+      text-sm
+      font-medium
+      text-text
+      shadow-card
+      transition-all
+      duration-200
+      ease-out
+      hover:-translate-y-0.5
+      hover:shadow-elevated
+      "
+    >
+      <RefreshCw size={18} />
+      Sincronizar dados
+    </button>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/layout/Header/ThemeToggle.tsx
+============================================================
+
+import { Moon, Sun } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { useTheme } from "@/providers/useTheme";
+
+export function ThemeToggle() {
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={
+        isDark
+          ? "Mudar para tema claro"
+          : "Mudar para tema escuro"
+      }
+      title={
+        isDark
+          ? "Ativar tema claro"
+          : "Ativar tema escuro"
+      }
+      className={cn(
+        "flex size-10 shrink-0 items-center justify-center",
+        "rounded-[14px] border border-border bg-card",
+        "text-text-muted shadow-card",
+        "transition-[background-color,border-color,color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-px",
+        "hover:border-border-highlight",
+        "hover:bg-card-hover hover:text-text",
+        "hover:shadow-elevated",
+        "focus-visible:ring-2 focus-visible:ring-primary",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+      )}
+    >
+      {isDark ? (
+        <Sun size={18} aria-hidden="true" />
+      ) : (
+        <Moon size={18} aria-hidden="true" />
+      )}
+    </button>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/common/Card/Card.tsx
+============================================================
+
+import type { CardProps, CardTone } from "./Card.types";
+
+const toneClass: Record<CardTone, string> = {
+  default: "bg-surface",
+  accent: "bg-surface-accent",
+  "accent-2": "bg-surface-accent-2",
+};
+
+export function Card({ children, className = "", tone = "default" }: CardProps) {
+  return (
+    <section
+      className={`
+        rounded-card
+        border
+        border-border
+        ${toneClass[tone]}
+        shadow-card
+        transition-all
+        duration-200
+        ease-out
+        hover:-translate-y-0.5
+        hover:shadow-elevated
+        ${className}
+      `}
+    >
+      {children}
+    </section>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/common/Card/CardHeader.tsx
+============================================================
+
+import type { CardSectionProps } from "./Card.types";
+
+export function CardHeader({ children, className = "" }: CardSectionProps) {
+  return (
+    <header
+      className={`
+        flex
+        items-center
+        justify-between
+        px-6
+        pt-6
+        ${className}
+      `}
+    >
+      {children}
+    </header>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/common/Card/CardTitle.tsx
+============================================================
+
+import type { CardSectionProps } from "./Card.types";
+
+export function CardTitle({ children, className = "" }: CardSectionProps) {
+  return (
+    <h3
+      className={`
+        text-title
+        font-semibold
+        tracking-tight
+        text-text
+        ${className}
+      `}
+    >
+      {children}
+    </h3>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/common/Card/CardContent.tsx
+============================================================
+
+import type { CardSectionProps } from "./Card.types";
+
+export function CardContent({ children, className = "" }: CardSectionProps) {
+  return (
+    <div
+      className={`
+        px-6
+        py-5
+        ${className}
+      `}
+    >
+      {children}
+    </div>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/common/Card/CardFooter.tsx
+============================================================
+
+import type { CardSectionProps } from "./Card.types";
+
+export function CardFooter({ children, className = "" }: CardSectionProps) {
+  return (
+    <footer
+      className={`
+        border-t
+        border-border-muted
+        px-6
+        py-4
+        ${className}
+      `}
+    >
+      {children}
+    </footer>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/common/Chart/ChartContainer.tsx
+============================================================
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import type { ChartContainerProps } from "./Chart.types";
+
+export function ChartContainer({
+  title,
+  subtitle,
+  children,
+  className = "",
+}: ChartContainerProps) {
+  return (
+    <Card className={className}>
+      <CardHeader className="items-start">
+        <div>
+          <CardTitle>{title}</CardTitle>
+
+          {subtitle && (
+            <p className="mt-1 text-caption text-text-muted">{subtitle}</p>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent className="h-[340px]">{children}</CardContent>
+    </Card>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/common/Chart/ChartLegend.tsx
+============================================================
+
+import type { ChartLegendItem } from "./Chart.types";
+
+interface Props {
+  items: ChartLegendItem[];
+}
+
+export function ChartLegend({ items }: Props) {
+  return (
+    <div className="mt-4 flex flex-wrap gap-5">
+      {items.map((item) => (
+        <div key={item.label} className="flex items-center gap-2">
+          <span
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: item.color }}
+          />
+          <span className="text-caption text-text-muted">{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/common/Chart/ChartTooltip.tsx
+============================================================
+
+import type { ChartTooltipProps } from "./Chart.types";
+
+export function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
+  if (!active || !payload?.length) return null;
+
+  return (
+    <div className="rounded-md bg-[var(--chart-tooltip-bg)] px-4 py-3 shadow-elevated">
+      {label && (
+        <p className="mb-2 text-caption font-medium text-[var(--chart-tooltip-text)] opacity-70">
+          {label}
+        </p>
+      )}
+
+      {payload.map((item) => (
+        <div
+          key={item.dataKey}
+          className="flex items-center justify-between gap-6 text-caption text-[var(--chart-tooltip-text)]"
+        >
+          <span className="opacity-80">{item.name}</span>
+          <span className="font-semibold">
+            {typeof item.value === "number"
+              ? item.value.toLocaleString("pt-BR")
+              : item.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/dashboard/FinancialCard/FinancialCard.tsx
+============================================================
+
+import {
+  useId,
+  type ReactNode,
+} from "react";
+
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+type FinancialCardTrend =
+  | "up"
+  | "down"
+  | "neutral";
+
+interface FinancialCardProps {
+  id?: string;
+  title: string;
+  value: string;
+  variation: string;
+  trend: FinancialCardTrend;
+  icon: ReactNode;
+  updatedAt?: string;
+  className?: string;
+}
+
+type FinancialCardTone =
+  | "balance"
+  | "income"
+  | "expenses"
+  | "neutral";
+
+interface FinancialCardVisual {
+  iconContainer: string;
+  badge: string;
+  lineColor: string;
+  glowColor: string;
+}
+
+const visualStyles: Record<
+  FinancialCardTone,
+  FinancialCardVisual
+> = {
+  balance: {
+    iconContainer:
+      "border-primary/20 bg-primary/10 text-primary-bright",
+    badge:
+      "border-success/15 bg-success/10 text-success",
+    lineColor: "#7c3aed",
+    glowColor: "#7c3aed",
+  },
+
+  income: {
+    iconContainer:
+      "border-success/20 bg-success/10 text-success",
+    badge:
+      "border-success/15 bg-success/10 text-success",
+    lineColor: "#10b981",
+    glowColor: "#10b981",
+  },
+
+  expenses: {
+    iconContainer:
+      "border-danger/20 bg-danger/10 text-danger",
+    badge:
+      "border-danger/15 bg-danger/10 text-danger",
+    lineColor: "#f43f5e",
+    glowColor: "#f43f5e",
+  },
+
+  neutral: {
+    iconContainer:
+      "border-border bg-surface-muted text-text-muted",
+    badge:
+      "border-border bg-surface-muted text-text-muted",
+    lineColor: "#3b82f6",
+    glowColor: "#3b82f6",
+  },
+};
+
+function getCardTone(
+  id: string | undefined,
+  trend: FinancialCardTrend,
+): FinancialCardTone {
+  switch (id) {
+    case "balance":
+      return "balance";
+
+    case "income":
+      return "income";
+
+    case "expenses":
+      return "expenses";
+
+    default:
+      return trend === "down"
+        ? "expenses"
+        : trend === "up"
+          ? "income"
+          : "neutral";
+  }
+}
+
+function getSparklinePath(
+  tone: FinancialCardTone,
+): string {
+  switch (tone) {
+    case "income":
+      return [
+        "M2 36",
+        "C18 36 26 33 40 27",
+        "C55 19 63 18 76 22",
+        "C91 28 104 28 118 19",
+        "C132 10 144 15 158 7",
+        "C166 3 174 4 178 4",
+      ].join(" ");
+
+    case "expenses":
+      return [
+        "M2 34",
+        "C18 33 26 29 39 27",
+        "C54 24 62 28 75 29",
+        "C91 30 102 25 116 25",
+        "C132 25 140 15 153 16",
+        "C165 17 170 12 178 11",
+      ].join(" ");
+
+    case "balance":
+      return [
+        "M2 35",
+        "C14 35 23 32 34 29",
+        "C47 25 55 29 68 28",
+        "C82 27 90 20 103 22",
+        "C117 24 126 18 139 16",
+        "C152 14 163 18 178 14",
+      ].join(" ");
+
+    case "neutral":
+      return [
+        "M2 35",
+        "C17 35 26 31 39 28",
+        "C52 25 63 27 76 23",
+        "C91 18 102 20 116 17",
+        "C130 14 142 16 155 10",
+        "C164 7 172 8 178 7",
+      ].join(" ");
+  }
+}
+
+export function FinancialCard({
+  id,
+  title,
+  value,
+  variation,
+  trend,
+  icon,
+  updatedAt = "Atualizado agora",
+  className,
+}: Readonly<FinancialCardProps>) {
+  const gradientId = useId().replaceAll(
+    ":",
+    "",
+  );
+
+  const tone = getCardTone(id, trend);
+  const visual = visualStyles[tone];
+  const sparklinePath =
+    getSparklinePath(tone);
+
+  return (
+    <Card
+      className={cn(
+        "group relative flex min-h-[228px] min-w-0",
+        "flex-col overflow-hidden",
+        "border-border bg-card",
+        "transition-[border-color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-0.5",
+        "hover:border-border-highlight",
+        "hover:shadow-elevated",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0",
+          "h-24 opacity-0 transition-opacity duration-300",
+          "bg-[radial-gradient(circle_at_top_right,var(--glow-primary),transparent_70%)]",
+          "group-hover:opacity-30",
+        )}
+        aria-hidden="true"
+      />
+
+      <CardHeader className="relative shrink-0 pb-3">
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0 items-center",
+              "justify-center rounded-[13px] border",
+              "[&_svg]:size-5",
+              visual.iconContainer,
+            )}
+            aria-hidden="true"
+          >
+            {icon}
+          </div>
+
+          <span
+            className={cn(
+              "inline-flex shrink-0 items-center",
+              "rounded-full border px-2.5 py-1",
+              "text-[10px] font-semibold leading-none",
+              visual.badge,
+            )}
+          >
+            {variation}
+          </span>
+        </div>
+      </CardHeader>
+
+      <CardContent className="relative flex flex-1 flex-col pb-3 pt-0">
+        <p className="text-xs font-medium text-text-muted">
+          {title}
+        </p>
+
+        <p
+          className={cn(
+            "mt-2 min-w-0 break-words",
+            "text-[clamp(1.35rem,2vw,1.75rem)]",
+            "font-bold leading-tight tracking-[-0.035em]",
+            "text-text",
+          )}
+        >
+          {value}
+        </p>
+
+        <div className="mt-auto pt-5">
+          <svg
+            width="100%"
+            height="48"
+            viewBox="0 0 180 48"
+            preserveAspectRatio="none"
+            fill="none"
+            role="img"
+            aria-label={`TendÃªncia de ${title}`}
+          >
+            <defs>
+              <linearGradient
+                id={`${gradientId}-area`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="0%"
+                  stopColor={visual.glowColor}
+                  stopOpacity="0.28"
+                />
+
+                <stop
+                  offset="100%"
+                  stopColor={visual.glowColor}
+                  stopOpacity="0"
+                />
+              </linearGradient>
+            </defs>
+
+            <path
+              d={`${sparklinePath} L178 48 L2 48 Z`}
+              fill={`url(#${gradientId}-area)`}
+            />
+
+            <path
+              d={sparklinePath}
+              stroke={visual.lineColor}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        </div>
+      </CardContent>
+
+      <CardFooter
+        className={cn(
+          "relative shrink-0 border-t border-border-muted",
+          "pb-4 pt-3",
+        )}
+      >
+        <span className="text-[10px] font-medium text-text-subtle">
+          {updatedAt}
+        </span>
+      </CardFooter>
+    </Card>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/FinancialCard/FinancialCard.types.ts
+============================================================
+
+import type { ReactNode } from "react";
+
+export interface FinancialCardProps {
+  id?: string;
+  title: string;
+  value: string;
+  variation: string;
+
+  trend: "up" | "down" | "neutral";
+
+  icon: ReactNode;
+
+  updatedAt?: string;
+
+  className?: string;
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/FinancialCards/FinancialCards.tsx
+============================================================
+
+import { dashboardMock } from "@/mocks/dashboard.mock";
+
+import {
+  FinancialCard,
+  type FinancialCardProps,
+} from "../FinancialCard";
+
+function isScoreCard(
+  card: FinancialCardProps,
+): boolean {
+  const normalizedId = String(
+    card.id ?? "",
+  ).toLocaleLowerCase("pt-BR");
+
+  const normalizedTitle =
+    card.title.toLocaleLowerCase("pt-BR");
+
+  return (
+    normalizedId.includes("score") ||
+    normalizedTitle.includes("score")
+  );
+}
+
+export function FinancialCards() {
+  const summaryCards: FinancialCardProps[] =
+    dashboardMock.summary.filter(
+      (card: FinancialCardProps) =>
+        !isScoreCard(card),
+    );
+
+  return (
+    <>
+      {summaryCards.map(
+        (card: FinancialCardProps) => (
+          <FinancialCard
+            key={card.id ?? card.title}
+            id={card.id}
+            title={card.title}
+            value={card.value}
+            variation={card.variation}
+            trend={card.trend}
+            icon={card.icon}
+            updatedAt={card.updatedAt}
+            className={card.className}
+          />
+        ),
+      )}
+    </>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/BalanceChart/BalanceChart.tsx
+============================================================
+
+import { useMemo } from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
+  CalendarDays,
+  WalletCards,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { BalanceChartTooltip } from "./BalanceChartTooltip";
+
+const compactCurrencyFormatter = new Intl.NumberFormat(
+  "pt-BR",
+  {
+    notation: "compact",
+    compactDisplay: "short",
+    maximumFractionDigits: 0,
+  },
+);
+
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  minimumFractionDigits: 2,
+});
+
+function formatAxisValue(value: number): string {
+  return `R$ ${compactCurrencyFormatter.format(value)}`;
+}
+
+export function BalanceChart() {
+  const data = dashboardService.getCashFlow();
+
+  const summary = useMemo(() => {
+    const latest = data.at(-1);
+
+    if (!latest) {
+      return null;
+    }
+
+    const balance = latest.income - latest.expenses;
+
+    const expensePercentage =
+      latest.income > 0
+        ? Math.round(
+            (latest.expenses / latest.income) * 100,
+          )
+        : 0;
+
+    return {
+      month: latest.month,
+      income: latest.income,
+      expenses: latest.expenses,
+      balance,
+      expensePercentage,
+    };
+  }, [data]);
+
+  return (
+    <Card className="min-w-0 overflow-hidden">
+      <CardHeader
+        className={cn(
+          "flex flex-col gap-4",
+          "lg:flex-row lg:items-start",
+          "lg:justify-between",
+        )}
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0 items-center",
+              "justify-center rounded-[13px]",
+              "border border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <BarChart3 size={19} />
+          </div>
+
+          <div className="min-w-0">
+            <CardTitle>
+              Fluxo financeiro
+            </CardTitle>
+
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              Comparativo entre receitas e despesas nos
+              Ãºltimos seis meses.
+            </p>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "inline-flex w-fit items-center gap-2",
+            "rounded-[12px] border border-border",
+            "bg-surface-elevated/65 px-3 py-2",
+            "text-[11px] font-medium text-text-muted",
+          )}
+        >
+          <CalendarDays
+            size={15}
+            aria-hidden="true"
+          />
+
+          Ãšltimos 6 meses
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        {data.length > 0 && summary ? (
+          <>
+            <div
+              className={cn(
+                "mb-5 grid min-w-0 grid-cols-1 gap-3",
+                "sm:grid-cols-3",
+              )}
+            >
+              <div
+                className={cn(
+                  "min-w-0 rounded-[14px]",
+                  "border border-success/15",
+                  "bg-success/5 px-4 py-3",
+                )}
+              >
+                <div className="flex items-center gap-2 text-success">
+                  <ArrowUpRight
+                    size={15}
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-[10px] font-semibold uppercase tracking-wide">
+                    Receitas em {summary.month}
+                  </span>
+                </div>
+
+                <p className="mt-2 truncate text-sm font-bold text-text">
+                  {currencyFormatter.format(
+                    summary.income,
+                  )}
+                </p>
+              </div>
+
+              <div
+                className={cn(
+                  "min-w-0 rounded-[14px]",
+                  "border border-danger/15",
+                  "bg-danger/5 px-4 py-3",
+                )}
+              >
+                <div className="flex items-center gap-2 text-danger">
+                  <ArrowDownRight
+                    size={15}
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-[10px] font-semibold uppercase tracking-wide">
+                    Despesas em {summary.month}
+                  </span>
+                </div>
+
+                <p className="mt-2 truncate text-sm font-bold text-text">
+                  {currencyFormatter.format(
+                    summary.expenses,
+                  )}
+                </p>
+              </div>
+
+              <div
+                className={cn(
+                  "min-w-0 rounded-[14px]",
+                  "border border-primary/15",
+                  "bg-primary/5 px-4 py-3",
+                )}
+              >
+                <div className="flex items-center gap-2 text-primary-bright">
+                  <WalletCards
+                    size={15}
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-[10px] font-semibold uppercase tracking-wide">
+                    Resultado mensal
+                  </span>
+                </div>
+
+                <p className="mt-2 truncate text-sm font-bold text-text">
+                  {currencyFormatter.format(
+                    summary.balance,
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "min-w-0 rounded-[16px]",
+                "border border-border-muted",
+                "bg-background/25 px-2 pb-2 pt-5",
+                "sm:px-4",
+              )}
+            >
+              <div className="h-[280px] min-w-0 sm:h-[320px] lg:h-[350px]">
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                >
+                  <AreaChart
+                    data={data}
+                    margin={{
+                      top: 8,
+                      right: 8,
+                      left: 0,
+                      bottom: 0,
+                    }}
+                  >
+                    <defs>
+                      <linearGradient
+                        id="balance-income-gradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="#10b981"
+                          stopOpacity={0.34}
+                        />
+
+                        <stop
+                          offset="92%"
+                          stopColor="#10b981"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+
+                      <linearGradient
+                        id="balance-expense-gradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="#f43f5e"
+                          stopOpacity={0.24}
+                        />
+
+                        <stop
+                          offset="92%"
+                          stopColor="#f43f5e"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+
+                    <CartesianGrid
+                      stroke="var(--border-muted)"
+                      strokeDasharray="4 6"
+                      vertical={false}
+                    />
+
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{
+                        fill: "var(--text-muted)",
+                        fontSize: 11,
+                      }}
+                      tickMargin={12}
+                    />
+
+                    <YAxis
+                      width={62}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{
+                        fill: "var(--text-muted)",
+                        fontSize: 10,
+                      }}
+                      tickFormatter={formatAxisValue}
+                    />
+
+                    <Tooltip
+                      cursor={{
+                        stroke: "var(--border-highlight)",
+                        strokeWidth: 1,
+                        strokeDasharray: "4 4",
+                      }}
+                      content={
+                        <BalanceChartTooltip />
+                      }
+                    />
+
+                    <Area
+                      type="monotone"
+                      dataKey="income"
+                      name="Receitas"
+                      stroke="#10b981"
+                      fill="url(#balance-income-gradient)"
+                      strokeWidth={2.5}
+                      dot={false}
+                      activeDot={{
+                        r: 5,
+                        strokeWidth: 3,
+                        stroke: "var(--card)",
+                        fill: "#10b981",
+                      }}
+                      animationDuration={700}
+                    />
+
+                    <Area
+                      type="monotone"
+                      dataKey="expenses"
+                      name="Despesas"
+                      stroke="#f43f5e"
+                      fill="url(#balance-expense-gradient)"
+                      strokeWidth={2.5}
+                      dot={false}
+                      activeDot={{
+                        r: 5,
+                        strokeWidth: 3,
+                        stroke: "var(--card)",
+                        fill: "#f43f5e",
+                      }}
+                      animationDuration={850}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "mt-4 flex flex-col gap-3",
+                "sm:flex-row sm:items-center",
+                "sm:justify-between",
+              )}
+            >
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="size-2.5 rounded-full bg-success"
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-xs font-medium text-text-muted">
+                    Receitas
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span
+                    className="size-2.5 rounded-full bg-danger"
+                    aria-hidden="true"
+                  />
+
+                  <span className="text-xs font-medium text-text-muted">
+                    Despesas
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-xs text-text-muted">
+                Despesas representam{" "}
+                <strong className="font-semibold text-text">
+                  {summary.expensePercentage}%
+                </strong>{" "}
+                das receitas em {summary.month}.
+              </p>
+            </div>
+          </>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[340px] flex-col",
+              "items-center justify-center",
+              "rounded-[16px] border",
+              "border-dashed border-border",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "bg-primary/10 text-primary-bright",
+              )}
+            >
+              <BarChart3
+                size={22}
+                aria-hidden="true"
+              />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhum dado financeiro disponÃ­vel
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              O grÃ¡fico serÃ¡ exibido quando houver receitas
+              e despesas registradas.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/BalanceChart/BalanceChart.types.ts
+============================================================
+
+export interface BalanceChartData {
+  month: string;
+  income: number;
+  expenses: number;
+}
+
+export interface BalanceChartTooltipPayload {
+  name?: string;
+  value?: number | string;
+  color?: string;
+  dataKey?: string | number;
+}
+
+export interface BalanceChartTooltipProps {
+  active?: boolean;
+  label?: string | number;
+  payload?: readonly BalanceChartTooltipPayload[];
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/AIInsights/AIInsights.tsx
+============================================================
+
+import {
+  ArrowUpRight,
+  Bot,
+  CreditCard,
+  Lightbulb,
+  Send,
+  Sparkles,
+  TriangleAlert,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { InsightItem } from "./InsightItem";
+
+import type {
+  AIInsightsProps,
+  InsightPresentation,
+} from "./AIInsights.types";
+
+const DEFAULT_MAX_VISIBLE_INSIGHTS = 4;
+
+const fallbackPresentations: readonly InsightPresentation[] =
+  [
+    {
+      icon: Sparkles,
+      tone: "success",
+      title: "Seu desempenho melhorou",
+    },
+    {
+      icon: Lightbulb,
+      tone: "warning",
+      title: "Oportunidade de economia",
+    },
+    {
+      icon: ArrowUpRight,
+      tone: "info",
+      title: "MovimentaÃ§Ã£o financeira",
+    },
+    {
+      icon: TriangleAlert,
+      tone: "danger",
+      title: "Ponto de atenÃ§Ã£o",
+    },
+  ];
+
+function getInsightPresentation(
+  insight: string,
+  index: number,
+): InsightPresentation {
+  const normalizedInsight =
+    insight.toLocaleLowerCase("pt-BR");
+
+  if (
+    normalizedInsight.includes("assinatura") ||
+    normalizedInsight.includes("atenÃ§Ã£o") ||
+    normalizedInsight.includes("risco")
+  ) {
+    return {
+      icon: CreditCard,
+      tone: "danger",
+      title: "AtenÃ§Ã£o necessÃ¡ria",
+    };
+  }
+
+  if (
+    normalizedInsight.includes("economizar") ||
+    normalizedInsight.includes("gasto") ||
+    normalizedInsight.includes("despesa") ||
+    normalizedInsight.includes("reduziu")
+  ) {
+    return {
+      icon: Lightbulb,
+      tone: "warning",
+      title: "Oportunidade de economia",
+    };
+  }
+
+  if (
+    normalizedInsight.includes("aument") ||
+    normalizedInsight.includes("crescimento") ||
+    normalizedInsight.includes("receita") ||
+    normalizedInsight.includes("renda") ||
+    normalizedInsight.includes("score")
+  ) {
+    return {
+      icon: ArrowUpRight,
+      tone: "success",
+      title: "EvoluÃ§Ã£o positiva",
+    };
+  }
+
+  return (
+    fallbackPresentations[
+      index % fallbackPresentations.length
+    ] ?? fallbackPresentations[0]
+  );
+}
+
+export function AIInsights({
+  title = "AI Assistant",
+  subtitle = "Insights e recomendaÃ§Ãµes inteligentes para suas finanÃ§as.",
+  maxVisibleInsights = DEFAULT_MAX_VISIBLE_INSIGHTS,
+}: Readonly<AIInsightsProps>) {
+  const insights: readonly string[] =
+    dashboardService.getInsights();
+
+  const safeMaxVisibleInsights = Math.max(
+    0,
+    maxVisibleInsights,
+  );
+
+  const visibleInsights = insights.slice(
+    0,
+    safeMaxVisibleInsights,
+  );
+
+  const hiddenInsightsCount = Math.max(
+    insights.length - visibleInsights.length,
+    0,
+  );
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0 items-center",
+              "justify-center rounded-[13px]",
+              "border border-primary/25",
+              "bg-gradient-to-br from-primary/20",
+              "via-primary/10 to-secondary/15",
+              "text-primary-bright",
+              "shadow-[0_0_24px_-12px_var(--glow-primary)]",
+            )}
+            aria-hidden="true"
+          >
+            <Bot size={20} />
+          </div>
+
+          <div className="min-w-0">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <span className="truncate">
+                {title}
+              </span>
+
+              <Sparkles
+                size={14}
+                className="shrink-0 text-secondary-bright"
+                aria-hidden="true"
+              />
+            </CardTitle>
+
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              {subtitle}
+            </p>
+          </div>
+        </div>
+
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5",
+            "rounded-full border border-success/20",
+            "bg-success/10 px-2.5 py-1",
+            "text-[10px] font-semibold text-success",
+          )}
+        >
+          <span
+            className="relative flex size-1.5"
+            aria-hidden="true"
+          >
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-50 motion-reduce:animate-none" />
+
+            <span className="relative inline-flex size-1.5 rounded-full bg-success" />
+          </span>
+
+          Online
+        </span>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {visibleInsights.length > 0 ? (
+          <div
+            className={cn(
+              "grid min-w-0 flex-1 grid-cols-1 gap-3",
+              "md:grid-cols-2",
+            )}
+            aria-label="Insights do assistente financeiro"
+          >
+            {visibleInsights.map(
+              (
+                insight: string,
+                index: number,
+              ) => {
+                const presentation =
+                  getInsightPresentation(
+                    insight,
+                    index,
+                  );
+
+                return (
+                  <InsightItem
+                    key={`${index}-${insight}`}
+                    insight={insight}
+                    presentation={presentation}
+                  />
+                );
+              },
+            )}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[280px] flex-col",
+              "items-center justify-center",
+              "rounded-[16px] border",
+              "border-dashed border-border",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-primary/20",
+                "bg-primary/10 text-primary-bright",
+              )}
+              aria-hidden="true"
+            >
+              <Bot size={22} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhum insight disponÃ­vel
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Uma nova anÃ¡lise financeira poderÃ¡ gerar
+              recomendaÃ§Ãµes personalizadas.
+            </p>
+          </div>
+        )}
+
+        {hiddenInsightsCount > 0 && (
+          <p className="mt-3 text-center text-xs text-text-muted">
+            +{hiddenInsightsCount}{" "}
+            {hiddenInsightsCount === 1
+              ? "insight adicional"
+              : "insights adicionais"}
+          </p>
+        )}
+
+        <div
+          className={cn(
+            "mt-4 flex min-w-0 items-center gap-2",
+            "rounded-[14px] border border-border",
+            "bg-background/50 p-1.5",
+            "transition-colors duration-200",
+            "focus-within:border-primary/40",
+          )}
+        >
+          <label
+            htmlFor="ai-financial-question"
+            className="sr-only"
+          >
+            Pergunte algo sobre suas finanÃ§as
+          </label>
+
+          <input
+            id="ai-financial-question"
+            type="text"
+            disabled
+            placeholder="Pergunte algo sobre suas finanÃ§as..."
+            className={cn(
+              "h-9 min-w-0 flex-1 bg-transparent px-2",
+              "text-xs text-text outline-none",
+              "placeholder:text-text-subtle",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-80",
+            )}
+          />
+
+          <button
+            type="button"
+            disabled
+            aria-label="Enviar pergunta"
+            title="DisponÃ­vel apÃ³s a integraÃ§Ã£o com o backend"
+            className={cn(
+              "flex size-9 shrink-0 items-center",
+              "justify-center rounded-[11px]",
+              "bg-gradient-to-br from-primary",
+              "to-secondary text-white",
+              "shadow-sm transition-opacity",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
+            )}
+          >
+            <Send
+              size={16}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-text-subtle">
+          <Sparkles
+            size={11}
+            aria-hidden="true"
+          />
+
+          <span>
+            Chat disponÃ­vel apÃ³s a integraÃ§Ã£o com o backend.
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/TransactionsTable/TransactionsTable.tsx
+============================================================
+
+import {
+  useMemo,
+  useState,
+} from "react";
+import {
+  ArrowRight,
+  ReceiptText,
+  SearchX,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { TransactionsTableHeader } from "./TransactionsTableHeader";
+import { TransactionsTableRow } from "./TransactionsTableRow";
+import { TransactionsTableSearch } from "./TransactionsTableSearch";
+
+import type {
+  TransactionsTableProps,
+} from "./TransactionsTable.types";
+
+export function TransactionsTable({
+  transactions: providedTransactions,
+  title = "TransaÃ§Ãµes recentes",
+  description = "Acompanhe as movimentaÃ§Ãµes mais recentes da sua conta.",
+  onViewAll,
+}: Readonly<TransactionsTableProps>) {
+  const [search, setSearch] = useState("");
+
+  const serviceTransactions =
+    dashboardService.getTransactions();
+
+  const transactions =
+    providedTransactions ??
+    serviceTransactions;
+
+  const filteredTransactions = useMemo(() => {
+    const normalizedTerm = search
+      .trim()
+      .toLocaleLowerCase("pt-BR");
+
+    if (!normalizedTerm) {
+      return transactions;
+    }
+
+    return transactions.filter(
+      (transaction) => {
+        const searchableContent = [
+          transaction.description,
+          transaction.category,
+          transaction.status === "completed"
+            ? "concluÃ­da"
+            : "pendente",
+        ]
+          .join(" ")
+          .toLocaleLowerCase("pt-BR");
+
+        return searchableContent.includes(
+          normalizedTerm,
+        );
+      },
+    );
+  }, [search, transactions]);
+
+  const hasSearch =
+    search.trim().length > 0;
+
+  return (
+    <Card className="min-w-0 overflow-hidden">
+      <CardHeader
+        className={cn(
+          "flex-col items-stretch gap-4",
+          "xl:flex-row xl:items-start",
+          "xl:justify-between",
+        )}
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex size-10 shrink-0 items-center",
+              "justify-center rounded-[13px]",
+              "border border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <ReceiptText size={18} />
+          </div>
+
+          <div className="min-w-0">
+            <CardTitle className="text-sm font-semibold">
+              {title}
+            </CardTitle>
+
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              {description}
+            </p>
+
+            <p className="mt-1 text-[10px] text-text-subtle">
+              {transactions.length}{" "}
+              {transactions.length === 1
+                ? "movimentaÃ§Ã£o registrada"
+                : "movimentaÃ§Ãµes registradas"}
+            </p>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "flex min-w-0 flex-col gap-3",
+            "sm:flex-row sm:items-start",
+          )}
+        >
+          <TransactionsTableSearch
+            value={search}
+            onChange={setSearch}
+            resultCount={
+              filteredTransactions.length
+            }
+          />
+
+          {onViewAll && (
+            <button
+              type="button"
+              onClick={onViewAll}
+              className={cn(
+                "inline-flex h-10 shrink-0",
+                "items-center justify-center gap-2",
+                "rounded-[12px] border",
+                "border-border bg-surface-elevated",
+                "px-3 text-xs font-semibold",
+                "text-text-muted",
+                "transition-[border-color,color,background-color]",
+                "hover:border-border-highlight",
+                "hover:bg-card-hover",
+                "hover:text-text",
+                "focus-visible:outline-none",
+                "focus-visible:ring-2",
+                "focus-visible:ring-primary/40",
+              )}
+            >
+              Ver todas
+
+              <ArrowRight
+                size={14}
+                aria-hidden="true"
+              />
+            </button>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-0">
+        {filteredTransactions.length > 0 ? (
+          <div className="max-h-[520px] overflow-auto">
+            <table className="min-w-[790px] w-full border-collapse">
+              <caption className="sr-only">
+                Lista de transaÃ§Ãµes financeiras recentes
+              </caption>
+
+              <TransactionsTableHeader />
+
+              <tbody className="divide-y divide-border-muted">
+                {filteredTransactions.map(
+                  (transaction) => (
+                    <TransactionsTableRow
+                      key={transaction.id}
+                      transaction={transaction}
+                    />
+                  ),
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[300px] flex-col",
+              "items-center justify-center",
+              "border-t border-border-muted",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-border",
+                "bg-surface-muted text-text-muted",
+              )}
+              aria-hidden="true"
+            >
+              <SearchX size={21} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              {hasSearch
+                ? "Nenhuma transaÃ§Ã£o encontrada"
+                : "Nenhuma transaÃ§Ã£o registrada"}
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              {hasSearch
+                ? `NÃ£o encontramos resultados para â€œ${search.trim()}â€.`
+                : "As movimentaÃ§Ãµes mais recentes aparecerÃ£o aqui."}
+            </p>
+
+            {hasSearch && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className={cn(
+                  "mt-4 rounded-[10px]",
+                  "border border-primary/20",
+                  "bg-primary/10 px-3 py-2",
+                  "text-xs font-semibold",
+                  "text-primary-bright",
+                  "transition-colors",
+                  "hover:bg-primary/15",
+                  "focus-visible:outline-none",
+                  "focus-visible:ring-2",
+                  "focus-visible:ring-primary/40",
+                )}
+              >
+                Limpar pesquisa
+              </button>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/TransactionsTable/TransactionsTableHeader.tsx
+============================================================
+
+import { cn } from "@/lib/utils";
+
+interface TransactionColumn {
+  label: string;
+  className?: string;
+}
+
+const columns: readonly TransactionColumn[] = [
+  {
+    label: "Categoria",
+    className: "min-w-[180px]",
+  },
+  {
+    label: "DescriÃ§Ã£o",
+    className: "min-w-[210px]",
+  },
+  {
+    label: "Data",
+    className: "min-w-[125px]",
+  },
+  {
+    label: "Valor",
+    className: "min-w-[145px] text-right",
+  },
+  {
+    label: "Status",
+    className: "min-w-[130px] text-right",
+  },
+];
+
+export function TransactionsTableHeader() {
+  return (
+    <thead
+      className={cn(
+        "sticky top-0 z-10",
+        "border-y border-border-muted",
+        "bg-surface-elevated/95",
+        "backdrop-blur-md",
+      )}
+    >
+      <tr>
+        {columns.map((column) => (
+          <th
+            key={column.label}
+            scope="col"
+            className={cn(
+              "px-5 py-3.5",
+              "text-left text-[10px]",
+              "font-semibold uppercase",
+              "tracking-[0.09em]",
+              "text-text-subtle",
+              column.className,
+            )}
+          >
+            {column.label}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/TransactionsTable/TransactionsTableRow.tsx
+============================================================
+
+import type { LucideIcon } from "lucide-react";
+import {
+  CarFront,
+  CircleDollarSign,
+  CreditCard,
+  Dumbbell,
+  HeartPulse,
+  Home,
+  ReceiptText,
+  ShoppingBasket,
+  Utensils,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type { TransactionsTableRowProps } from "./TransactionsTable.types";
+
+interface CategoryVisual {
+  icon: LucideIcon;
+  iconContainerClassName: string;
+  iconClassName: string;
+}
+
+const currencyFormatter = new Intl.NumberFormat(
+  "pt-BR",
+  {
+    style: "currency",
+    currency: "BRL",
+  },
+);
+
+const dateFormatter = new Intl.DateTimeFormat(
+  "pt-BR",
+  {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  },
+);
+
+const categoryVisuals: Record<
+  string,
+  CategoryVisual
+> = {
+  receita: {
+    icon: CircleDollarSign,
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    iconClassName: "text-success",
+  },
+
+  alimentação: {
+    icon: ShoppingBasket,
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+
+  assinatura: {
+    icon: CreditCard,
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+  },
+
+  transporte: {
+    icon: CarFront,
+    iconContainerClassName:
+      "border-info/20 bg-info/10",
+    iconClassName: "text-info",
+  },
+
+  moradia: {
+    icon: Home,
+    iconContainerClassName:
+      "border-secondary/20 bg-secondary/10",
+    iconClassName: "text-secondary-bright",
+  },
+
+  saúde: {
+    icon: HeartPulse,
+    iconContainerClassName:
+      "border-danger/20 bg-danger/10",
+    iconClassName: "text-danger",
+  },
+
+  academia: {
+    icon: Dumbbell,
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+  },
+
+  restaurante: {
+    icon: Utensils,
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+  },
+};
+
+const fallbackCategoryVisual: CategoryVisual = {
+  icon: ReceiptText,
+  iconContainerClassName:
+    "border-border bg-surface-muted",
+  iconClassName: "text-text-muted",
+};
+
+function normalizeCategory(
+  category: string,
+): string {
+  return category
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("pt-BR");
+}
+
+function getCategoryVisual(
+  category: string,
+): CategoryVisual {
+  const normalizedCategory =
+    normalizeCategory(category);
+
+  const matchingEntry = Object.entries(
+    categoryVisuals,
+  ).find(([key]) =>
+    normalizedCategory.includes(
+      normalizeCategory(key),
+    ),
+  );
+
+  return (
+    matchingEntry?.[1] ??
+    fallbackCategoryVisual
+  );
+}
+
+function parseLocalDate(
+  date: string,
+): Date {
+  return new Date(`${date}T00:00:00`);
+}
+
+export function TransactionsTableRow({
+  transaction,
+}: Readonly<TransactionsTableRowProps>) {
+  const isIncome =
+    transaction.type === "income";
+
+  const isCompleted =
+    transaction.status === "completed";
+
+  const categoryVisual =
+    getCategoryVisual(transaction.category);
+
+  const CategoryIcon =
+    categoryVisual.icon;
+
+  const formattedAmount =
+    currencyFormatter.format(
+      Math.abs(transaction.amount),
+    );
+
+  return (
+    <tr
+      className={cn(
+        "group transition-colors duration-150",
+        "hover:bg-surface-elevated/55",
+      )}
+    >
+      <td className="px-5 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className={cn(
+              "flex size-9 shrink-0",
+              "items-center justify-center",
+              "rounded-[11px] border",
+              categoryVisual.iconContainerClassName,
+              categoryVisual.iconClassName,
+            )}
+            aria-hidden="true"
+          >
+            <CategoryIcon size={16} />
+          </div>
+
+          <span className="truncate text-xs font-semibold text-text">
+            {transaction.category}
+          </span>
+        </div>
+      </td>
+
+      <td className="px-5 py-4">
+        <div className="min-w-0">
+          <p className="truncate text-xs font-medium text-text">
+            {transaction.description}
+          </p>
+
+          <p className="mt-1 text-[10px] text-text-subtle">
+            ID #{transaction.id}
+          </p>
+        </div>
+      </td>
+
+      <td className="px-5 py-4">
+        <time
+          dateTime={transaction.date}
+          className="whitespace-nowrap text-xs text-text-muted"
+        >
+          {dateFormatter.format(
+            parseLocalDate(transaction.date),
+          )}
+        </time>
+      </td>
+
+      <td className="px-5 py-4 text-right">
+        <span
+          className={cn(
+            "inline-flex items-center",
+            "justify-end gap-1",
+            "whitespace-nowrap text-xs",
+            "font-semibold tabular-nums",
+            isIncome
+              ? "text-success"
+              : "text-danger",
+          )}
+        >
+          {isIncome ? "+" : "−"}
+
+          {formattedAmount}
+        </span>
+      </td>
+
+      <td className="px-5 py-4 text-right">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5",
+            "rounded-full border",
+            "px-2.5 py-1",
+            "text-[10px] font-semibold",
+            isCompleted
+              ? [
+                  "border-success/20",
+                  "bg-success/10",
+                  "text-success",
+                ]
+              : [
+                  "border-warning/20",
+                  "bg-warning/10",
+                  "text-warning",
+                ],
+          )}
+        >
+          <span
+            className={cn(
+              "size-1.5 rounded-full",
+              isCompleted
+                ? "bg-success"
+                : "bg-warning",
+            )}
+            aria-hidden="true"
+          />
+
+          {isCompleted
+            ? "Concluída"
+            : "Pendente"}
+        </span>
+      </td>
+    </tr>
+  );
+}
+
+
+============================================================
+ARQUIVO: src/components/dashboard/TransactionsTable/TransactionsTableSearch.tsx
+============================================================
+
+import {
+  Search,
+  X,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type { TransactionsTableSearchProps } from "./TransactionsTable.types";
+
+export function TransactionsTableSearch({
+  value,
+  onChange,
+  resultCount,
+}: Readonly<TransactionsTableSearchProps>) {
+  const hasValue = value.trim().length > 0;
+
+  return (
+    <div className="min-w-0">
+      <label
+        htmlFor="transactions-search"
+        className="sr-only"
+      >
+        Pesquisar transaÃ§Ãµes
+      </label>
+
+      <div className="relative w-full min-w-0 sm:w-72">
+        <Search
+          size={16}
+          className={cn(
+            "pointer-events-none absolute",
+            "left-3 top-1/2 -translate-y-1/2",
+            "text-text-subtle",
+          )}
+          aria-hidden="true"
+        />
+
+        <input
+          id="transactions-search"
+          type="search"
+          value={value}
+          onChange={(event) =>
+            onChange(event.target.value)
+          }
+          placeholder="Pesquisar transaÃ§Ãµes..."
+          autoComplete="off"
+          className={cn(
+            "h-10 w-full min-w-0",
+            "rounded-[12px] border border-border",
+            "bg-background/45",
+            "pl-9 pr-10",
+            "text-xs text-text outline-none",
+            "placeholder:text-text-subtle",
+            "transition-[border-color,box-shadow,background-color]",
+            "duration-200",
+            "hover:bg-background/65",
+            "focus:border-primary/45",
+            "focus:ring-4 focus:ring-primary/10",
+          )}
+        />
+
+        {hasValue && (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            aria-label="Limpar pesquisa"
+            title="Limpar pesquisa"
+            className={cn(
+              "absolute right-2 top-1/2",
+              "flex size-7 -translate-y-1/2",
+              "items-center justify-center",
+              "rounded-lg text-text-subtle",
+              "transition-colors",
+              "hover:bg-surface-muted",
+              "hover:text-text",
+              "focus-visible:outline-none",
+              "focus-visible:ring-2",
+              "focus-visible:ring-primary/40",
+            )}
+          >
+            <X
+              size={14}
+              aria-hidden="true"
+            />
+          </button>
+        )}
+      </div>
+
+      {hasValue &&
+        resultCount !== undefined && (
+          <p
+            className="mt-1.5 text-[10px] text-text-subtle"
+            aria-live="polite"
+          >
+            {resultCount}{" "}
+            {resultCount === 1
+              ? "resultado encontrado"
+              : "resultados encontrados"}
+          </p>
+        )}
+    </div>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/ScoreCard/ScoreCard.tsx
+============================================================
+
+import {
+  ArrowUpRight,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+import { dashboardService } from "@/services/dashboard.service";
+
+import { ScoreGauge } from "./ScoreGauge";
+import type { ScoreCardProps } from "./ScoreCard.types";
+
+export function ScoreCard({
+  title = "PontuaÃ§Ã£o financeira",
+}: Readonly<ScoreCardProps>) {
+  const score = dashboardService.getScore();
+
+  const safeMaxScore = Math.max(
+    score.maxScore,
+    1,
+  );
+
+  const percentage = Math.min(
+    Math.max(
+      Math.round(
+        (score.score / safeMaxScore) * 100,
+      ),
+      0,
+    ),
+    100,
+  );
+
+  return (
+    <Card
+      className={cn(
+        "group relative flex min-h-[228px] min-w-0",
+        "flex-col overflow-hidden",
+        "border-border bg-card",
+        "transition-[border-color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-0.5",
+        "hover:border-border-highlight",
+        "hover:shadow-elevated",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute right-0 top-0",
+          "size-40 translate-x-1/3 -translate-y-1/3",
+          "rounded-full bg-primary/10 blur-3xl",
+        )}
+        aria-hidden="true"
+      />
+
+      <CardHeader className="relative shrink-0 pb-2">
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <CardTitle className="truncate text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <div
+            className={cn(
+              "flex size-9 shrink-0 items-center",
+              "justify-center rounded-[12px]",
+              "border border-primary/20",
+              "bg-primary/10 text-primary-bright",
+            )}
+            aria-hidden="true"
+          >
+            <ShieldCheck size={17} />
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent
+        className={cn(
+          "relative flex flex-1 flex-col",
+          "justify-between gap-3 pt-0",
+        )}
+      >
+        <div className="flex min-w-0 items-center gap-4">
+          <ScoreGauge
+            score={score.score}
+            maxScore={score.maxScore}
+          />
+
+          <div className="min-w-0 flex-1">
+            <span
+              className={cn(
+                "inline-flex items-center rounded-full",
+                "border border-success/20",
+                "bg-success/10 px-2.5 py-1",
+                "text-[10px] font-semibold text-success",
+              )}
+            >
+              {score.classification}
+            </span>
+
+            <p className="mt-3 text-xs leading-5 text-text-muted">
+              Seu desempenho financeiro estÃ¡ acima da mÃ©dia.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3 text-[10px]">
+            <span className="font-medium text-text-muted">
+              Progresso do score
+            </span>
+
+            <span className="font-semibold text-primary-bright">
+              {percentage}%
+            </span>
+          </div>
+
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-muted">
+            <div
+              className={cn(
+                "h-full rounded-full",
+                "bg-gradient-to-r from-primary",
+                "via-primary-bright to-secondary-bright",
+                "transition-[width] duration-700 ease-out",
+              )}
+              style={{
+                width: `${percentage}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "flex items-center gap-2 rounded-[12px]",
+            "border border-border-muted",
+            "bg-surface-elevated/70 px-3 py-2",
+          )}
+        >
+          <div
+            className={cn(
+              "flex size-7 shrink-0 items-center",
+              "justify-center rounded-lg",
+              "bg-success/10 text-success",
+            )}
+            aria-hidden="true"
+          >
+            <ArrowUpRight size={15} />
+          </div>
+
+          <p className="min-w-0 text-[11px] font-medium text-text-muted">
+            {score.variation}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/ScoreCard/ScoreGauge.tsx
+============================================================
+
+import type { ScoreGaugeProps } from "./ScoreCard.types";
+
+export function ScoreGauge({
+  score,
+  maxScore,
+}: Readonly<ScoreGaugeProps>) {
+  const size = 112;
+  const center = size / 2;
+  const radius = 43;
+  const strokeWidth = 9;
+
+  const circumference =
+    2 * Math.PI * radius;
+
+  const safeMaxScore = Math.max(maxScore, 1);
+
+  const progress = Math.min(
+    Math.max(score / safeMaxScore, 0),
+    1,
+  );
+
+  const strokeDashoffset =
+    circumference * (1 - progress);
+
+  return (
+    <div
+      className="relative flex size-28 shrink-0 items-center justify-center"
+      aria-label={`PontuaÃ§Ã£o financeira: ${score} de ${maxScore}`}
+      role="img"
+    >
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="-rotate-90"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient
+            id="score-gauge-gradient"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="1"
+          >
+            <stop
+              offset="0%"
+              stopColor="#7c3aed"
+            />
+
+            <stop
+              offset="52%"
+              stopColor="#2563eb"
+            />
+
+            <stop
+              offset="100%"
+              stopColor="#38bdf8"
+            />
+          </linearGradient>
+
+          <filter
+            id="score-gauge-glow"
+            x="-50%"
+            y="-50%"
+            width="200%"
+            height="200%"
+          >
+            <feGaussianBlur
+              stdDeviation="2.5"
+              result="blur"
+            />
+
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="transparent"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-border-muted"
+        />
+
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="transparent"
+          stroke="url(#score-gauge-gradient)"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          filter="url(#score-gauge-glow)"
+          className="transition-[stroke-dashoffset] duration-700 ease-out"
+        />
+      </svg>
+
+      <div className="absolute flex flex-col items-center">
+        <span className="text-3xl font-bold tracking-[-0.04em] text-text">
+          {score}
+        </span>
+
+        <span className="mt-0.5 text-[10px] font-medium text-text-muted">
+          / {maxScore}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/ScoreCard/ScoreCard.types.ts
+============================================================
+
+export interface ScoreGaugeProps {
+  score: number;
+  maxScore: number;
+}
+
+export interface ScoreCardProps {
+  title?: string;
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/Alerts/Alerts.tsx
+============================================================
+
+import {
+  BellRing,
+  CheckCircle2,
+  Eye,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../common/Card";
+import { cn } from "@/lib/utils";
+
+import { AlertItem } from "./AlertItem";
+
+import type {
+  AlertsProps,
+  FinancialAlertType,
+} from "./Alerts.types";
+
+const DEFAULT_MAX_VISIBLE_ALERTS = 4;
+
+function countAlertsByType(
+  alerts: AlertsProps["alerts"],
+  type: FinancialAlertType,
+): number {
+  return alerts.filter(
+    (alert) => alert.type === type,
+  ).length;
+}
+
+export function Alerts({
+  alerts,
+  title = "Alertas financeiros",
+  description = "Pontos que merecem sua atenÃ§Ã£o.",
+  maxVisibleAlerts = DEFAULT_MAX_VISIBLE_ALERTS,
+  onAlertAction,
+}: Readonly<AlertsProps>) {
+  const safeMaxVisibleAlerts = Math.max(
+    0,
+    maxVisibleAlerts,
+  );
+
+  const visibleAlerts = alerts.slice(
+    0,
+    safeMaxVisibleAlerts,
+  );
+
+  const hiddenAlertsCount = Math.max(
+    alerts.length - visibleAlerts.length,
+    0,
+  );
+
+  const dangerCount = countAlertsByType(
+    alerts,
+    "danger",
+  );
+
+  const warningCount = countAlertsByType(
+    alerts,
+    "warning",
+  );
+
+  const attentionCount =
+    dangerCount + warningCount;
+
+  const shouldShowSummary =
+    visibleAlerts.length > 0 &&
+    visibleAlerts.length < 4;
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <CardTitle className="text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={cn(
+            "relative flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-warning/20 bg-warning/10",
+            "text-warning",
+          )}
+          aria-hidden="true"
+        >
+          <BellRing className="size-4" />
+
+          {alerts.length > 0 && (
+            <span
+              className={cn(
+                "absolute -right-1 -top-1",
+                "flex size-5 items-center justify-center",
+                "rounded-full border-2 border-card",
+                "bg-danger text-[9px]",
+                "font-bold text-white",
+              )}
+            >
+              {alerts.length}
+            </span>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {visibleAlerts.length > 0 ? (
+          <div
+            className={cn(
+              "grid min-w-0 flex-1",
+              "grid-cols-1 gap-3",
+              "md:grid-cols-2",
+            )}
+            aria-label="Lista de alertas financeiros"
+          >
+            {visibleAlerts.map((alert) => (
+              <AlertItem
+                key={alert.id}
+                alert={alert}
+                onAction={onAlertAction}
+              />
+            ))}
+
+            {shouldShowSummary && (
+              <article
+                className={cn(
+                  "relative flex min-h-[156px]",
+                  "min-w-0 flex-col overflow-hidden",
+                  "rounded-[16px] border border-border",
+                  "bg-gradient-to-br",
+                  "from-primary/5 via-surface-elevated/55",
+                  "to-secondary/5 p-4",
+                )}
+                aria-label="Resumo do monitoramento financeiro"
+              >
+                <span
+                  className={cn(
+                    "absolute inset-y-0 left-0 w-0.5",
+                    attentionCount > 0
+                      ? "bg-warning"
+                      : "bg-success",
+                  )}
+                  aria-hidden="true"
+                />
+
+                <div className="flex items-start justify-between gap-3">
+                  <div
+                    className={cn(
+                      "flex size-9 shrink-0 items-center",
+                      "justify-center rounded-[11px]",
+                      "border border-primary/20",
+                      "bg-primary/10 text-primary-bright",
+                    )}
+                    aria-hidden="true"
+                  >
+                    <ShieldCheck className="size-4" />
+                  </div>
+
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5",
+                      "rounded-full border",
+                      "border-success/20 bg-success/10",
+                      "px-2 py-1 text-[9px]",
+                      "font-semibold uppercase",
+                      "tracking-[0.08em] text-success",
+                    )}
+                  >
+                    <span
+                      className="size-1.5 rounded-full bg-success"
+                      aria-hidden="true"
+                    />
+
+                    Ativo
+                  </span>
+                </div>
+
+                <div className="mt-3 min-w-0 flex-1">
+                  <h4 className="text-sm font-semibold text-text">
+                    Monitoramento financeiro
+                  </h4>
+
+                  <p className="mt-1.5 text-xs leading-5 text-text-muted">
+                    O Finance AI acompanha suas movimentaÃ§Ãµes
+                    e identifica alteraÃ§Ãµes relevantes.
+                  </p>
+                </div>
+
+                <div
+                  className={cn(
+                    "mt-3 flex items-center justify-between",
+                    "gap-3 rounded-[11px]",
+                    "border border-border-muted",
+                    "bg-background/40 px-3 py-2",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <Eye
+                      className="size-3.5 text-text-muted"
+                      aria-hidden="true"
+                    />
+
+                    <span className="text-[10px] font-medium text-text-muted">
+                      Alertas ativos
+                    </span>
+                  </div>
+
+                  <span className="text-xs font-bold text-text">
+                    {alerts.length}
+                  </span>
+                </div>
+              </article>
+            )}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[330px] flex-col",
+              "items-center justify-center",
+              "rounded-[16px] border",
+              "border-dashed border-border",
+              "px-6 text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center justify-center",
+                "rounded-[15px]",
+                "border border-success/20",
+                "bg-success/10 text-success",
+              )}
+              aria-hidden="true"
+            >
+              <CheckCircle2 className="size-5" />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhum alerta no momento
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Sua situaÃ§Ã£o financeira nÃ£o apresenta pontos
+              crÃ­ticos ou mudanÃ§as relevantes.
+            </p>
+          </div>
+        )}
+
+        {hiddenAlertsCount > 0 && (
+          <div
+            className={cn(
+              "mt-3 flex items-center justify-center",
+              "rounded-[11px] border",
+              "border-border-muted bg-background/35",
+              "px-3 py-2",
+            )}
+          >
+            <p className="text-xs text-text-muted">
+              +{hiddenAlertsCount}{" "}
+              {hiddenAlertsCount === 1
+                ? "alerta adicional"
+                : "alertas adicionais"}
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/Alerts/AlertItem.tsx
+============================================================
+
+import {
+  AlertCircle,
+  ArrowRight,
+  BadgeCheck,
+  CircleAlert,
+  Info,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type {
+  AlertItemProps,
+  AlertVisualConfig,
+  FinancialAlertType,
+} from "./Alerts.types";
+
+const alertVisualConfig: Record<
+  FinancialAlertType,
+  AlertVisualConfig
+> = {
+  info: {
+    icon: Info,
+    label: "Informativo",
+    accentClassName: "bg-primary-bright",
+    iconClassName: "text-primary-bright",
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    badgeClassName:
+      "border-primary/20 bg-primary/10 text-primary-bright",
+  },
+
+  success: {
+    icon: BadgeCheck,
+    label: "Positivo",
+    accentClassName: "bg-success",
+    iconClassName: "text-success",
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+  },
+
+  warning: {
+    icon: CircleAlert,
+    label: "AtenÃ§Ã£o",
+    accentClassName: "bg-warning",
+    iconClassName: "text-warning",
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+  },
+
+  danger: {
+    icon: AlertCircle,
+    label: "CrÃ­tico",
+    accentClassName: "bg-danger",
+    iconClassName: "text-danger",
+    iconContainerClassName:
+      "border-danger/20 bg-danger/10",
+    badgeClassName:
+      "border-danger/20 bg-danger/10 text-danger",
+  },
+};
+
+export function AlertItem({
+  alert,
+  onAction,
+}: Readonly<AlertItemProps>) {
+  const config = alertVisualConfig[alert.type];
+  const Icon = config.icon;
+
+  const hasAction = Boolean(
+    alert.actionLabel && onAction,
+  );
+
+  return (
+    <article
+      className={cn(
+        "group relative flex min-h-[156px]",
+        "min-w-0 flex-col overflow-hidden",
+        "rounded-[16px] border border-border",
+        "bg-surface-elevated/55 p-4",
+        "transition-[border-color,background-color,transform,box-shadow]",
+        "duration-200 ease-out",
+        "hover:-translate-y-px",
+        "hover:border-border-highlight",
+        "hover:bg-card-hover",
+        "hover:shadow-card",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+      )}
+      aria-label={`${config.label}: ${alert.title}`}
+    >
+      <span
+        className={cn(
+          "absolute inset-y-0 left-0 w-0.5",
+          config.accentClassName,
+        )}
+        aria-hidden="true"
+      />
+
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <div
+          className={cn(
+            "flex size-9 shrink-0 items-center",
+            "justify-center rounded-[11px] border",
+            config.iconContainerClassName,
+            config.iconClassName,
+          )}
+          aria-hidden="true"
+        >
+          <Icon className="size-4" />
+        </div>
+
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center",
+            "rounded-full border px-2 py-1",
+            "text-[9px] font-semibold uppercase",
+            "tracking-[0.08em]",
+            config.badgeClassName,
+          )}
+        >
+          {config.label}
+        </span>
+      </div>
+
+      <div className="mt-3 min-w-0 flex-1">
+        <h4 className="text-sm font-semibold leading-5 text-text">
+          {alert.title}
+        </h4>
+
+        {alert.description && (
+          <p className="mt-1.5 text-xs leading-5 text-text-muted">
+            {alert.description}
+          </p>
+        )}
+      </div>
+
+      {hasAction && (
+        <button
+          type="button"
+          onClick={() => onAction?.(alert)}
+          className={cn(
+            "mt-3 inline-flex w-fit items-center gap-1.5",
+            "rounded-lg text-xs font-semibold",
+            "text-primary-bright",
+            "transition-[color,transform]",
+            "hover:text-primary",
+            "focus-visible:outline-none",
+            "focus-visible:ring-2",
+            "focus-visible:ring-primary/40",
+            "focus-visible:ring-offset-2",
+            "focus-visible:ring-offset-background",
+          )}
+        >
+          {alert.actionLabel}
+
+          <ArrowRight
+            className={cn(
+              "size-3.5 transition-transform",
+              "group-hover:translate-x-0.5",
+              "motion-reduce:transition-none",
+              "motion-reduce:translate-x-0",
+            )}
+            aria-hidden="true"
+          />
+        </button>
+      )}
+    </article>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/Alerts/Alerts.types.ts
+============================================================
+
+import type { LucideIcon } from "lucide-react";
+
+export type FinancialAlertType =
+  | "success"
+  | "warning"
+  | "danger"
+  | "info";
+
+export interface FinancialAlert {
+  id: number;
+  title: string;
+  type: FinancialAlertType;
+  description?: string;
+  actionLabel?: string;
+}
+
+export interface AlertsProps {
+  alerts: readonly FinancialAlert[];
+  title?: string;
+  description?: string;
+  maxVisibleAlerts?: number;
+  onAlertAction?: (alert: FinancialAlert) => void;
+}
+
+export interface AlertItemProps {
+  alert: FinancialAlert;
+  onAction?: (alert: FinancialAlert) => void;
+}
+
+export interface AlertVisualConfig {
+  icon: LucideIcon;
+  label: string;
+  accentClassName: string;
+  iconClassName: string;
+  iconContainerClassName: string;
+  badgeClassName: string;
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/QuickActions/QuickActions.tsx
+============================================================
+
+import {
+  CheckCircle2,
+  Zap,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/Card";
+import { cn } from "@/lib/utils";
+
+import { QuickActionButton } from "./QuickActionButton";
+import { dashboardQuickActions } from "./quickActions.data";
+
+import type { QuickActionsProps } from "./QuickActions.types";
+
+export function QuickActions({
+  actions = dashboardQuickActions,
+  title = "AÃ§Ãµes rÃ¡pidas",
+  description = "Acesse os principais recursos do Finance AI.",
+  onAction,
+}: Readonly<QuickActionsProps>) {
+  const availableActionsCount =
+    actions.filter(
+      (action) => !action.disabled,
+    ).length;
+
+  const disabledActionsCount =
+    actions.length -
+    availableActionsCount;
+
+  return (
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div className="min-w-0">
+          <CardTitle className="text-sm font-semibold">
+            {title}
+          </CardTitle>
+
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {description}
+          </p>
+
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5",
+                "text-[10px] font-medium",
+                "text-success",
+              )}
+            >
+              <CheckCircle2
+                size={12}
+                aria-hidden="true"
+              />
+
+              {availableActionsCount}{" "}
+              {availableActionsCount === 1
+                ? "aÃ§Ã£o disponÃ­vel"
+                : "aÃ§Ãµes disponÃ­veis"}
+            </span>
+
+            {disabledActionsCount > 0 && (
+              <span className="text-[10px] font-medium text-text-subtle">
+                {disabledActionsCount}{" "}
+                {disabledActionsCount === 1
+                  ? "em desenvolvimento"
+                  : "em desenvolvimento"}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "relative flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[13px] border",
+            "border-primary/20",
+            "bg-primary/10",
+            "text-primary-bright",
+          )}
+          aria-hidden="true"
+        >
+          <Zap className="size-[18px]" />
+
+          <span
+            className={cn(
+              "absolute -right-1 -top-1",
+              "flex size-5 items-center",
+              "justify-center rounded-full",
+              "border-2 border-card",
+              "bg-primary-bright",
+              "text-[9px] font-bold text-white",
+            )}
+          >
+            {availableActionsCount}
+          </span>
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col pt-4">
+        {actions.length > 0 ? (
+          <div
+            className={cn(
+              "grid min-w-0 flex-1",
+              "grid-cols-1 gap-3",
+              "sm:grid-cols-2",
+              "xl:grid-cols-2",
+            )}
+            aria-label="Lista de aÃ§Ãµes rÃ¡pidas"
+          >
+            {actions.map((action) => (
+              <QuickActionButton
+                key={action.id}
+                action={action}
+                onAction={onAction}
+              />
+            ))}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex min-h-[330px]",
+              "flex-col items-center",
+              "justify-center rounded-[16px]",
+              "border border-dashed",
+              "border-border px-6",
+              "text-center",
+            )}
+          >
+            <div
+              className={cn(
+                "flex size-12 items-center",
+                "justify-center rounded-[15px]",
+                "border border-border",
+                "bg-surface-muted",
+                "text-text-muted",
+              )}
+              aria-hidden="true"
+            >
+              <Zap size={21} />
+            </div>
+
+            <p className="mt-4 text-sm font-semibold text-text">
+              Nenhuma aÃ§Ã£o disponÃ­vel
+            </p>
+
+            <p className="mt-1 max-w-sm text-xs leading-5 text-text-muted">
+              Os principais recursos do Finance AI aparecerÃ£o
+              aqui quando estiverem disponÃ­veis.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/QuickActions/QuickActionButton.tsx
+============================================================
+
+import {
+  ArrowUpRight,
+  LockKeyhole,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import type {
+  QuickActionButtonProps,
+  QuickActionVariant,
+  QuickActionVisualConfig,
+} from "./QuickActions.types";
+
+const variantStyles: Record<
+  QuickActionVariant,
+  QuickActionVisualConfig
+> = {
+  primary: {
+    accentClassName: "bg-primary-bright",
+    iconContainerClassName:
+      "border-primary/20 bg-primary/10",
+    iconClassName: "text-primary-bright",
+    badgeClassName:
+      "border-primary/20 bg-primary/10 text-primary-bright",
+    hoverBorderClassName:
+      "hover:border-primary/35",
+  },
+
+  neutral: {
+    accentClassName: "bg-text-subtle",
+    iconContainerClassName:
+      "border-border bg-surface-muted",
+    iconClassName: "text-text-muted",
+    badgeClassName:
+      "border-border bg-surface-muted text-text-muted",
+    hoverBorderClassName:
+      "hover:border-border-highlight",
+  },
+
+  success: {
+    accentClassName: "bg-success",
+    iconContainerClassName:
+      "border-success/20 bg-success/10",
+    iconClassName: "text-success",
+    badgeClassName:
+      "border-success/20 bg-success/10 text-success",
+    hoverBorderClassName:
+      "hover:border-success/35",
+  },
+
+  warning: {
+    accentClassName: "bg-warning",
+    iconContainerClassName:
+      "border-warning/20 bg-warning/10",
+    iconClassName: "text-warning",
+    badgeClassName:
+      "border-warning/20 bg-warning/10 text-warning",
+    hoverBorderClassName:
+      "hover:border-warning/35",
+  },
+};
+
+export function QuickActionButton({
+  action,
+  onAction,
+}: Readonly<QuickActionButtonProps>) {
+  const Icon = action.icon;
+  const styles =
+    variantStyles[action.variant];
+
+  const isDisabled =
+    action.disabled === true;
+
+  const handleClick = (): void => {
+    if (isDisabled) {
+      return;
+    }
+
+    onAction?.(action);
+  };
+
+  return (
+    <button
+      type="button"
+      disabled={isDisabled}
+      onClick={handleClick}
+      className={cn(
+        "group relative flex min-h-[158px]",
+        "min-w-0 flex-col items-start",
+        "overflow-hidden rounded-[16px]",
+        "border border-border",
+        "bg-surface-elevated/55 p-4",
+        "text-left",
+        "transition-[border-color,background-color,box-shadow,transform]",
+        "duration-200 ease-out",
+        "hover:-translate-y-px",
+        "hover:bg-card-hover",
+        "hover:shadow-card",
+        "focus-visible:outline-none",
+        "focus-visible:ring-2",
+        "focus-visible:ring-primary/40",
+        "focus-visible:ring-offset-2",
+        "focus-visible:ring-offset-background",
+        "disabled:pointer-events-none",
+        "disabled:cursor-not-allowed",
+        "disabled:opacity-60",
+        "motion-reduce:transition-none",
+        "motion-reduce:hover:translate-y-0",
+        styles.hoverBorderClassName,
+      )}
+      aria-label={
+        isDisabled
+          ? `${action.title}. IndisponÃ­vel no momento.`
+          : action.title
+      }
+    >
+      <span
+        className={cn(
+          "absolute inset-y-0 left-0 w-0.5",
+          styles.accentClassName,
+        )}
+        aria-hidden="true"
+      />
+
+      <div className="flex w-full items-start justify-between gap-3">
+        <div
+          className={cn(
+            "flex size-10 shrink-0",
+            "items-center justify-center",
+            "rounded-[12px] border",
+            styles.iconContainerClassName,
+            styles.iconClassName,
+          )}
+          aria-hidden="true"
+        >
+          <Icon className="size-[18px]" />
+        </div>
+
+        {isDisabled ? (
+          <span
+            className={cn(
+              "inline-flex shrink-0 items-center gap-1.5",
+              "rounded-full border",
+              "border-border bg-surface-muted",
+              "px-2 py-1",
+              "text-[9px] font-semibold",
+              "uppercase tracking-[0.08em]",
+              "text-text-muted",
+            )}
+          >
+            <LockKeyhole
+              size={10}
+              aria-hidden="true"
+            />
+
+            {action.badge ?? "IndisponÃ­vel"}
+          </span>
+        ) : action.badge ? (
+          <span
+            className={cn(
+              "inline-flex shrink-0 rounded-full border",
+              "px-2 py-1 text-[9px]",
+              "font-semibold uppercase",
+              "tracking-[0.08em]",
+              styles.badgeClassName,
+            )}
+          >
+            {action.badge}
+          </span>
+        ) : (
+          <ArrowUpRight
+            className={cn(
+              "size-4 shrink-0 text-text-subtle",
+              "transition-[color,transform]",
+              "duration-200",
+              "group-hover:-translate-y-0.5",
+              "group-hover:translate-x-0.5",
+              "group-hover:text-text",
+              "motion-reduce:transition-none",
+              "motion-reduce:transform-none",
+            )}
+            aria-hidden="true"
+          />
+        )}
+      </div>
+
+      <div className="mt-4 min-w-0 flex-1">
+        <h4 className="text-sm font-semibold leading-5 text-text">
+          {action.title}
+        </h4>
+
+        <p className="mt-1.5 text-xs leading-5 text-text-muted">
+          {action.description}
+        </p>
+      </div>
+
+      <div
+        className={cn(
+          "mt-3 flex w-full items-center",
+          "justify-between gap-3",
+          "border-t border-border-muted pt-3",
+        )}
+      >
+        <span className="text-[10px] font-medium text-text-subtle">
+          {isDisabled
+            ? "Recurso em desenvolvimento"
+            : "Abrir recurso"}
+        </span>
+
+        {!isDisabled && (
+          <ArrowUpRight
+            size={13}
+            className={cn(
+              "text-text-subtle",
+              "transition-transform duration-200",
+              "group-hover:-translate-y-0.5",
+              "group-hover:translate-x-0.5",
+            )}
+            aria-hidden="true"
+          />
+        )}
+      </div>
+    </button>
+  );
+}
+
+============================================================
+ARQUIVO: src/components/dashboard/QuickActions/quickActions.data.ts
+============================================================
+
+import {
+  FileUp,
+  Lightbulb,
+  Plus,
+  Sparkles,
+} from "lucide-react";
+
+import type { QuickAction } from "./QuickActions.types";
+
+export const dashboardQuickActions = [
+  {
+    id: "add-transaction",
+    title: "Nova transaÃ§Ã£o",
+    description: "Registre uma nova receita ou despesa.",
+    icon: Plus,
+    variant: "primary",
+  },
+  {
+    id: "run-analysis",
+    title: "Analisar finanÃ§as",
+    description: "Atualize sua avaliaÃ§Ã£o financeira.",
+    icon: Sparkles,
+    variant: "success",
+  },
+  {
+    id: "view-recommendations",
+    title: "RecomendaÃ§Ãµes",
+    description: "Veja orientaÃ§Ãµes personalizadas geradas pela IA.",
+    icon: Lightbulb,
+    variant: "warning",
+  },
+  {
+    id: "import-transactions",
+    title: "Importar transaÃ§Ãµes",
+    description: "Envie movimentaÃ§Ãµes financeiras por arquivo.",
+    icon: FileUp,
+    variant: "neutral",
+    disabled: true,
+    badge: "Em breve",
+  },
+] satisfies readonly QuickAction[];
+
+============================================================
+ARQUIVO: src/components/dashboard/QuickActions/QuickActions.types.ts
+============================================================
+
+import type { LucideIcon } from "lucide-react";
+
+export type QuickActionId =
+  | "add-transaction"
+  | "run-analysis"
+  | "view-recommendations"
+  | "import-transactions";
+
+export type QuickActionVariant =
+  | "primary"
+  | "neutral"
+  | "success"
+  | "warning";
+
+export interface QuickAction {
+  id: QuickActionId;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  variant: QuickActionVariant;
+  disabled?: boolean;
+  badge?: string;
+}
+
+export interface QuickActionsProps {
+  actions?: readonly QuickAction[];
+  title?: string;
+  description?: string;
+  onAction?: (action: QuickAction) => void;
+}
+
+export interface QuickActionButtonProps {
+  action: QuickAction;
+  onAction?: (action: QuickAction) => void;
+}
+
+export interface QuickActionVisualConfig {
+  accentClassName: string;
+  iconContainerClassName: string;
+  iconClassName: string;
+  badgeClassName: string;
+  hoverBorderClassName: string;
+}
+
+============================================================
+ARQUIVO: src/constants/navigation.constants.ts
+============================================================
+
+import {
+  LayoutDashboard,
+  Settings,
+  UserRound,
+} from "lucide-react";
+
+import type { NavigationItem } from "@/types/navigation.types";
+
+export const NAVIGATION_ITEMS = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    path: "/",
+    icon: LayoutDashboard,
+  },
+  {
+    id: "profile",
+    label: "Meu perfil",
+    path: "/profile",
+    icon: UserRound,
+  },
+  {
+    id: "settings",
+    label: "ConfiguraÃ§Ãµes",
+    path: "/settings",
+    icon: Settings,
+  },
+] satisfies readonly NavigationItem[];
+
+============================================================
+ARQUIVO: src/types/navigation.types.ts
+============================================================
+
+import type { LucideIcon } from "lucide-react";
+
+export interface NavigationItem {
+  id: string;
+  label: string;
+  path: string;
+  icon: LucideIcon;
+}
+
+============================================================
+ARQUIVO: src/lib/mocks/dashboard.mock.tsx
+============================================================
+
+ARQUIVO NÃO ENCONTRADO
+
+============================================================
+ARQUIVO: src/types/dashboard.ts
+============================================================
+
+import type { FinancialAlert } from "@/components/dashboard/Alerts";
+import type { BalanceChartData } from "@/components/dashboard/BalanceChart";
+import type { ExpenseCategory } from "@/components/dashboard/ExpenseChart/ExpenseChart.types";
+import type { FinancialCardProps } from "@/components/dashboard/FinancialCard";
+
+export interface Transaction {
+  id: number;
+  description: string;
+  category: string;
+  amount: number;
+  date: string;
+  type: "income" | "expense";
+  status: "completed" | "pending";
+}
+
+export interface FinancialScore {
+  score: number;
+  maxScore: number;
+  classification:
+    | "Excelente"
+    | "Bom"
+    | "Regular"
+    | "Baixo";
+  variation: string;
+}
+
+export interface FinancialHealth
+  extends FinancialScore {
+  insights: string[];
+  alerts: FinancialAlert[];
+}
+
+export interface DashboardMock {
+  summary: FinancialCardProps[];
+  cashFlow: BalanceChartData[];
+  categories: ExpenseCategory[];
+  transactions: Transaction[];
+  financialHealth: FinancialHealth;
+}

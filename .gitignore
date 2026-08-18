@@ -3,6 +3,7 @@
 venv/
 ENV/
 env/
+.env/
 
 # --- Python (Byte-compiled / caches) ---
 __pycache__/
@@ -25,4 +26,3 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-.env
